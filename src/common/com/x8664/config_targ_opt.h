@@ -131,6 +131,9 @@ extern BOOL Target_SSE4_1_Set;
 extern BOOL Target_SSE4_2;      // Generate SSE4_2 instructions?
 extern BOOL Target_SSE4_2_Set;
 
+extern BOOL Target_AVX;         //Generate AVX instrutions?
+extern BOOL Target_AVX_Set;
+
 
 extern int Target_x87_Precision;	// precision of x87 calculations
 

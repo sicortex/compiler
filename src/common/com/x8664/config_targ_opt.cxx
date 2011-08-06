@@ -99,6 +99,9 @@ BOOL Target_SSE4_1_Set = FALSE;
 BOOL Target_SSE4_2 = FALSE;      // -TARG:sse4_2=on/off
 BOOL Target_SSE4_2_Set = FALSE;
 
+BOOL Target_AVX = FALSE;         //-TARG:avx=on/off
+BOOL Target_AVX_Set = FALSE;
+
 // bug 4327
 int Target_x87_Precision = 80;	// -TARG:x87_precision=32/64/80
 
@@ -155,6 +158,9 @@ static OPTION_DESC Options_TARG[] = {
   { OVK_BOOL,   OV_VISIBLE,     FALSE, "sse4_2",         "sse4_2",
     0, 0, 0,    &Target_SSE4_2,  &Target_SSE4_2_Set,
     "Enable SSE4_2 extensions" },
+  { OVK_BOOL,   OV_VISIBLE,     FALSE, "avx",            "avx",
+    0, 0, 0,    &Target_AVX,     &Target_AVX_Set,
+    "Enable_AVX_extensions"},
   { OVK_INT32,	OV_VISIBLE,	FALSE, "x87-precision", "x87-precision",
     80, 32, 80, &Target_x87_Precision,	NULL,
     "Specify the precision of x87 floating-point calculations (32, 64, or 80)"},

@@ -425,6 +425,8 @@ extern const char *host_detect_local_cpu (int argc, const char **argv);
        builtin_define ("__SSE4_1__");                            \
       if (TARGET_SSE4_2)                                         \
        builtin_define ("__SSE4_2__");                            \
+      if (TARGET_AVX)                       \
+	   builtin_define ("__AVX__");          \
       if (TARGET_SSE_MATH && TARGET_SSE)			\
 	builtin_define ("__SSE_MATH__");			\
       if (TARGET_SSE_MATH && TARGET_SSE2)			\

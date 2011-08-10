@@ -1540,7 +1540,8 @@ static void Init_OP_Name()
       !Is_Target_EM64T() &&
       !Is_Target_Core() &&
       !Is_Target_Wolfdale() &&
-      !Is_Target_Barcelona()){// bug 10295
+      !Is_Target_Barcelona() &&
+      !Is_Target_Sandy_Bridge()){// bug 10295
     // Use movlpd only for loads.  Bug 5809.
     OP_Name[TOP_ldsd] = "movlpd";
     OP_Name[TOP_ldsd_n32] = "movlpd";

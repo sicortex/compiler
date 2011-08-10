@@ -149,31 +149,31 @@ Pick_Load_Instruction (TYPE_ID rtype, TYPE_ID desc,
 	   is_reloc_x8664_64 ? TOP_ld64_abs : TOP_ld64;
   case MTYPE_F4:
     if (rclass == ISA_REGISTER_CLASS_float)
-      return base != NULL ? TOP_ldss : TOP_ldss_n32;
+      return base != NULL ? (Target_AVX? TOP_vmovss_f128_float_base64_simm32 : TOP_ldss) : TOP_ldss_n32;
     else
       return base != NULL ? TOP_flds : TOP_flds_n32;
   case MTYPE_F8:
     if (rclass == ISA_REGISTER_CLASS_float)
-      return base != NULL ? TOP_ldsd : TOP_ldsd_n32;
+      return base != NULL ? (Target_AVX? TOP_vmovsd_f128_float_base64_simm32 : TOP_ldsd) : TOP_ldsd_n32;
     else
       return base != NULL ? TOP_fldl : TOP_fldl_n32;
   case MTYPE_F16:
-      return TOP_lddqu;
+      return (Target_AVX? TOP_vmovdqu_f128_ofloat_base64_simm32 : TOP_lddqu);
   case MTYPE_FQ:
     return base != NULL ? TOP_fldt : TOP_fldt_n32;
   case MTYPE_V16F4:
   case MTYPE_V16C4:
-    return base != NULL ? TOP_ldaps : TOP_ldaps_n32;
+    return base != NULL ? (Target_AVX? TOP_vmovaps_f128_ofloat_base64_simm32 : TOP_ldaps) : TOP_ldaps_n32;
   case MTYPE_V8F4:
     return base != NULL ? TOP_ldlps : TOP_ldlps_n32;
   case MTYPE_V16F8:
   case MTYPE_V16C8:
-    return base != NULL ? TOP_ldapd : TOP_ldapd_n32;
+    return base != NULL ? (Target_AVX? TOP_vmovapd_f128_ofloat_base64_simm32 : TOP_ldapd) : TOP_ldapd_n32;
   case MTYPE_V16I1:
   case MTYPE_V16I2:
   case MTYPE_V16I4:
   case MTYPE_V16I8: 
-    return base != NULL ? TOP_lddqa : TOP_lddqa_n32;
+    return base != NULL ? (Target_AVX? TOP_vmovdqu_f128_ofloat_base64_simm32 : TOP_lddqa) : TOP_lddqa_n32;
   case MTYPE_V8I1: 
   case MTYPE_V8I2: 
   case MTYPE_V8I4: 
@@ -189,13 +189,13 @@ Pick_Load_Instruction (TYPE_ID rtype, TYPE_ID desc,
   case MTYPE_V32I4:
   case MTYPE_V32I8:
   	FmtAssert(base != NULL, ("Seems doesn't support vmovapd simm32, ymm"));
-    return TOP_vmovdqa_f256_ofloat_base64_simm32;
+    return TOP_vmovdqu_f256_ofloat_base64_simm32;
   case MTYPE_V32F4:
   	FmtAssert(base != NULL, ("Seems doesn't support vmovaps simm32, ymm"));
-    return TOP_vmovaps_f256_ofloat_base64_simm32;
+    return TOP_vmovups_f256_ofloat_base64_simm32;
   case MTYPE_V32F8:
   	FmtAssert(base != NULL, ("Seems doesn't support vmovdqa simm32, ymm"));
-    return TOP_vmovapd_f256_ofloat_base64_simm32; 
+    return TOP_vmovupd_f256_ofloat_base64_simm32; 
   case MTYPE_F32:
   	return TOP_vmovdqu_f256_ofloat_base64_simm32;
   case MTYPE_V:
@@ -295,19 +295,20 @@ Expand_Load (OPCODE opcode, TN *result, TN *base, TN *ofst, OPS *ops)
 				   TN_register_class(result));
   Is_True (TN_is_constant(ofst), ("Expand_Load: Illegal offset TN"));
 
-  if (top == TOP_lddqu && mtype == MTYPE_F16 &&
+  if ((top == TOP_lddqu || top == TOP_vmovdqu_f128_ofloat_base64_simm32) && 
+  	  mtype == MTYPE_F16 &&
       (base == SP_TN || base == FP_TN) &&
       Stack_Alignment() == 16 ) {
     if (TN_has_value(ofst) &&
 	(TN_value(ofst) % 16 == 0))
-      top = TOP_lddqa;
+      top = (Target_AVX? TOP_vmovdqa_f128_ofloat_base64_simm32 : TOP_lddqa);
     else if (TN_is_symbol(ofst)) {
       ST* base;
       INT64 offset = 0;
       Base_Symbol_And_Offset (TN_var(ofst), &base, &offset);
       offset += TN_offset(ofst);
       if (offset % 16 == 0)
-	top = TOP_lddqa;
+	top = (Target_AVX? TOP_vmovdqa_f128_ofloat_base64_simm32 : TOP_lddqa);
     }      
   }
 
@@ -407,37 +408,37 @@ Pick_Store_Instruction( TYPE_ID mtype,
 	   base == NULL ? TOP_store64_off : TOP_store64;
   case MTYPE_F4:
     if( rclass == ISA_REGISTER_CLASS_float )
-      return base != NULL ? TOP_stss : TOP_stss_n32;
+      return base != NULL ? (Target_AVX? TOP_vmovss_f128_obase64_simm32_float : TOP_stss) : TOP_stss_n32;
     else
       return base != NULL ? TOP_fstps : TOP_fstps_n32;
   case MTYPE_F8:
     if( rclass == ISA_REGISTER_CLASS_float )
-      return base != NULL ? TOP_stsd : TOP_stsd_n32;
+      return base != NULL ? (Target_AVX? TOP_vmovsd_f128_obase64_simm32_float : TOP_stsd) : TOP_stsd_n32;
     else
       return base != NULL ? TOP_fstpl : TOP_fstpl_n32;
   case MTYPE_F16:
-    return TOP_stdqu;
+    return (Target_AVX? TOP_vmovdqu_f128_obase64_simm32_float: TOP_stdqu);
   case MTYPE_FQ:
     return base != NULL ? TOP_fstpt : TOP_fstpt_n32;
   case MTYPE_V16F4: 
   case MTYPE_V16C4: 
-    return base != NULL ? TOP_staps : TOP_staps_n32;
+    return base != NULL ? (Target_AVX? TOP_vmovaps_f128_obase64_simm32_float : TOP_staps) : TOP_staps_n32;
   case MTYPE_V16F8: 
   case MTYPE_V16C8: 
-    return base != NULL ? TOP_stapd : TOP_stapd_n32;
+    return base != NULL ? (Target_AVX? TOP_vmovapd_f128_obase64_simm32_float : TOP_stapd) : TOP_stapd_n32;
   case MTYPE_V8F4:
     return base != NULL ? TOP_stlps : TOP_stlps_n32;
   case MTYPE_V16I1: 
   case MTYPE_V16I2: 
   case MTYPE_V16I4: 
   case MTYPE_V16I8:
-    return base != NULL ? TOP_stdqa : TOP_stdqa_n32;
+    return base != NULL ? (Target_AVX? TOP_vmovdqa_f128_obase64_simm32_float : TOP_stdqa) : TOP_stdqa_n32;
   case MTYPE_V8I1: 
   case MTYPE_V8I2: 
   case MTYPE_V8I4: 
     if (!Is_Target_SSE2())
       return base != NULL ? TOP_stlps : TOP_stlps_n32;
-    else return base != NULL ? TOP_store64_fsse : TOP_store64_fsse_n32;
+    else return base != NULL ? (Target_AVX? TOP_vmovq_f128_obase64_simm32_float : TOP_store64_fsse) : TOP_store64_fsse_n32;
   case MTYPE_M8I1:
   case MTYPE_M8I2:
   case MTYPE_M8I4:
@@ -448,13 +449,13 @@ Pick_Store_Instruction( TYPE_ID mtype,
   case MTYPE_V32I4:
   case MTYPE_V32I8:
   	FmtAssert(base != NULL, ("Seems doesn't support vmovapd simm32, ymm"));
-    return TOP_vmovdqa_f256_obase64_simm32_float;
+    return TOP_vmovdqu_f256_obase64_simm32_float;
   case MTYPE_V32F4:
   	FmtAssert(base != NULL, ("Seems doesn't support vmovapd simm32, ymm"));
-    return TOP_vmovaps_f256_obase64_simm32_float;
+    return TOP_vmovups_f256_obase64_simm32_float;
   case MTYPE_V32F8:
   	FmtAssert(base != NULL, ("Seems doesn't support vmovapd simm32, ymm"));
-    return TOP_vmovapd_f256_obase64_simm32_float;
+    return TOP_vmovupd_f256_obase64_simm32_float;
   case MTYPE_F32:
   	return TOP_vmovdqu_f256_obase64_simm32_float;
   default:  FmtAssert(FALSE, ("NYI: Pick_Store_Instruction mtype"));
@@ -503,19 +504,20 @@ Expand_Store (TYPE_ID mtype, TN *src, TN *base, TN *ofst, OPS *ops)
     Pick_Store_Instruction( mtype, base, ofst, TN_register_class(src) );
   Is_True (TN_is_constant(ofst), ("Expand_Store: Illegal offset TN"));
 
-  if (top == TOP_stdqu && mtype == MTYPE_F16 &&
+  if ((top == TOP_stdqu || top == TOP_vmovdqu_f128_obase64_simm32_float) && 
+  	  mtype == MTYPE_F16 &&
       (base == SP_TN || base == FP_TN) &&
       Stack_Alignment() == 16 ) {
     if (TN_has_value(ofst) &&
 	(TN_value(ofst) % 16 == 0))
-      top = TOP_stdqa;
+      top = (Target_AVX? TOP_vmovdqa_f128_obase64_simm32_float : TOP_stdqa);
     else if (TN_is_symbol(ofst)) {
       ST* base;
       INT64 offset = 0;
       Base_Symbol_And_Offset (TN_var(ofst), &base, &offset);
       offset += TN_offset(ofst);
       if (offset % 16 == 0)
-	top = TOP_stdqa;
+	top = (Target_AVX? TOP_vmovdqa_f128_obase64_simm32_float : TOP_stdqa);
     }      
   }
 
@@ -524,7 +526,7 @@ Expand_Store (TYPE_ID mtype, TN *src, TN *base, TN *ofst, OPS *ops)
     return;
   }
 
-  if(top == TOP_store64_fsse && 
+  if((top == TOP_store64_fsse || top == TOP_vmovq_f128_obase64_simm32_float) && 
   	TN_register_class(src) == ISA_REGISTER_CLASS_integer){
 
 	TN *mtn = Gen_Register_TN(ISA_REGISTER_CLASS_float,8);

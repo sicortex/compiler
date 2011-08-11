@@ -245,7 +245,7 @@ my @ops=(
 		#[@vmovddup128, ["f128","f256"],["OPS"], ["ofloat"], @float_mem],
 		#[@vmovdqa256, ["f256"],["OPS"],@ofloat_mem, ["float"]],
 		[@vmovhlps, ["f128"],["OPS"],["ofloat"],["float"],["float"]],
-		[@vmovhpd, ["f128"],["OPS"],["float"],@only_mem],
+		[@vmovhpd, ["f128"],["OPS"],["ofloat"],@only_mem],
 		[@vmovlpd128,["f128"],["OPS"],["ofloat"], ["float"],@only_mem],
 		[@vmovlpd_xmm_to_mem,["f128"],["OPS"],@oonly_mem,["float"]],
 		[@vmovlps_xmm_mem_oxmm,["f128"],["OPS"],["ofloat"],@only_mem,["float"]],
@@ -753,7 +753,7 @@ foreach (@tops){
   fprint("isa_avx_properties_avx_vector.cxx", $print_avx_vector);
   copy_to('../src/common/targ_info/isa/x8664/',"isa_avx_properties_avx_vector.cxx");
 
-if (0){
+if (1){
 fprint("isa_avx.cxx", $isa_isa_print);
 fprint("isa_avx_print.cxx",$isa_print_print);
 fprint("isa_avx_operands.cxx",$isa_operands_print);

@@ -149,12 +149,12 @@ Pick_Load_Instruction (TYPE_ID rtype, TYPE_ID desc,
 	   is_reloc_x8664_64 ? TOP_ld64_abs : TOP_ld64;
   case MTYPE_F4:
     if (rclass == ISA_REGISTER_CLASS_float)
-      return base != NULL ? (Target_AVX? TOP_vmovss_f128_float_base64_simm32 : TOP_ldss) : TOP_ldss_n32;
+      return base != NULL ? (Target_AVX? TOP_vmovss_f128_ofloat_base64_simm32 : TOP_ldss) : TOP_ldss_n32;
     else
       return base != NULL ? TOP_flds : TOP_flds_n32;
   case MTYPE_F8:
     if (rclass == ISA_REGISTER_CLASS_float)
-      return base != NULL ? (Target_AVX? TOP_vmovsd_f128_float_base64_simm32 : TOP_ldsd) : TOP_ldsd_n32;
+      return base != NULL ? (Target_AVX? TOP_vmovsd_f128_ofloat_base64_simm32 : TOP_ldsd) : TOP_ldsd_n32;
     else
       return base != NULL ? TOP_fldl : TOP_fldl_n32;
   case MTYPE_F16:

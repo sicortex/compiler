@@ -3138,13 +3138,13 @@ Expand_Float_To_Int_Tas (TN *dest, TN *src, TYPE_ID imtype, OPS *ops)
 
   if (MTYPE_byte_size(imtype) == 4) {
     // store the float value to memory
-    Build_OP(Is_Target_SSE2() ? (Target_AVX? TOP_vmovss_f128_float_base64_simm32: TOP_stss) : TOP_fstps, src, base_tn, ofst_tn, ops );
+    Build_OP(Is_Target_SSE2() ? (Target_AVX? TOP_vmovss_f128_ofloat_base64_simm32: TOP_stss) : TOP_fstps, src, base_tn, ofst_tn, ops );
     // load the value into an int register.
     Build_OP(TOP_ld32, dest, base_tn, ofst_tn, ops );
   }
   else {
     // store the float value to memory
-    Build_OP(Is_Target_SSE2() ? (Target_AVX? TOP_vmovsd_f128_float_base64_simm32 : TOP_stsd) : TOP_fstpl, src, base_tn, ofst_tn, ops );
+    Build_OP(Is_Target_SSE2() ? (Target_AVX? TOP_vmovsd_f128_ofloat_base64_simm32 : TOP_stsd) : TOP_fstpl, src, base_tn, ofst_tn, ops );
     // load the value into an int register.
     Expand_Load(OPCODE_make_op(OPR_LDID, imtype, imtype), dest, base_tn, ofst_tn, ops);
   }

@@ -4590,6 +4590,7 @@ Extract_Paired_Hi(TCON v)
   case MTYPE_I8:
   case MTYPE_U8:
   case MTYPE_V16F8:
+  case MTYPE_V32F8:
     {
       /* May want to use F4 instead of I4. */
       TCON_ty(c) = MTYPE_I4;
@@ -4618,6 +4619,7 @@ Extract_Paired_Lo(TCON v)
   case MTYPE_I8:
   case MTYPE_U8:
   case MTYPE_V16F8:
+  case MTYPE_V32F8:
     {
       /* May want to use F4 instead of I4. */
       TCON_ty(c) = MTYPE_I4;

@@ -4000,6 +4000,9 @@ Expand_Int_To_Float (TN *dest, TN *src, TYPE_ID imtype, TYPE_ID fmtype, OPS *ops
       top = TOP_cvtsi2sdq; // bug 3082 workaround, others should not reach here
 	else if(imtype == MTYPE_V16I8) 
       top = TOP_cvtdq2ps;
+  } else if (fmtype == MTYPE_V32F8) {
+      if(imtype == MTYPE_V16I4)
+	  	top = TOP_vcvtdq2pd_f128_ofloat_float;
   }
 
   FmtAssert( top != TOP_UNDEFINED, ("Expand_Int_To_Float: Undefined opcode") );
@@ -5649,6 +5652,13 @@ void Expand_Flop( OPCODE opcode, TN *result, TN *src1, TN *src2, TN *src3, OPS *
   case OPC_V16C8ADD:
     opc = (Target_AVX ? TOP_vaddpd_f128_ofloat_float_float : TOP_fadd128v64);
     break;
+  case OPC_V32F4ADD:
+  	FmtAssert(Target_AVX, ("AVX instruction met without -mavx"));
+  	opc= TOP_vaddps_f256_ofloat_float_float;
+	break;
+  case OPC_V32F8ADD:
+  	opc = TOP_vaddpd_f128_ofloat_float_float;
+	break;
   case OPC_V8F4ADD:
     opc = (Target_AVX ? TOP_vaddps_f128_ofloat_float_float : TOP_fadd128v32);
     break;
@@ -5692,6 +5702,12 @@ void Expand_Flop( OPCODE opcode, TN *result, TN *src1, TN *src2, TN *src3, OPS *
   case OPC_V16F8MPY:
     opc = (Target_AVX? TOP_vmulpd_f128_ofloat_float_float : TOP_fmul128v64);
     break;
+  case OPC_V32F4MPY:
+  	opc = TOP_vmulps_f256_ofloat_float_float;
+	break;
+  case OPC_V32F8MPY:
+  	opc = TOP_vmulpd_f256_ofloat_float_float;
+	break;
   case OPC_V16I2MPY:
     opc = (Target_AVX? TOP_vpmullw_f128_ofloat_float_float : TOP_mul128v16);
     break;

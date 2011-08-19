@@ -1167,7 +1167,7 @@ Expand_Copy (TN *result, TN *src, TYPE_ID mtype, OPS *ops)
       Set_OP_copy( OP_prev(OPS_last(ops)) );
 
     } else {
-      Build_OP( MTYPE_is_size_double(mtype) ? (Target_AVX? TOP_vmovq_f128_ofloat_float : TOP_mov64): (TOP_mov32), 
+      Build_OP( MTYPE_is_size_double(mtype) ? TOP_mov64: (TOP_mov32), 
 		result, src, ops);
 	  // TODO: TOP_mov32 AVX?
     }
@@ -5683,6 +5683,12 @@ void Expand_Flop( OPCODE opcode, TN *result, TN *src1, TN *src2, TN *src3, OPS *
   case OPC_V16C8SUB:
     opc = (Target_AVX ? TOP_vsubpd_f128_ofloat_float_float : TOP_fsub128v64);
     break;
+  case OPC_V32F4SUB:
+  	opc = TOP_vsubps_f256_ofloat_float_float;
+	break;
+  case OPC_V32F8SUB:
+  	opc = TOP_vsubpd_f256_ofloat_float_float;
+	break;
   case OPC_F4MPY:
     if( Is_Target_SSE2() ){
       opc = Target_AVX ? TOP_vmulss_f128_ofloat_float_float : TOP_mulss;
@@ -5744,6 +5750,12 @@ void Expand_Flop( OPCODE opcode, TN *result, TN *src1, TN *src2, TN *src3, OPS *
   case OPC_V16F8DIV:
     opc = Target_AVX? TOP_vdivpd_f128_ofloat_float_float : TOP_fdiv128v64;
     break;
+  case OPC_V32F4DIV:
+  	opc = TOP_vdivps_f256_ofloat_float_float;
+	break;
+  case OPC_V32F8DIV:
+  	opc = TOP_vdivpd_f256_ofloat_float_float;
+	break;
   case OPC_F4RECIP:
   case OPC_F8RECIP:
   case OPC_FQRECIP:
@@ -5823,6 +5835,25 @@ Expand_Replicate (OPCODE op, TN *result, TN *op1, OPS *ops)
     Build_OP(Target_AVX? TOP_vunpcklps_f128_ofloat_float_float : TOP_unpcklps, result, result, op1, ops);
     Build_OP(Target_AVX? TOP_vunpcklps_f128_ofloat_float_float : TOP_unpcklps, result, result, result, ops);
     break;
+  case OPC_V32F4F4REPLICA:
+  {
+    TN *tmp3 = Build_TN_Of_Mtype(MTYPE_V16F4);
+    Expand_Copy(tmp3, op1, MTYPE_F4, ops);
+    Build_OP(TOP_vunpcklps_f128_ofloat_float_float, tmp3, tmp3, op1, ops);
+	Build_OP(TOP_vunpcklps_f128_ofloat_float_float, tmp3, tmp3, tmp3, ops);
+	Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, tmp3, Gen_Literal_TN(0, 1), ops);
+	Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, tmp3, Gen_Literal_TN(1, 1), ops);
+  	break;
+  }
+  case OPC_V32F8F8REPLICA:
+  {
+  	TN *tmp3 = Build_TN_Of_Mtype(MTYPE_V16F8);
+	Expand_Copy(tmp3, op1, MTYPE_F8, ops);
+	Build_OP(TOP_vunpcklpd_f128_ofloat_float_float, tmp3, tmp3, op1, ops);
+	Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, tmp3, Gen_Literal_TN(0, 1), ops);
+	Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, tmp3, Gen_Literal_TN(1, 1), ops);
+	break;
+  }
   case OPC_V16I2I2REPLICA:     
   {
     TN* tmp_a = Build_TN_Like(result);
@@ -8642,33 +8673,57 @@ void Expand_Const (TN *dest, TN *src, TYPE_ID mtype, OPS *ops)
 
     // Must use Targ_Is_Zero to check for positive zero.  Bug 9734.
     if (TCON_ty(tcon) == MTYPE_F4 && Targ_Is_Zero(tcon)) {
-      FmtAssert(TCON_ty(tcon) == mtype || mtype == MTYPE_V16F4, 
+      FmtAssert(TCON_ty(tcon) == mtype || mtype == MTYPE_V16F4 || mtype == MTYPE_V32F4, 
 		("Expand_Const: inconsistent mtypes"));
-      if ( Is_Target_SSE2() )
-	Build_OP( mtype == MTYPE_V16F4?TOP_xzero128v32:TOP_xzero32, dest, ops);
-      else
-	Build_OP( TOP_fldz, dest, ops);
+	  if(mtype != MTYPE_V32F4){
+       if ( Is_Target_SSE2() ){
+	   	if(Target_AVX)
+		  Build_OP (TOP_vxorps_f128_ofloat_float_float, dest, dest, dest, ops);
+		else
+	      Build_OP( mtype == MTYPE_V16F4?TOP_xzero128v32:TOP_xzero32, dest, ops);
+       }
+       else
+ 	    Build_OP( TOP_fldz, dest, ops);
+	  }
+	  else{
+	  	FmtAssert( Target_AVX, ("Expand_Const no -mavx but met MTYPE_V32F4"));
+		Build_OP(TOP_vxorps_f256_ofloat_float_float, dest, dest, dest, ops);
+	  }
       return;
     }
     if (TCON_ty(tcon) == MTYPE_F8 && Targ_Is_Zero(tcon)) {
-      FmtAssert(TCON_ty(tcon) == mtype || mtype == MTYPE_V16F8, 
+      FmtAssert(TCON_ty(tcon) == mtype || mtype == MTYPE_V16F8 || mtype == MTYPE_V32F8, 
 		("Expand_Const: inconsistent mtypes"));
-      if ( Is_Target_SSE2() )
-	Build_OP( mtype == MTYPE_V16F8?TOP_xzero128v64:TOP_xzero64, dest, ops);
-      else
-	Build_OP( TOP_fldz, dest, ops);
+	  if(mtype != MTYPE_V32F8){
+       if ( Is_Target_SSE2() ){
+	   	if(Target_AVX)
+		  Build_OP(TOP_vxorpd_f128_ofloat_float_float, dest, dest, dest, ops);
+		else
+	      Build_OP( mtype == MTYPE_V16F8?TOP_xzero128v64:TOP_xzero64, dest, ops);
+       }
+       else
+	    Build_OP( TOP_fldz, dest, ops);
+	  }else{
+	    Build_OP(TOP_vxorpd_f256_ofloat_float_float, dest, dest, dest, ops);
+	  }
       return;
     }
     if (TCON_ty(tcon) == MTYPE_V16F4 && Targ_Is_Zero(tcon)) {
       FmtAssert(TCON_ty(tcon) == mtype && Is_Target_SSE2(),
 		("Expand_Const: inconsistent mtypes"));
-      Build_OP( TOP_xzero128v32, dest, ops);
+	  if(Target_AVX)
+	  	Build_OP(TOP_vxorps_f128_ofloat_float_float, dest, dest, dest, ops);
+	  else
+        Build_OP( TOP_xzero128v32, dest, ops);
       return;
     }
     if (TCON_ty(tcon) == MTYPE_V16F8 && Targ_Is_Zero(tcon)) {
       FmtAssert(TCON_ty(tcon) == mtype && Is_Target_SSE2(),
 		("Expand_Const: inconsistent mtypes"));
-      Build_OP( TOP_xzero128v64, dest, ops);
+	  if(Target_AVX)
+	  	Build_OP(TOP_vxorpd_f128_ofloat_float_float, dest, dest, dest, ops);
+	  else
+        Build_OP( TOP_xzero128v64, dest, ops);
       return;
     }
   }

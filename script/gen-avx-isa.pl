@@ -96,7 +96,7 @@ my @vaddp=["vaddpd","vaddps","vaddsubpd","vaddsubps","vandpd","vandnpd","vandps"
 ##opnd(ymm),opnd(ymm/mem), result(ymm)
 my @ymm_ymmomem_to_ymm=["vpermilps"];
 ##opnd(xmm),opnd(xmm/mem), result(xmm)
-my @vadds=["vaddsd","vaddss","vcvtsd2ss","vcvtss2sd","vdivsd","vdivss","vmaxsd","vmaxss","vminsd","vminss","vmovhpd","vmovhps","vmulsd","vmulss","vpacksswb","vpackssdw","vpackuswb","vpackusdw","vpaddb","vpaddw","vpaddd","vpaddq","vpaddsb","vpaddsw","vpaddusb","vpaddusw","vpand","vpandn","vpavgb","vpavgw","vpcmpeqb","vpcmpeqw","vpcmpeqd","vpcmpeqq","vpcmpgtb","vpcmpgtw","vpcmpgtd","vpcvpgtq","vpermilps","vphaddw","vphaddd","vphaddsw","vphsubw","vphsubd","vphsubsw","vpmaddwd","vpmaddubsw","vpmaxsb","vpmaxsw","vpmaxsd","vpmaxub","vpmaxuw","vpmaxud","vpminsb","vpminsw","vpminsd","vpminub","vpminuw","vpminud","vpmulhuw","vpmulhrsw","vpmulhw","vpmullw","vpmulld","vpmuludq","vpmuldq","vpor","vpsadbw","vpshufb","vpsignb","vpsignw","vpsignd","vpsllw","vpslld","vpsrad","vpsrlw","vpsrld","vpsubb","vpsubw","vpsubd","vpsubq","vpsubsb","vpsubsw","vpsubusb","vpsubusw","vpunpckhbw","vpunpckhwd","vpunpckhdq","vpunpckhqdq","vpunpcklbw","vpunpcklwd","vpunpckldq","vpunpcklqdq","vpxor","vrcpss","vrsqrtss","vsqrtsd","vsqrtss","vsubsd","vsubss"];
+my @vadds=["vaddsd","vaddss","vcvtsd2ss","vcvtss2sd","vdivsd","vdivss","vmaxsd","vmaxss","vminsd","vminss","vmovhpd","vmovhps","vmulsd","vmulss","vpacksswb","vpackssdw","vpackuswb","vpackusdw","vpaddb","vpaddw","vpaddd","vpaddq","vpaddsb","vpaddsw","vpaddusb","vpaddusw","vpand","vpandn","vpavgb","vpavgw","vpcmpeqb","vpcmpeqw","vpcmpeqd","vpcmpeqq","vpcmpgtb","vpcmpgtw","vpcmpgtd","vpcvpgtq","vpermilps","vphaddw","vphaddd","vphaddsw","vphsubw","vphsubd","vphsubsw","vpmaddwd","vpmaddubsw","vpmaxsb","vpmaxsw","vpmaxsd","vpmaxub","vpmaxuw","vpmaxud","vpminsb","vpminsw","vpminsd","vpminub","vpminuw","vpminud","vpmulhuw","vpmulhrsw","vpmulhw","vpmullw","vpmulld","vpmuludq","vpmuldq","vpor","vpsadbw","vpshufb","vpsignb","vpsignw","vpsignd","vpsllw","vpslld","vpsrad","vpsrlw","vpsrld","vpsubb","vpsubw","vpsubd","vpsubq","vpsubsb","vpsubsw","vpsubusb","vpsubusw","vpunpckhbw","vpunpckhwd","vpunpckhdq","vpunpckhqdq","vpunpcklbw","vpunpcklwd","vpunpckldq","vpunpcklqdq","vpxor","vrcpss","vrsqrtss","vsqrtsd","vsqrtss","vsubsd","vsubss", "vpsrlq"];
 ##opnd(xmm),opnd(mem),result(xmm)
 my @vmovlps_xmm_mem_oxmm=["vmovlps"];
 ##opnd(ymm/xmm),opnd(ymm/xmm/mem),opnd(imm8), result(ymm/xmm)
@@ -140,9 +140,9 @@ my @vmovd32_toxmm=["vmovd"];
 ## opnd(int32), result(xmm)
 my @int32_to_xmm=["vmovd"];
 ## opnd(int64), result(xmm)
-my @int64_to_xmm=["vmovq"];
+my @int64_to_xmm=["vmovq", "vmovd"];
 ## opnd(xmm), result(int64/mem)
-my @vmovd64_tomem=["vmovq"];
+my @vmovd64_tomem=["vmovq", "vmovd"];
 ## opnd(xmm), result(int32/int64)
 my @xmm_to_int = ["vpmovmskb"];
 ## opnd(xmm/mem),result(xmm)
@@ -158,9 +158,9 @@ my @vcvtsd2si64=["vcvtsd2si","vcvtss2si","vcvttsd2si","vcvttss2si"];
 ## opnd(xmm/ymm), result(int32)
 my @vmovmskpd=["vmovmskpd","vmovmskps"];
 ## opnd(xmm) opnd(int32/mem), result(xmm)
-my @vcvtsi2sd32=["vcvtsi2sd","vcvtsi2ss"];
+my @vcvtsi2sd32=["vcvtsi2sd","vcvtsi2ss", "vcvtsi2sdq", "vcvtsi2ssq"];
 ## opnd(xmm) opnd(int64/mem), result(xmm)
-my @vcvtsi2sd64=["vcvtsi2sd","vcvtsi2ss"];
+my @vcvtsi2sd64=["vcvtsi2sd","vcvtsi2ss", "vcvtsi2sdq", "vcvtsi2ssq"];
 ## opnd(xmm) opnd(int32/mem) opnd(imm8) result(xmm)
 my @xmm_int32omem_imm8_to_xmm=["vpinsrb","vpinsrw","vpinsrd"];
 ## opnd(xmm) opnd(int64/mem) opnd(imm8) result(xmm)
@@ -195,7 +195,7 @@ my @xmm_imm_to_int32=["vpextrb","vpextrw"];
 ## opnd(xmm) opnd(imm), result(mem)
 my @xmm_imm_to_mem=["vpextrb"];
 ## opnd(xmm) opnd(imm), result(xmm)
-my @xmm_imm_to_xmm=["vpslldq","vpsrldq","vpsllw","vpsrad","vpsrlw"];
+my @xmm_imm_to_xmm=["vpslldq","vpsrldq","vpsllw","vpsrad","vpsrlw","vpsrlq"];
 
 ## opnd(mxcsr), result(mem)
 my @mxcsr_to_mem=["vstmxcsr"];
@@ -258,7 +258,7 @@ my @ops=(
 		[@ymm_ymmomem_imm_to_ymm, ["f256"],["OPS"],["ofloat"],["float"],@float_mem, ["simm8"]],
 		[@xmm_imm_to_int32, ["int32"],["OPS"],["oint32"],["float"],["simm8"]],
 		[@xmm_imm_to_mem, ["mem"], ["OPS"], @oonly_mem,["float"],["simm8"]],
-		[@xmm_imm_to_xmm, ["f128"], ["OPS"], ["float"],["float"],["simm8"]],
+		[@xmm_imm_to_xmm, ["f128"], ["OPS"], ["ofloat"],["float"],["simm8"]],
 		[@xmm_int32omem_imm8_to_xmm, ["f128"],["OPS"],["ofloat"],["float"],@int32_mem,["simm8"]],
 		[@xmm_int64omem_imm8_to_xmm, ["f128"],["OPS"],["ofloat"],["float"],@int64_mem,["simm8"]],
 		[@xmm_to_int, ["int32"],["OPS"],["oint32","oint64"],["float"]],

@@ -2346,13 +2346,13 @@ static void Simd_Mark_Code (WN* wn)
       Simd_Mark_Code(WN_kid(wn, kid));
 }
 
-static INT Simd_Compute_Best_Align (INT offset, INT fn, INT size)
+static INT Simd_Compute_Best_Align (INT offset, INT fn, INT size, INT align_bytes)
 {
   INT A0, A;
 
   A0 = offset;
-  A = (A0 + fn*size)%16;
-  return (A == 0 ? A : ((16 - A)/size));
+  A = (A0 + fn*size)%align_bytes;
+  return (A == 0 ? A : ((align_bytes - A)/size));
 }
 
 // Have we created a vector type preg to create unroll copies for the use of 
@@ -3454,6 +3454,37 @@ static BOOL Simd_Analysis(WN *innerloop, char *verbose_msg)
 
  return TRUE;
 }  
+
+//determine the number of iters to peel for simd alignment
+static INT Simd_Align_Best_Peel_AVX(STACK_OF_WN *vec_simd_ops, SIMD_KIND *simd_op_kind,
+                          INT **simd_op_best_align, WN *innerloop)
+{
+    INT peel_benefit[32], peel;
+    INT best_peel = 0, best_benefit = 0;
+    for (peel = 0; peel < 32; peel ++) {
+      peel_benefit[peel] = -1;
+      for (INT j=vec_simd_ops->Elements()-1; j >= 0; j--) {
+        WN* simd_op=vec_simd_ops->Top_nth(j);
+
+        if (simd_op_kind[j] == INVALID || 
+            innerloop != LWN_Get_Parent(Find_Do_Body(simd_op)))
+          continue; 
+
+        for(INT k=0; k<4; k++)
+        if (simd_op_best_align[k][j] == peel)
+          peel_benefit[peel] ++;
+      } //end j 
+    }//end peel
+
+    for (peel = 0; peel < 32; peel ++) {
+      if (peel_benefit[peel] > best_benefit) {
+        best_benefit = peel_benefit[peel];
+        best_peel = peel;
+      }
+    }
+   return best_peel;
+}
+
  
 //determine the number of iters to peel for simd alignment
 static INT Simd_Align_Best_Peel(STACK_OF_WN *vec_simd_ops, SIMD_KIND *simd_op_kind,
@@ -3564,6 +3595,8 @@ static INT Simd_Align_Analysis(INT init_align, WN *load_store,
       else if (!is_store && Vec_Unit_Size[simd_kind] != MTYPE_byte_size(WN_desc(load_store)))
         alignment = -2;
       else {
+	  	INT align_bytes = (Target_AVX? 32: 16);
+		
         if (aa0->Dim(aa0->Num_Vec()-1)->Loop_Coeff(Do_Loop_Depth(innerloop))==
             -1)
           copy = LWN_CreateExp2(OPCODE_make_op(OPR_SUB,Mtype_TransferSign(MTYPE_I4, index_type), MTYPE_V),
@@ -3571,7 +3604,7 @@ static INT Simd_Align_Analysis(INT init_align, WN *load_store,
                                 WN_CreateIntconst(OPCODE_make_op(OPR_INTCONST,
                                                                  index_type,
                                                                  MTYPE_V),
-                                                  (16/ABS(WN_element_size(array0)))-1));
+                                                  (align_bytes/ABS(WN_element_size(array0)))-1));
         INT fn = WN_const_val(copy);
         // Compute A0 (alignment of the base of the array).
         WN *array_base = WN_array_base(array0); //may be different for store
@@ -3589,12 +3622,12 @@ static INT Simd_Align_Analysis(INT init_align, WN *load_store,
 
         if(!is_store || !var_base){ // load should always do this
           ty_iload0 = ST_type(base_st);
-          alignment = Simd_Compute_Best_Align(offset, fn, size);
-          Set_TY_align_exp (ty_iload0, 4);
+          alignment = Simd_Compute_Best_Align(offset, fn, size, align_bytes);
+           Set_TY_align_exp (ty_iload0, (Target_AVX? 5 : 4));
            // ARRAYs within COMMON blocks that are not padded to align
            Base_Symbol_And_Offset(WN_st(array_base),
                                &base_st, &offset);
-           if (ST_sclass(base_st) == SCLASS_COMMON && offset%16 != 0)
+           if (ST_sclass(base_st) == SCLASS_COMMON && offset%align_bytes != 0)
              alignment = -2;
 
            // Fortran Equivalenced arrays should not be aligned
@@ -3625,7 +3658,7 @@ static INT Simd_Align_Analysis(INT init_align, WN *load_store,
               // the pointed-to type, but we will just use the desc type of the
               // ISTORE.
               MTYPE_byte_size(WN_desc(istore) == MTYPE_V ? //istore is parent
-                              WN_rtype(istore) : WN_desc(istore)))%16 != 0))
+                              WN_rtype(istore) : WN_desc(istore)))%align_bytes!= 0))
           alignment = -2;
         if (alignment == -2 ||
             (TY_kind(ST_type(st)) == KIND_STRUCT &&
@@ -3636,7 +3669,7 @@ static INT Simd_Align_Analysis(INT init_align, WN *load_store,
           ; // Do nothing
         else if (TY_kind(ST_type(st)) == KIND_POINTER) {
           TY_IDX ty = TY_pointed(ST_type(st));
-          Set_TY_align_exp(ty, 4);
+          Set_TY_align_exp(ty, (Target_AVX? 5: 4));
           Set_TY_pointed(ST_type(st), ty);
         }
         else if (base_st->sym_class != CLASS_BLOCK &&
@@ -3648,15 +3681,15 @@ static INT Simd_Align_Analysis(INT init_align, WN *load_store,
                  ST_sclass(st) != SCLASS_FORMAL &&
                  ST_sclass(st) != SCLASS_FORMAL_REF) {
           TY_IDX st_ty_idx = ST_type(st);
-          Set_TY_align_exp(st_ty_idx, 4);
+          Set_TY_align_exp(st_ty_idx, (Target_AVX? 5 : 4));
           Set_ST_type(st, st_ty_idx);
-          Set_STB_align(base_st, 16);
+          Set_STB_align(base_st, align_bytes);
           Simd_Reallocate_Objects = TRUE;
         } else if (ST_sclass(st) == SCLASS_AUTO &&
-                   Stack_Alignment() == 16 &&
+                   Stack_Alignment() == align_bytes &&
                    ST_level(st) == Current_scope) {
           TY_IDX st_ty_idx = ST_type(st);
-          Set_TY_align_exp(st_ty_idx, 4);
+          Set_TY_align_exp(st_ty_idx, (Target_AVX? 5 : 4));
           Set_ST_type(st, st_ty_idx);
         }
         if (alignment == -2 ||
@@ -3668,7 +3701,7 @@ static INT Simd_Align_Analysis(INT init_align, WN *load_store,
           alignment = -2;
         else if (ST_sclass(st) == SCLASS_AUTO &&
                  (ST_level(st) != Current_scope ||
-                  Stack_Alignment() != 16))
+                  Stack_Alignment() != align_bytes))
           alignment = -2;
         else if (ST_sclass(st) == SCLASS_FORMAL ||
                  ST_sclass(st) == SCLASS_FORMAL_REF)
@@ -3687,7 +3720,10 @@ static void Simd_Align_Load_Store(WN *load_store, BOOL is_load)
                        WN_load_addr_ty(load_store):WN_ty(load_store));
         TY_IDX ty_idx = 0; 
         TY &ty = New_TY (ty_idx);
-        Set_TY_align (ty_load_store, 16);
+		if(Target_AVX)
+		 Set_TY_align (ty_load_store, 32);
+		else
+         Set_TY_align (ty_load_store, 16);
 
         TY_Init (ty, Pointer_Size, KIND_POINTER, Pointer_Mtype,
                  Save_Str ("anon_ptr."));
@@ -5459,7 +5495,13 @@ static INT Simd(WN* innerloop)
       continue;
 
     WN* innerloop=LWN_Get_Parent(Find_Do_Body(simd_op));
-    INT best_peel = Simd_Align_Best_Peel(vec_simd_ops, simd_op_kind,
+	
+    INT best_peel;
+	if(Target_AVX)
+	  best_peel = Simd_Align_Best_Peel_AVX(vec_simd_ops, simd_op_kind,
+	                               simd_op_best_align, innerloop);
+	else
+	  best_peel= Simd_Align_Best_Peel(vec_simd_ops, simd_op_kind,
                                    simd_op_best_align, innerloop);
     
     if(best_peel==0)

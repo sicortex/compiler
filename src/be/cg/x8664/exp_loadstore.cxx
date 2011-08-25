@@ -298,7 +298,7 @@ Expand_Load (OPCODE opcode, TN *result, TN *base, TN *ofst, OPS *ops)
   if ((top == TOP_lddqu || top == TOP_vmovdqu_f128_ofloat_base64_simm32) && 
   	  mtype == MTYPE_F16 &&
       (base == SP_TN || base == FP_TN) &&
-      Stack_Alignment() == 16 ) {
+      (Stack_Alignment()%16 == 0) ) {
     if (TN_has_value(ofst) &&
 	(TN_value(ofst) % 16 == 0))
       top = (Target_AVX? TOP_vmovdqa_f128_ofloat_base64_simm32 : TOP_lddqa);
@@ -507,7 +507,7 @@ Expand_Store (TYPE_ID mtype, TN *src, TN *base, TN *ofst, OPS *ops)
   if ((top == TOP_stdqu || top == TOP_vmovdqu_f128_obase64_simm32_float) && 
   	  mtype == MTYPE_F16 &&
       (base == SP_TN || base == FP_TN) &&
-      Stack_Alignment() == 16 ) {
+      (Stack_Alignment()%16 == 0) ) {
     if (TN_has_value(ofst) &&
 	(TN_value(ofst) % 16 == 0))
       top = (Target_AVX? TOP_vmovdqa_f128_obase64_simm32_float : TOP_stdqa);

@@ -168,7 +168,8 @@ typedef enum _align {
   _CARD_ALIGN = 2,
   _WORD_ALIGN = 4,
   _DWORD_ALIGN = 8,
-  _QUAD_ALIGN = 16
+  _QUAD_ALIGN = 16,
+  _DQUAD_ALIGN = 32
 } ALIGN;  
 
 static STACK_DIR stack_direction;
@@ -519,7 +520,7 @@ Stack_Alignment ( void )
 {
 #ifdef TARG_X8664
   if( Is_Target_64bit() )
-    return _QUAD_ALIGN;
+    return (Target_AVX? _DQUAD_ALIGN : _QUAD_ALIGN);
 
   /* TODO:
      We need something like -mpreferred-stack-boundary=num.

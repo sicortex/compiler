@@ -520,7 +520,7 @@ Stack_Alignment ( void )
 {
 #ifdef TARG_X8664
   if( Is_Target_64bit() )
-    return (Target_AVX? _DQUAD_ALIGN : _QUAD_ALIGN);
+    return  _QUAD_ALIGN;
 
   /* TODO:
      We need something like -mpreferred-stack-boundary=num.

@@ -3603,8 +3603,10 @@ static void Expand_Unsigned_Int_To_Float_m32( TN* dest,
   }
 
   Cur_BB = bb_exit;
-  Build_OP( is_double ? (Target_AVX? TOP_vmovsd_f128_ofloat_float_float : TOP_movsd) :
-  	                    (Target_AVX? TOP_vmovss_f128_ofloat_float_float : TOP_movss) , dest, tmp_dest, ops );
+  if(Target_AVX)
+  	Build_OP(is_double ? TOP_vmovsd_f128_ofloat_float_float : TOP_vmovss_f128_ofloat_float_float, dest, tmp_dest, tmp_dest, ops);
+  else
+    Build_OP( is_double ?  TOP_movsd : TOP_movss , dest, tmp_dest, ops );
 }
 
 
@@ -3695,8 +3697,10 @@ static void Expand_Unsigned_Long_To_Float( TN* dest, TN* src, TYPE_ID mtype, OPS
   }
 
   if( tmp_dest != dest ){
-    Build_OP( mtype == MTYPE_F8 ? (Target_AVX? TOP_vmovsd_f128_ofloat_float_float : TOP_movsd) : 
-		                          (Target_AVX? TOP_vmovss_f128_ofloat_float_float : TOP_movss), dest, tmp_dest, ops );
+  	if(Target_AVX)
+	  Build_OP(mtype == MTYPE_F8 ? TOP_vmovsd_f128_ofloat_float_float : TOP_vmovss_f128_ofloat_float_float , dest, tmp_dest, tmp_dest, ops);
+    else
+	  Build_OP( mtype == MTYPE_F8 ?  TOP_movsd : TOP_movss, dest, tmp_dest, ops );
   }
 
   Cur_BB = bb_exit;
@@ -6428,9 +6432,14 @@ Exp_COPY (TN *tgt_tn, TN *src_tn, OPS *ops, BOOL copy_pair)
       }
     } else if (tgt_rc == src_rc && tgt_rc == ISA_REGISTER_CLASS_float) {
       /* dedicated TNs always have size 8, so need to check both TNs */
-      Build_OP(is_128bit ? (Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq): 
-                           (is_64bit ? (Target_AVX? TOP_vmovsd_f128_ofloat_float_float : TOP_movsd) : 
-						   	           (Target_AVX? TOP_vmovss_f128_ofloat_float_float : TOP_movss)), 
+	  if(Target_AVX ){
+	  	if(is_128bit)
+		  Build_OP(TOP_vmovdqa_f128_ofloat_float, tgt_tn, src_tn, ops);
+		else
+		  Build_OP(is_64bit ? TOP_vmovsd_f128_ofloat_float_float: TOP_vmovss_f128_ofloat_float_float, tgt_tn, src_tn,src_tn, ops);
+	  }	
+	  else
+        Build_OP(is_128bit ? TOP_movdq: (is_64bit ?  TOP_movsd : TOP_movss), 
 	       tgt_tn, src_tn, ops);
       Set_OP_copy (OPS_last(ops));
 

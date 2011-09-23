@@ -764,6 +764,7 @@ static BOOL Is_Well_Formed_Simd ( WN* wn, WN* loop)
      !Is_Target_Core() && 
      !Is_Target_Wolfdale() &&
      !Is_Target_Barcelona() &&
+     !Is_Target_Orochi() &&
      !Is_Target_Sandy_Bridge() &&
      WN_operator(wn) == OPR_RECIP && WN_rtype(wn) == MTYPE_F8
      && WN_operator(parent) == OPR_MPY)

@@ -2031,6 +2031,7 @@ static struct
   { "istanbul",	"barcelona",		ABI_M64,		TRUE,	TRUE,  TRUE,  TRUE},
   { "nehalem",	"wolfdale",		ABI_M64,		TRUE,	TRUE,  FALSE, FALSE},
   { "sandy", "sandy", ABI_M64, TRUE, TRUE, TRUE, TRUE},
+  { "bdverl", "bdverl", ABI_M64, TRUE, TRUE, TRUE, TRUE},
   { NULL,	NULL, },
 };
   
@@ -2359,6 +2360,8 @@ get_x86_auto_cpu_name ()
         }
       case 16:
         return "barcelona";     // FIXME??
+      case 21:
+	  	return "bdverl";
     default:
       return "generic";
     }

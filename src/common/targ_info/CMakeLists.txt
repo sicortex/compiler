@@ -177,6 +177,24 @@ if(${x8664_enabled})
                  COMPILE_FLAGS "-I${CMAKE_CURRENT_BINARY_DIR}/x8664")
 
 
+    add_executable(orochi_si_gen proc/x8664/orochi_si.cxx)
+    target_link_libraries(orochi_si_gen ${si_gen_x8664_name} ${isa_gen_topcode_x8664_name})
+    set_property(TARGET orochi_si_gen APPEND PROPERTY
+                 COMPILE_FLAGS "-I${CMAKE_CURRENT_BINARY_DIR}/x8664")
+
+    add_custom_command(
+      OUTPUT orochi.c
+      COMMAND orochi_si_gen
+      DEPENDS orochi_si_gen
+      )
+    add_library(orochi SHARED orochi.c)
+    set_property(TARGET orochi PROPERTY LIBRARY_OUTPUT_DIRECTORY
+                 ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/x8664)
+    set_property(TARGET orochi PROPERTY PREFIX "")
+    set_property(TARGET orochi APPEND PROPERTY
+                 COMPILE_FLAGS "-I${CMAKE_CURRENT_BINARY_DIR}/x8664")
+
+
     add_executable(wolfdale_si_gen proc/x8664/wolfdale_si.cxx)
     target_link_libraries(wolfdale_si_gen ${si_gen_x8664_name} ${isa_gen_topcode_x8664_name})
     set_property(TARGET wolfdale_si_gen APPEND PROPERTY

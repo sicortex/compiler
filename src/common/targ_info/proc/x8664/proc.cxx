@@ -42,6 +42,7 @@ int main ()
   PROC_Create( "x8664",
 	       "opteron",
                "barcelona",
+           "orochi",
 	       "em64t",
 	       "core",
 	       "wolfdale",

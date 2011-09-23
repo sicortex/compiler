@@ -133,6 +133,7 @@ typedef enum {
   TARGET_barcelona,     /* AMD Barcelona (opteron) */
   TARGET_athlon64,	/* AMD Athlon64 */
   TARGET_athlon,	/* AMD Athlon */
+  TARGET_orochi,	/* AMD orochi*/
   TARGET_em64t,		/* Intel EM64T */
   TARGET_core,		/* Intel Core */
   TARGET_wolfdale,	/* Intel Wolfdale */
@@ -165,6 +166,8 @@ extern const char *Targ_Name (TARGET_PROCESSOR target);
 #define Target_x87_precision()	(Target_x87_Precision+0)
 #define Is_Target_Barcelona()   (Target == TARGET_barcelona)
 #define Is_Target_Sandy_Bridge() (Target == TARGET_sandy)
+#define Is_Target_Orochi()      (Target == TARGET_orochi)
+
 
 
 /* ========== */

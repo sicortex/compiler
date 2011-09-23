@@ -1543,6 +1543,7 @@ static void Init_OP_Name()
       !Is_Target_Core() &&
       !Is_Target_Wolfdale() &&
       !Is_Target_Barcelona() &&
+      !Is_Target_Orochi()&&
       !Is_Target_Sandy_Bridge()){// bug 10295
     // Use movlpd only for loads.  Bug 5809.
     OP_Name[TOP_ldsd] = "movlpd";
@@ -1570,6 +1571,7 @@ static void Init_OP_Name()
 	Is_Target_EM64T()     || // em64t
         Is_Target_Wolfdale()  ||
 	Is_Target_Core() ||
+	Is_Target_Orochi() ||
 	Is_Target_Sandy_Bridge()) {	 // use movapd for woodcrest for bug 11548
       OP_Name[TOP_movsd] = "movapd";  
     }

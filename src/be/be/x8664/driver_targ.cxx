@@ -93,6 +93,9 @@ void Initialize_Targ_Info(void)
   case TARGET_sandy:
   	proc = PROCESSOR_sandy;
 	break;
+  case TARGET_orochi:
+    proc = PROCESSOR_orochi;
+    break;
   default:
     FmtAssert(FALSE, ("targinfo doesn't handle target: %s\n", Targ_Name(Target)));
     /*NOTREACHED*/

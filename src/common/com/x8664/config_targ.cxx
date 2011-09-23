@@ -332,6 +332,7 @@ Targ_Name ( TARGET_PROCESSOR b)
     case TARGET_xeon: return "Xeon";
     case TARGET_anyx86: return "Anyx86";
     case TARGET_barcelona: return "Barcelona";
+	case TARGET_orochi: return "Bdverl";
 	case TARGET_sandy: return "Sandy Bridge";
     default:
       r = bnb[bnb_used].name;
@@ -476,6 +477,10 @@ Prepare_Target ( void )
 #endif
       targ = TARGET_barcelona;
     }
+	else if ( strcasecmp ( Processor_Name, "bdverl") == 0){
+	  targ = TARGET_orochi;
+	  // TODO: here to add Tareget sse?
+	}
     else if ( strcasecmp ( Processor_Name, "athlon64fx" ) == 0 ) {
       targ = TARGET_opteron;
     }

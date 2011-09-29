@@ -3999,6 +3999,11 @@ static Addr_Mode_Group Addr_Mode_Group_Table[] = {
   {TOP_or128v64,	TOP_orx128v64,	TOP_orxx128v64,	TOP_orxxx128v64,	TOP_UNDEFINED},
   {TOP_for128v32,	TOP_forx128v32,	TOP_forxx128v32,	TOP_forxxx128v32,	TOP_UNDEFINED},
   {TOP_for128v64,	TOP_forx128v64,	TOP_forxx128v64,	TOP_forxxx128v64,	TOP_UNDEFINED},
+  /*AVX 256-bits*/
+  {TOP_vaddpd_f256_ofloat_float_float, TOP_vaddpd_f256_ofloat_float_base64_simm32, 
+   TOP_vaddpd_f256_ofloat_float_base64_index64_uimm8_simm32, TOP_vaddpd_f256_ofloat_float_index64_uimm8_simm32, TOP_UNDEFINED},
+  {TOP_vaddps_f256_ofloat_float_float, TOP_vaddps_f256_ofloat_float_base64_simm32,
+   TOP_vaddps_f256_ofloat_float_base64_index64_uimm8_simm32, TOP_vaddps_f256_ofloat_float_index64_uimm8_simm32, TOP_UNDEFINED},
   // orps/orpd share the same load-execute OPs as for128v32/for128v64.  Must
   // put orps/orpd after for128v32/for128v64 so that the load-execute OPs will
   // have for128v32/for128v64 as the base mode.
@@ -5405,6 +5410,7 @@ BOOL EBO_Load_Execution( OP* alu_op,
    */
   if( OP_unalign_mem( ld_op ) &&
       TOP_is_vector_op( OP_code(ld_op) ) ){
+    // TODO: AVX instruction unalign load/store isa property
     return FALSE;
   }
 

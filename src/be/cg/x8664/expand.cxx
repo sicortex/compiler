@@ -5926,6 +5926,19 @@ Expand_Reduce_Add (OPCODE op, TN *result, TN *op1, OPS *ops)
     }
     break;
   }
+  case OPC_F4V32F4REDUCE_ADD:
+  {
+  	TN *tmp_a = Build_TN_Like(op1);
+	TN *tmp_low = Build_TN_Like(result);
+	TN *tmp_high = Build_TN_Like(result);
+	Build_OP(TOP_vmovaps_f256_ofloat_float, tmp_a, op1, ops);
+	Build_OP(TOP_vhaddps_f256_ofloat_float_float, tmp_a, op1, op1, ops);
+	Build_OP(TOP_vhaddps_f256_ofloat_float_float, tmp_a, tmp_a, tmp_a, ops);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8,  tmp_low, tmp_a, Gen_Literal_TN(0, 1), ops);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8,  tmp_high, tmp_a, Gen_Literal_TN(1, 1), ops);
+	Build_OP(TOP_vaddss_f128_ofloat_float_float, result, tmp_low, tmp_high, ops);
+	break;
+  }
   case OPC_I4V16I1REDUCE_ADD:
   {
     TN* tmp = Build_TN_Like(op1);
@@ -6397,6 +6410,7 @@ Exp_COPY (TN *tgt_tn, TN *src_tn, OPS *ops, BOOL copy_pair)
 			  (TN_size(src_tn) == 8) :
 			  (TN_size(src_tn) == 8 && TN_size(tgt_tn) == 8);
   const BOOL is_128bit = (TN_size(src_tn) == 16);
+  const BOOL is_256bit = (TN_size(src_tn) == 32);
 
   if( TN_is_constant(src_tn) ){
     FmtAssert (TN_has_value(src_tn), ("Exp_COPY: illegal source tn"));
@@ -6433,14 +6447,18 @@ Exp_COPY (TN *tgt_tn, TN *src_tn, OPS *ops, BOOL copy_pair)
     } else if (tgt_rc == src_rc && tgt_rc == ISA_REGISTER_CLASS_float) {
       /* dedicated TNs always have size 8, so need to check both TNs */
 	  if(Target_AVX ){
-	  	if(is_128bit)
+	  	if(is_256bit)
+		  Build_OP(TOP_vmovdqa_f256_ofloat_float, tgt_tn, src_tn, ops);
+	  	else if(is_128bit)
 		  Build_OP(TOP_vmovdqa_f128_ofloat_float, tgt_tn, src_tn, ops);
 		else
 		  Build_OP(is_64bit ? TOP_vmovsd_f128_ofloat_float_float: TOP_vmovss_f128_ofloat_float_float, tgt_tn, src_tn,src_tn, ops);
 	  }	
-	  else
+	  else{
+	  	FmtAssert(!is_256bit,("no way to handle 256 bits in copy in no AVX"));
         Build_OP(is_128bit ? TOP_movdq: (is_64bit ?  TOP_movsd : TOP_movss), 
 	       tgt_tn, src_tn, ops);
+	  }
       Set_OP_copy (OPS_last(ops));
 
     } else if( tgt_rc == src_rc && tgt_rc == ISA_REGISTER_CLASS_x87 ){

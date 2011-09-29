@@ -2910,8 +2910,45 @@ Simd_Op_In_Stack(WN *simd_op, STACK_OF_WN * simd_stack){
   return !(i==simd_stack->Elements());
 }
 
-/*determine if WN *simd_op is suitable for AVX simd or not*/
+static BOOL Is_STID_Kid_AVX(WN *op){
+  for (INT i = 0; i < vec_simd_ops->Elements(); i++){
+    WN *simd_op = vec_simd_ops->Top_nth(i);
+	if(!Wn_Is_Inside(simd_op, op))
+	  continue;
+	if(!simd_op_avx[i])
+	 return FALSE;
+  }
+  return TRUE;
+}
 
+static BOOL Is_DU_AVX_Op(WN* op){
+  if(WN_operator(op) != OPR_LDID)
+  	return TRUE;
+  //now op must be lDID, look for the DU chane to see if any def must be V16* type
+  WN *loop_body = Find_Do_Body(op);
+  WN *loop = LWN_Get_Parent(loop_body);
+
+  STACK<WN *>* equivalence_class =
+  	Scalar_Equivalence_Class(op, Du_Mgr, &LNO_local_pool);
+  //We just care about STID operator to the same symbol so far
+  if(!equivalence_class)
+  	return TRUE;
+
+  for (INT i=0; i < equivalence_class->Elements(); i++){
+  	WN *scalar_ref = equivalence_class->Top_nth(i);
+	if(!Wn_Is_Inside(scalar_ref, loop) || WN_operator(scalar_ref) == OPR_LDID)
+	  continue;
+	FmtAssert(WN_operator(scalar_ref) == OPR_STID, 
+		("FIXME: DU AVX OP ecounter other types beside STID"));
+	if(Wn_Is_Inside(op, scalar_ref))
+	  continue;
+	if(!Is_STID_Kid_AVX(scalar_ref))
+	  return FALSE;
+  }
+  return TRUE;
+}
+
+/*determine if WN *simd_op is suitable for AVX simd or not*/
 static BOOL Is_AVX_Simd_Op(WN *simd_op){
   INT i, j;
   for(i = 0; i < WN_kid_count(simd_op); i++){
@@ -2928,13 +2965,22 @@ static BOOL Is_AVX_Simd_Op(WN *simd_op){
 	  if(!Is_AVX_Simd_Op(kid))
 	  	return FALSE;
 	}else{
-	  for(j = 0; j < WN_kid_count(kid); j++)
+	  if(!Is_DU_AVX_Op(kid))
+		  return FALSE;
+	  for(j = 0; j < WN_kid_count(kid); j++){
 	    if(!Is_AVX_Simd_Op(WN_kid(kid, j)))
 		  return FALSE;
+	  }
 	}
   }
-  if(!Simd_Op_In_Stack(simd_op, vec_simd_ops))
-  	return TRUE;
+#if 1
+  if(!Simd_Op_In_Stack(simd_op, vec_simd_ops)){
+  	if(Is_DU_AVX_Op(simd_op))
+	  return TRUE;
+	else
+	  return FALSE;
+  }
+#endif
   TYPE_ID type = WN_rtype(simd_op);
   switch(type){
   	case MTYPE_F4:
@@ -2963,11 +3009,24 @@ static void SA_Set_SimdOps_Info2()
     CXX_NEW_ARRAY(SIMD_KIND, vec_simd_ops->Elements(),&LNO_local_pool);
   simd_op_avx = 
   	CXX_NEW_ARRAY(BOOL, vec_simd_ops->Elements(),&LNO_local_pool);
-  	
-
-
 
   WN *istore, *simd_op;
+  for (INT i = 0; i < vec_simd_ops->Elements(); i++){
+  	simd_op = vec_simd_ops->Top_nth(i);
+  	simd_op_avx[i] = Is_AVX_Simd_Op(simd_op);
+  }
+  //set all the kids AVX FALSE when the simd_op's AVX is FALSE
+  for (INT i = 0; i < vec_simd_ops->Elements(); i++){
+  	simd_op = vec_simd_ops->Top_nth(i);
+	for(INT j = i+1; j < vec_simd_ops->Elements(); j++){
+		WN *kid_simd_op = vec_simd_ops->Top_nth(j);
+		if(!Wn_Is_Inside(kid_simd_op, simd_op))
+		  continue;
+		simd_op_avx[j] = simd_op_avx[i]; 
+	}
+  }
+
+  
   for (INT i=0; i < vec_simd_ops->Elements(); i++){
     simd_op=vec_simd_ops->Top_nth(i);
 
@@ -2984,7 +3043,6 @@ static void SA_Set_SimdOps_Info2()
     newwn[0] = simd_op;
     simd_op_kind[i] = INVALID;
     simd_op_last_in_loop[i] = TRUE;
-	simd_op_avx[i] = Is_AVX_Simd_Op(simd_op);
 
     // If simd_op belongs to one of earlier simd ops' hash entry then,
     // set hash table equivalent to previous entry and skip this entry.
@@ -4058,14 +4116,20 @@ static TYPE_ID Simd_Get_Vector_Type(WN *istore, WN *simd_op, INT i_nth)
       case MTYPE_V16C4: case MTYPE_C4:
         vmtype = MTYPE_V16C4;
         break;
-      case MTYPE_V16F4: case MTYPE_F4:
+      case MTYPE_V16F4:
+	  	vmtype = MTYPE_V16F4;
+		break;
+	  case MTYPE_F4:
 	  {
 	  	BOOL avx_simd;
 	  	avx_simd = Target_AVX && simd_op_avx[i_nth];
         vmtype = avx_simd? MTYPE_V32F4: MTYPE_V16F4;
       }
         break;
-      case MTYPE_V16F8: case MTYPE_F8:
+      case MTYPE_V16F8:
+	  	vmtype = MTYPE_V16F8;
+		break;
+	  case MTYPE_F8:
 	  {
 	  	BOOL avx_simd;
 		avx_simd = Target_AVX && simd_op_avx[i_nth];
@@ -4088,6 +4152,14 @@ static TYPE_ID Simd_Get_Vector_Type(WN *istore, WN *simd_op, INT i_nth)
       case MTYPE_U8:
         vmtype = MTYPE_V16I8;
         break;
+	  case MTYPE_V32F4:
+	  	vmtype = MTYPE_V32F4;
+	  	break;
+	  case MTYPE_V32F8:
+	  	vmtype = MTYPE_V32F8;
+		break;
+	  default:
+	  	FmtAssert(FALSE, ("NYI from simd get vector type"));
     }
   return vmtype;
 }
@@ -4234,6 +4306,16 @@ static WN *Simd_Vectorize_Invariants(WN *inv_wn,
             LWN_CreateExp1(OPCODE_make_op(OPR_REPLICATE, MTYPE_V16I8, MTYPE_I8),
                            inv_wn);
           break;
+	 case MTYPE_V32F4:
+	 	  inv_wn =
+		  	LWN_CreateExp1(OPCODE_make_op(OPR_REPLICATE, MTYPE_V32F4, MTYPE_F4),
+		  	               inv_wn);
+		  break;
+	 case MTYPE_V32F8:
+	 	  inv_wn =
+		  	LWN_CreateExp1(OPCODE_make_op(OPR_REPLICATE, MTYPE_V32F8, MTYPE_F8),
+		  				   inv_wn);
+		  break;
         }//end switch
    return inv_wn;
 }
@@ -4425,7 +4507,7 @@ static void Simd_Unroll_Statement( INT unroll_times, INT add_to_base,
 		/*
 		 case here also need to unroll copy index
 		  V16I4V16I4LDID 65 <1,28,.preg_V16I4> T<4,.predef_I4,4> # _i_0
-		 V16F4V16I4CVT
+		 V16F4V16I4CVT(PAREN)
 		  U8LDA 0 <1,53,a> T<54,anon_ptr.,8>
 		  U4INTCONST 1000 (0x3e8)
 		   I4I4LDID 54 <1,4,.preg_I4> T<4,.predef_I4,4> # _i_0
@@ -4435,7 +4517,7 @@ static void Simd_Unroll_Statement( INT unroll_times, INT add_to_base,
 		*/
 		  WN *cvtload = WN_kid(WN_kid0(copy),k);
 		  WN *cvt_origA = WN_kid(WN_kid0(istore), k);
-		  if(WN_operator(copy_simd_op) == OPR_CVT && 
+		  if((WN_operator(copy_simd_op) == OPR_CVT|| WN_operator(copy_simd_op) == OPR_PAREN)&& 
 		  	 vec_index_preg_store &&
 		  	 WN_operator(cvtload) == OPR_LDID &&
 		  	 WN_has_sym(cvtload) &&

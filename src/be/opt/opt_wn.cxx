@@ -628,20 +628,6 @@ Mtype_from_mtype_class_and_size( INT mtype_class, INT bytes )
         if ( bytes == 4 )
           return MTYPE_M8F4; 
       }
-    } else // 128-bit vectors
-    if ( mtype_class & MTYPE_CLASS_INTEGER ) {
-      switch ( bytes ) {
-      case 1: return MTYPE_V16I1; 
-      case 2: return MTYPE_V16I2; 
-      case 4: return MTYPE_V16I4; 
-      case 8: return MTYPE_V16I8; 
-      }
-    } else if ( mtype_class & MTYPE_CLASS_FLOAT ) {
-      switch ( bytes ) {
-      case 4: return MTYPE_V16F4; 
-      case 8: return MTYPE_V16F8; 
-      case 16: return MTYPE_V16C8;
-      }
     }else if ( ( mtype_class & MTYPE_CLASS_AVECTOR ) == MTYPE_CLASS_AVECTOR ) {
       // 256-bit AVX vector
       if ( mtype_class & MTYPE_CLASS_INTEGER ) {
@@ -657,6 +643,21 @@ Mtype_from_mtype_class_and_size( INT mtype_class, INT bytes )
         case 8: return MTYPE_V32F8; 
         case 16: return MTYPE_V32C8;
         }
+      }
+    }
+	else // 128-bit vectors
+    if ( mtype_class & MTYPE_CLASS_INTEGER ) {
+      switch ( bytes ) {
+      case 1: return MTYPE_V16I1; 
+      case 2: return MTYPE_V16I2; 
+      case 4: return MTYPE_V16I4; 
+      case 8: return MTYPE_V16I8; 
+      }
+    } else if ( mtype_class & MTYPE_CLASS_FLOAT ) {
+      switch ( bytes ) {
+      case 4: return MTYPE_V16F4; 
+      case 8: return MTYPE_V16F8; 
+      case 16: return MTYPE_V16C8;
       }
     }
     FmtAssert( FALSE, 
@@ -747,7 +748,23 @@ Ldid_from_mtype_class_and_size( INT mtype_class, INT bytes )
         if ( bytes == 4 )
           return OPC_M8F4M8F4LDID; 
       }
-    } else // 128-bit vectors
+    }else if((mtype_class & MTYPE_CLASS_AVECTOR) == MTYPE_CLASS_AVECTOR){
+      if(mtype_class & MTYPE_CLASS_INTEGER){
+	  	switch (bytes) {
+		case 1: return OPC_V32I1V32I1LDID;
+		case 2: return OPC_V32I2V32I2LDID;
+		case 4: return OPC_V32I4V32I4LDID;
+		case 8: return OPC_V32I8V32I8LDID;
+	  	}
+      }else if(mtype_class & MTYPE_CLASS_FLOAT){
+        switch (bytes) {
+		case 4: return OPC_V32F4V32F4LDID;
+		case 8: return OPC_V32F8V32F8LDID;
+		case 16: return OPC_V32C8V32C8LDID;
+		}
+      }
+    }
+	 else // 128-bit vectors
     if ( mtype_class & MTYPE_CLASS_INTEGER ) {
       switch ( bytes ) {
       case 1: return OPC_V16I1V16I1LDID; 
@@ -849,7 +866,24 @@ Stid_from_mtype_class_and_size( INT mtype_class, INT bytes )
         if ( bytes == 4 )
           return OPC_M8F4STID; 
       }
-    } else // 128-bit vectors
+    }else if((mtype_class & MTYPE_CLASS_AVECTOR) == MTYPE_CLASS_AVECTOR) {
+      // 256-bit vectors
+      if(mtype_class & MTYPE_CLASS_INTEGER){
+	  	switch(bytes){
+	  	case 1: return OPC_V32I1STID;
+		case 2: return OPC_V32I2STID;
+		case 4: return OPC_V32I4STID;
+		case 8: return OPC_V32I8STID;
+	    }
+      }else if (mtype_class & MTYPE_CLASS_FLOAT){
+        switch(bytes){
+		case 4: return OPC_V32F4STID;
+		case 8: return OPC_V32F8STID;
+		case 16:return OPC_V32C8STID;
+        }
+      }
+    }
+	 else // 128-bit vectors
     if ( mtype_class & MTYPE_CLASS_INTEGER ) {
       switch ( bytes ) {
       case 1: return OPC_V16I1STID; 

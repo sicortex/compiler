@@ -19,7 +19,7 @@ sub cartesian {		#cartesian product, the perl way ]:->
 }
 sub access_memory{
 	my($top_instructions)=@_;
-	if($top_instructions=~/base64_simm32/ || $top_instructions=~/base64_index64_uimm8_simm32/ || $top_instructions=~/index64_uimm8_simm32/){
+	if($top_instructions=~/base64_simm32/ || $top_instructions=~/base64_index64_uimm8_simm32/ || $top_instructions=~/index64_uimm8_simm32/||$top_instructions=~/n32/){
 		#print "hehe met memory".$top_instructions."\n";
 	  return 1;
 	}else{
@@ -29,13 +29,13 @@ sub access_memory{
 
 sub type_operation{
 	my($top_instr)=@_;
-	if($top_instr=~/obase64_simm32/ || $top_instr=~/obase64_index64_uimm8_simm32/ || $top_instr=~/oindex64_uimm8_simm32/){
+	if($top_instr=~/obase64_simm32/ || $top_instr=~/obase64_index64_uimm8_simm32/ || $top_instr=~/oindex64_uimm8_simm32/ || $top_instr=~/on32/){
 		#print "match store".$top_instr."\n";
 	    return "store_only";
 		  #die "fuck that isa".$top_instr;
 		  #return 0;
 	}
-	elsif($top_instr=~/base64_simm32/ || $top_instr=~/base64_index64_uimm8_simm32/ || $top_instr=~/index64_uimm8_simm32/){
+	elsif($top_instr=~/base64_simm32/ || $top_instr=~/base64_index64_uimm8_simm32/ || $top_instr=~/index64_uimm8_simm32/ ||$top_instr=~/n32/){
 	  #print "load  ".$top_instr."\n";
 	  if($top_instr=~/mov/){
 	    return "load_only";
@@ -83,11 +83,13 @@ sub how_many_opnds{
 #my @mem=[["base64"],["offset32"],[["base64"],["offset64"],["uimm8"],["simm32"]],[["offset64"],["uimm8"],["simm32"]];
 #my @mem =["base64","offset32"];
 my @only_mem=["base64_simm32", "base64_index64_uimm8_simm32","index64_uimm8_simm32"];
+my @only_mem_n32=["base64_simm32", "base64_index64_uimm8_simm32","index64_uimm8_simm32","n32"];
 my @float_mem=["float","base64_simm32","base64_index64_uimm8_simm32","index64_uimm8_simm32"];
 my @int32_mem=["int32","base64_simm32","base64_index64_uimm8_simm32","index64_uimm8_simm32"];
 my @int64_mem=["int64","base64_simm32","base64_index64_uimm8_simm32","index64_uimm8_simm32"];
 
 my @oonly_mem=["obase64_simm32", "obase64_index64_uimm8_simm32","oindex64_uimm8_simm32"];
+my @oonly_mem_n32=["obase64_simm32", "obase64_index64_uimm8_simm32","oindex64_uimm8_simm32","on32"];
 my @ofloat_mem=["ofloat","obase64_simm32", "obase64_index64_uimm8_simm32","oindex64_uimm8_simm32"];
 my @oint32_mem=["oint32","obase64_simm32","obase64_index64_uimm8_simm32","oindex64_uimm8_simm32"];
 my @oint64_mem=["oint64","obase64_simm32","obase64_index64_uimm8_simm32","oindex64_uimm8_simm32"];
@@ -123,6 +125,10 @@ my @ymmomem_imm_to_ymm=["vpermilpd","vpermilps","vroundpd","vroundps"];
 my @vbroadcast256=["vbroadcastss","vbroadcastsd", "vbroadcastf128","vmovapd","vrcpps","vrsqrtps","vsqrtpd","vsqrtps","vcvtdq2ps","vcvtps2dq","vcvttpd2dq","vcvttps2dq","vmovaps","vmovdqa","vmovdqu","vmovddup","vmovshdup","vmovsldup","vmovupd","vmovups"];
 ## opnd(xmm/mem),result(xmm)
 my @vcomisd=["vcomisd","vcomiss","vcvtdq2pd","vcvtdq2ps","vcvtpd2ps","vcvtps2dq","vcvtps2pd","vcvttpd2dq","vcvttps2dq","vmovapd","vmovaps","vmovq","vmovdqa","vmovdqu","vmovddup","vmovshdup","vmovsldup","vmovupd","vmovups","vpabsb","vpabsw","vpabsd","vbroadcastss","vphminposuw","vpmovsxbw","vpmovsxbd","vpmovzxbw","vpmovzxbd","vrcpps","vrsqrtps","vsqrtpd","vsqrtps","vucomisd","vucomiss"];
+##opnd(offset mem), result(ymm)
+#my @n32_mode_load_256=["vmovapd", "vmovaps", "vmovdqa", "vmovdqu","vmovupd","vmovups"];
+##opnd(offset mem), result(xmm)
+#my @n32_mode_load_128=["vmovapd", "vmovaps", "vmovdqa", "vmovdqu","vmovupd","vmovups","vmovq"];
 ## opnd(xmm/mem),result(ymm)
 my @vcvtdq2pd256=["vcvtdq2pd","vcvtpd2dq","vcvtps2pd"];
 ## opnd(ymm/mem),result(ymm)
@@ -189,6 +195,10 @@ my @ymm_to_mem=["vmovntdq","vmovntpd","vmovntps","vmovaps","vmovapd","vmovdqa","
 
 ## opnd(xmm) opnd(xmm), result(xmm)
 my @vmovhlps=["vmovhlps","vmovlhps","vmovsd","vmovss","vpermilpd"];
+## opnd(ymm), result(n32_mode(mem))
+#my @n32_mode_store_256=["vmovaps","vmovapd","vmovdqa","vmovdqu","vmovupd","vmovups"];
+## opnd(xmm), result(n32_mode(mem))
+#my @n32_mode_store_128=["vmovaps","vmovapd","vmovdqa","vmovdqu","vmovupd","vmovups", "vmovq"];
 
 ## opnd(xmm) opnd(imm), result(int32)
 my @xmm_imm_to_int32=["vpextrb","vpextrw"];
@@ -231,7 +241,7 @@ my @ops=(
 		[@vextractps, ["f128"], ["OPS"], @oint32_mem, ["float"],["simm8"]],
 		[@vinsertf128,["f256"], ["OPS"], ["ofloat"],["float"], @float_mem,["simm8"]],
 		[@vinsertps,["f128"], ["OPS"], ["ofloat"],["float"], @float_mem,["simm8"]],
-		[@vlddqu,["f128","f256"],["OPS"],["ofloat"], @only_mem],
+		[@vlddqu,["f128","f256"],["OPS"],["ofloat"], @only_mem_n32],
 		[@vmaskmovdqu,["f128"], ["OPS"], ["ofloat"], ["float"]],
 		[@vmaskmovps,["f128","f256"], ["OPS"], ["ofloat"], ["float"],@only_mem],
 		[@vmaskmovps_tomem,["f128","f256"], ["OPS"],@oonly_mem,["float"],["float"]],	
@@ -245,12 +255,13 @@ my @ops=(
 		#[@vmovddup128, ["f128","f256"],["OPS"], ["ofloat"], @float_mem],
 		#[@vmovdqa256, ["f256"],["OPS"],@ofloat_mem, ["float"]],
 		[@vmovhlps, ["f128"],["OPS"],["ofloat"],["float"],["float"]],
-		[@vmovhpd, ["f128"],["OPS"],["ofloat"],@only_mem],
+		[@vmovhpd, ["f128"],["OPS"],["ofloat"],@only_mem_n32],
 		[@vmovlpd128,["f128"],["OPS"],["ofloat"], ["float"],@only_mem],
-		[@vmovlpd_xmm_to_mem,["f128"],["OPS"],@oonly_mem,["float"]],
+		[@vmovlpd_xmm_to_mem,["f128"],["OPS"],@oonly_mem_n32,["float"]],
 		[@vmovlps_xmm_mem_oxmm,["f128"],["OPS"],["ofloat"],@only_mem,["float"]],
 		[@vmovmskpd,["f128","f256"],["OPS"],["oint32"],["float"]],
-		[@ymm_to_mem,["f256"],["OPS"],@oonly_mem,["float"]],
+		[@ymm_to_mem,["f256"],["OPS"],@oonly_mem_n32,["float"]],
+#[@n32_mode_store_256,["f256"],["OPS"],["on32"],["float"]],
 		[@xmm_xmmomem_xmm_to_xmm, ["f128"],["OPS"],["ofloat"],["float"],@float_mem,["float"]],
 		[@xmmomem_imm_to_xmm,["f128"],["OPS"],["ofloat"],@float_mem,["simm8"]],
 		[@ymmomem_imm_to_ymm,["f256"],["OPS"],["ofloat"],@float_mem,["simm8"]],
@@ -264,8 +275,8 @@ my @ops=(
 		[@xmm_to_int, ["int32"],["OPS"],["oint32","oint64"],["float"]],
 		[["vzeroall"],["OPS"],["null"]],
 		[["vzeroupper"],["OPS"],["null"]],
-		[@mxcsr_to_mem,["OPS"],@oonly_mem,["mxcsr"]],
-		[@mem_to_mxcsr,["OPS"],["mxcsr"],@oonly_mem],
+		[@mxcsr_to_mem,["OPS"],@oonly_mem_n32,["mxcsr"]],
+		[@mem_to_mxcsr,["OPS"],["mxcsr"],@only_mem_n32],
 
 	);
 my @isa;
@@ -394,7 +405,11 @@ foreach (keys %isa_operands){
 			$isa_operands_print.="\tOperand(".$opnd++.", "."simm32".",offset".");\n";
 			#$opnd_post++;
 		}else{die "doesn't know wtf base:".$_."\n";}
-	}else {
+	}elsif($_=~/^on32/){
+		$isa_operands_print.="\tOperand(".$opnd++.", "."fp128".", storeval".");\n";
+		$isa_operands_print.="\tOperand(".$opnd++.", "."simm32".",offset".");\n";
+	}
+	else {
 	foreach (@{$isa_operands{$_}[0]->[1]}){
 		#$isa_operands_print.='@{$isa_operands{$_}[0]->[1]:';
 		#$isa_operands_print.=$_."\n";
@@ -447,6 +462,9 @@ foreach (keys %isa_operands){
 		if($_=~/^simm8$/){
 			$isa_operands_print.="\tOperand(".$opnd++.", "."simm8".",opnd".$opnd_post++.");\n";
 		}
+		if($_=~/^n32$/){
+			$isa_operands_print.="\tOperand(".$opnd++.", "."simm32".",offset".");\n";
+		}
 		
 	}
    }
@@ -483,6 +501,8 @@ foreach (keys %isa_operands){
 		  $isa_print_print.='%s ';
 		}elsif($opnd[$i]=~/^int/){
 		  $isa_print_print.='%s ';
+		}elsif($opnd[$i]=~/^n32/){
+		  $isa_print_print.='%s ';
 		}elsif($opnd[$i]=~/^null/||$opnd[$i]=~/^mxcsr/){
 		 ##do nothing here;
 		}
@@ -512,6 +532,9 @@ foreach (keys %isa_operands){
 			$store_op=1;
 		}elsif($res[0]=~/^oindex64_uimm8_simm32$/){
 			$isa_print_print.='%s%s(,%s,%s) ';
+			$store_op=1;
+		}elsif($res[0]=~/^on32$/){
+			$isa_print_print.='%s';
 			$store_op=1;
 		}elsif($res[0]=~/^osimm8$/){
 		  $isa_print_print.='%s';
@@ -576,6 +599,8 @@ foreach (keys %isa_operands){
 			$isa_print_print.="Operand(".$third.");\n";
 			#$isa_print_print.='%s%s(,%s,%s) ';
 			$total_opnd+=3;
+		}elsif($opnd[$i]=~/^n32$/){
+			$isa_print_print.="Operand(0);\n";
 		}elsif($opnd[$i]=~/^simm8$/ || $opnd[$i]=~/^float/ || $opnd[$i]=~/^int/){
 		  #$isa_print_print.='%s ';
 		  	my $j,$number_opnd_front,$tmp_n;
@@ -632,6 +657,9 @@ foreach (keys %isa_operands){
 			$isa_print_print.="Operand(".$second.");\n";
 			$isa_print_print.="Operand(".$third.");\n";
 			#$isa_print_print.='%s%s(,%s,%s) ';
+		}elsif($res[0]=~/^on32/){
+			$isa_print_print.="Operand(1);\n";
+
 		}elsif($res[0]=~/^osimm8$/){
 			$isa_print_print.="Result(0);\n";
 		  #$isa_print_print.='%s';
@@ -709,6 +737,88 @@ foreach (@tops){
 	  $print_flop_prop.="\t".$_.",\n";
 	}
 }
+my $print_ebo_special;
+  my @reg_mode="";
+  my @base_mode="";
+  my @base_index_mode="";
+  my @index_mode="";
+  my @n32_mode="";
+  my $prev_inst="";
+print "\navx_ebo_special.cxx\n";
+foreach(@tops){
+  if((type_operation($_) eq "load_exe")){
+    if($_=~/base64_simm32/){
+	  my @tr = split("_o",$prev_inst);
+	  my @tbase = split("_o",$_);
+	  if($tr[0]!=$tbase[0]){
+	    push @reg_mode,"TOP_UNDEFINED";
+	  }else{
+	    print '$tr[0]!=$tbase[0] match'."\n";
+		push @reg_mode,$prev_inst;
+	  }
+	  push @base_mode,$_;
+	  push @n32_mode,"TOP_UNDEFINED";
+	}elsif($_=~/base64_index64_uimm8_simm32/){
+	  push @base_index_mode,$_;
+	}elsif($_=~/index64_uimm8_simm32/){
+	  push @index_mode,$_;
+	}
+  }elsif(type_operation($_) eq "load_only" || type_operation($_) eq "store_only"){
+# TODO: fix the ebo n32 load/store
+    if($_=~/base64_simm32/){
+	  push @base_mode,$_;
+	  push @reg_mode,"TOP_UNDEFINED";
+	  push @n32_mode,"TOP_UNDEFINED";
+#my @mode_count;
+#	  if(@mode_count = $_=~/float/g){
+#	    if(scalar(@mode_count)>1 || $_=~/simm8/)
+#		{push @n32_mode,"TOP_UNDEFINED";}
+#	  }
+	}elsif($_=~/base64_index64_uimm8_simm32/){
+	  push @base_index_mode,$_;
+	}elsif($_=~/index64_uimm8_simm32/){
+	  push @index_mode,$_;
+	}#elsif($_=~/n32/){
+#my @tr = split("_o",$prev_inst);
+#	  my @tbase = split("_o",$_);
+#	  if($tr[0]!=$tbase[0]){
+#	    push @n32_mode,"TOP_UNDEFINED";
+#	  }else{
+#print '$tr[0]!=$tbase[0] match'."\n";
+#		push @n32_mode,$_;
+#	  }
+#	}
+  }
+  $prev_inst=$_;
+}
+if(scalar(@base_mode)!=scalar(@base_index_mode)
+	||scalar(@base_mode)!=scalar(@index_mode)
+	||scalar(@index_mode)!=scalar(@base_index_mode)
+	){
+  die "no match ebo";
+}else{
+	if(scalar(@base_mode)!=scalar(@n32_mode)||scalar(@base_mode)!=scalar(@reg_mode)){
+	  print "base=".scalar(@base_mode)."\n";
+	  print "n32_mode".scalar(@n32_mode)."\n";
+	  print "reg_mode".scalar(@reg_mode)."\n";
+	  die "n32 or reg mode didn't match";
+	}
+   my $iii;
+   for($iii=1;$iii<scalar(@base_mode);$iii++){
+	 if($reg_mode[$iii] eq ""){
+	   $print_ebo_special.="\t{TOP_UNDEFINED";
+	 }else{
+	   $print_ebo_special.="\t{".$reg_mode[$iii];
+	 }
+     $print_ebo_special.=",\t".$base_mode[$iii].",\t".$base_index_mode[$iii].",\n";
+	 $print_ebo_special.="\t ".$index_mode[$iii].",\t";
+	 if($n32_mode[$iii] eq ""){
+	    $print_ebo_special.="TOP_UNDEFINED".'},'."\n";
+	 }else{
+		$print_ebo_special.=$n32_mode[$iii].'},'."\n";
+    }
+   }
+}
 
 print "\navx_pack.cxx:\n";
 foreach (@tops){
@@ -762,6 +872,7 @@ fprint("isa_avx_subset.cxx",$isa_subset_print);
 fprint("avx_si2.cxx", $isa_si_print);
 fprint("isa_avx_properties.cxx",$isa_properties_print);
 fprint("cgemit_targ_avx.cxx", $isa_cgemit_avx_print);
+fprint("ebo_special_avx.cxx",$print_ebo_special);
 
 copy_to('../src/common/targ_info/isa/x8664/',"isa_avx.cxx");
 copy_to('../src/common/targ_info/isa/x8664/',"isa_avx_print.cxx");
@@ -771,6 +882,7 @@ copy_to('../src/common/targ_info/isa/x8664/',"isa_avx_subset.cxx");
 copy_to('../src/common/targ_info/isa/x8664/',"isa_avx_properties.cxx");
 copy_to('../src/common/targ_info/proc/x8664/',"avx_si2.cxx");
 copy_to('../src/be/cg/x8664/cgemit_targ_avx.cxx',"cgemit_targ_avx.cxx");
+copy_to('../src/be/cg/x8664/',"ebo_special_avx.cxx");
   
 fprint("isa_avx_properties_load_only.cxx", $print_load_only);
   fprint("isa_avx_properties_load_exe.cxx", $print_load_exe);

@@ -2085,8 +2085,8 @@ int main (int argc, char *argv[])
   Any_Operand_Access_Time(0);
   Any_Result_Available_Time(0);
 
-#include "avx_si.cxx"
 #include "avx_si2.cxx"
+#include "xop_fma_si2.cxx"
 
   Instruction_Group("tls",
                     TOP_tls_get_addr_64,

@@ -415,6 +415,7 @@ int main()
 		     TOP_bsr32,
 		     TOP_bsr64,
 #include "isa_avx_properties_change_rflags.cxx"
+//#include "isa_xop_fma_properties_change_rflags.cxx"
                      TOP_UNDEFINED);
 
   /* ===== Move operator ====== */
@@ -456,6 +457,7 @@ int main()
 				 TOP_pmovzxwq,
 				 TOP_pmovzxdq,
 #include "isa_avx_properties_move_prop.cxx"
+#include "isa_xop_fma_properties_move_prop.cxx"
 		     TOP_UNDEFINED);
 
   /* ===== Move ext operator ====== */
@@ -595,20 +597,8 @@ int main()
 		     TOP_fmovsldupxxx,
 		     TOP_fmovshdupxxx,
 		     TOP_fmovddupxxx,
-		     /*AVX instructions*/
-		     TOP_vlddqa_n32,
-                     TOP_vldapd_n32,
-                     TOP_vldaps_n32,
-		     TOP_vlddqa,
-                     TOP_vlddqax,
-                     TOP_vlddqaxx,
-		     TOP_vldapd,
-                     TOP_vldapdx,
-                     TOP_vldapdxx,
-                     TOP_vldaps,
-                     TOP_vldapsx,
-                     TOP_vldapsxx,
 #include "isa_avx_properties_load_only.cxx";
+#include "isa_xop_fma_properties_load_only.cxx"
                      TOP_UNDEFINED);
 
   /* ===== Memory load and extend operator ====== */
@@ -1175,6 +1165,7 @@ int main()
              TOP_xchgx32,
              TOP_xchgx64,
 #include "isa_avx_properties_load_exe.cxx"
+#include "isa_xop_fma_properties_load_exe.cxx"
                      TOP_UNDEFINED);
 
   /* ===== arith. operations with memory src and dest operand ====== */
@@ -1346,20 +1337,8 @@ int main()
 		     TOP_storenti128,
 		     TOP_storelpd,
 		     TOP_storent64_fm,
-		     /* AVX instructions */
-                     TOP_vstdqa,
-                     TOP_vstdqax,
-                     TOP_vstdqaxx,
-                     TOP_vstdqa_n32,
-                     TOP_vstapd,
-                     TOP_vstapdx,
-                     TOP_vstapdxx,
-                     TOP_vstaps,
-                     TOP_vstapsx,
-                     TOP_vstapsxx,
-		     TOP_vstapd_n32,
-                     TOP_vstaps_n32,
 #include "isa_avx_properties_store_only.cxx"                     
+//#include "isa_xop_fma_properties_store_only.cxx"
                      TOP_UNDEFINED);
 
   /* ===== Prefetch operator ====== */
@@ -2342,12 +2321,8 @@ int main()
 		     TOP_storelpd,
 		     TOP_pshufw64v16,
 		     TOP_pmovmskb128,
-		    /*AVX instructions*/
-		     TOP_vstapd_n32,
-                     TOP_vstaps_n32,
-                     TOP_vldapd_n32,
-                     TOP_vldaps_n32,
 #include "isa_avx_properties_flop_prop.cxx" 
+//#include "isa_xop_fma_properties_flop_prop.cxx"
                      TOP_UNDEFINED);
 
   /* ===== FP add operator ====== */
@@ -2432,6 +2407,7 @@ int main()
 		     TOP_fsubr,
 		     TOP_fsubrp,		     
 #include "isa_avx_properties_fsub_prop.cxx"
+#include "isa_xop_fma_properties_fsub_prop.cxx"
                      TOP_UNDEFINED);
 
   /* ===== FP multiply operator ====== */
@@ -2456,6 +2432,7 @@ int main()
 		     TOP_fmul,
 		     TOP_fmulp,
 #include "isa_avx_properties_fmul_prop.cxx"
+//#include "isa_xop_fma_properties_fmul_prop.cxx"
                      TOP_UNDEFINED);
 
   /* ===== FP miscellaneous operator ====== */
@@ -3406,31 +3383,8 @@ int main()
 				TOP_pabsd,
 				 TOP_palignr128,
 				 TOP_palignr,
-		     /*AVX instructions*/
-		     TOP_vstdqa,
-                     TOP_vstdqax,
-                     TOP_vstdqaxx,
-                     TOP_vstapd,
-                     TOP_vstapdx,
-                     TOP_vstapdxx,
-                     TOP_vstaps,
-                     TOP_vstapsx,
-                     TOP_vstapsxx,
-		     TOP_vstapd_n32,
-                     TOP_vstaps_n32,
-		     TOP_vlddqa_n32,
-                     TOP_vldapd_n32,
-                     TOP_vldaps_n32,
-		     TOP_vlddqa,
-		     TOP_vlddqax,
-		     TOP_vlddqaxx,
-		     TOP_vldapd,
-                     TOP_vldapdx,
-                     TOP_vldapdxx,
-                     TOP_vldaps,
-                     TOP_vldapsx,
-                     TOP_vldapsxx,
 #include "isa_avx_properties.cxx"
+#include "isa_xop_fma_properties.cxx"
 		     TOP_UNDEFINED );
 
   /* ==== x86 style instructions ==== */
@@ -4486,8 +4440,8 @@ int main()
 
   vector_avx = ISA_Property_Create ("vector_avx"); 
   Instruction_Group (vector_avx,
-                     TOP_vaddpd,
 #include "isa_avx_properties_avx_vector.cxx"
+#include "isa_properties_xop_fma_vector.cxx"
 		     TOP_UNDEFINED);
 
   cfi = ISA_Property_Create ("cfi");

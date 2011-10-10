@@ -3313,7 +3313,8 @@ static WN *lower_madd(WN *block, WN *tree, LOWER_ACTIONS actions)
   {
   case OPR_NEG:
     {
-      WN	*child = WN_kid0(tree);
+	  
+      WN	*child = lower_madd(block, WN_kid0(tree), actions);
       switch(WN_operator(child))
       {
       case OPR_MADD:

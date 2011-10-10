@@ -5642,13 +5642,53 @@ void Expand_Flop( OPCODE opcode, TN *result, TN *src1, TN *src2, TN *src3, OPS *
     opc = TOP_pmullw;
     break;
   case OPC_F4MADD:	// (src2 * src3) + src1
+    if(Is_Target_Orochi()){
+      opc = TOP_vfmaddss_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+    }
   case OPC_F4NMADD:	// -((src2 * src3) + src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmsubss_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+    }
   case OPC_F4MSUB:	// (src2 * src3) - src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmsubss_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
   case OPC_F4NMSUB:	// -((src2 * src3) - src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmaddss_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
   case OPC_F8MADD:	// (src2 * src3) + src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmaddsd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
   case OPC_F8NMADD:	// -((src2 * src3) + src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmsubsd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
   case OPC_F8MSUB:	// (src2 * src3) - src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmsubsd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
   case OPC_F8NMSUB:	// -((src2 * src3) - src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmaddsd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
     FmtAssert( false,
 	       ("Expand_Flop: Unsupported opcode (%s)", OPCODE_name(opcode)) );
     break;
@@ -5702,7 +5742,7 @@ void Expand_Flop( OPCODE opcode, TN *result, TN *src1, TN *src2, TN *src3, OPS *
     #pragma mips_frequency_hint NEVER
     FmtAssert(FALSE, ("Unimplemented flop: %s", OPCODE_name(opcode)));
   }
-
+  
   Build_OP( opc, result, src1, src2, ops );
 }
 

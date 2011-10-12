@@ -3777,8 +3777,7 @@ WGEN_target_builtins (gs_t exp, INTRINSIC * iopc, BOOL * intrinsic_op)
 	  break;
       }
     case GSBI_IX86_BUILTIN_VEC_EXT_V4SF:
-      wn = WN_Tas(MTYPE_F4, MTYPE_To_TY(MTYPE_V16F4), arg0);
-      *intrinsic_op = FALSE;
+     *iopc = INTRN_EXTRACTPS;
       break;
     case GSBI_IX86_BUILTIN_PMADDWD:
     case GSBI_IX86_BUILTIN_PMADDWD128:

@@ -1245,7 +1245,6 @@ int main()
 	TOP_pextrb,
 	TOP_pextrd,
 	TOP_pextrq,
-	TOP_extractps,
 	TOP_pinsrb,
 	TOP_pinsrd,
 	TOP_pinsrq,
@@ -1782,6 +1781,7 @@ int main()
 			   TOP_pextrw64,
 			   TOP_pextrw128,
 			   TOP_pshufw64v16,
+			   TOP_extractps,
 			   TOP_UNDEFINED );
 
   ISA_PRINT_TYPE packed_ins = 

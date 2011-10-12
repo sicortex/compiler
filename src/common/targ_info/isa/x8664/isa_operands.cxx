@@ -2448,10 +2448,9 @@ int main()
 	Instruction_Group("extractps fp32",
 				TOP_extractps,
 				TOP_UNDEFINED);
-	Result(0,fp64);
-	Operand(0,int32,opnd1);
-	Operand(1,fp128,opnd2);
-	Operand(2,uimm8,opnd3);
+	Result(0,int64);
+	Operand(0,fp128,opnd1);
+	Operand(1,uimm8,opnd2);
 
 	Instruction_Group("insertps fp32",
 				TOP_insertps,

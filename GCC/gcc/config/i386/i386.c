@@ -15802,8 +15802,8 @@ ix86_init_mmx_sse_builtins (void)
   def_builtin (MASK_SSE4_1, "__builtin_ia32_vec_ext_v4si",ftype, IX86_BUILTIN_PEXTRD);
   ftype = build_function_type_list (long_long_integer_type_node, V2DI_type_node,integer_type_node,  NULL_TREE);
   def_builtin (MASK_SSE4_1, "__builtin_ia32_vec_ext_v2di",ftype, IX86_BUILTIN_PEXTRQ);
-  ftype = build_function_type_list (float_type_node, V4SF_type_node,integer_type_node,  NULL_TREE);
-  def_builtin (MASK_SSE4_1, "__builtin_ia32_vec_ext_v4sf",ftype, IX86_BUILTIN_EXTRACTPS);
+  ftype = build_function_type_list (integer_type_node, V4SF_type_node,integer_type_node,  NULL_TREE);
+  def_builtin (MASK_SSE4_1, "__builtin_ia32_extract_ps",ftype, IX86_BUILTIN_EXTRACTPS);
 /*insert*/
   ftype = build_function_type_list (V16QI_type_node,V16QI_type_node, integer_type_node,integer_type_node,  NULL_TREE);
   def_builtin (MASK_SSE4_1, "__builtin_ia32_vec_set_v16qi",ftype, IX86_BUILTIN_PINSRB);

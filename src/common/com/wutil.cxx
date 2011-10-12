@@ -1329,6 +1329,7 @@ static const struct {
 	INTRN_PEXTRB,                "INTRN_PEXTRB",
 	INTRN_PEXTRD,                "INTRN_PEXTRD",
 	INTRN_PEXTRQ,                "INTRN_PEXTRQ",
+	INTRN_VEC_EXT_V4SF,          "INTRN_VEC_EXT_V4SF",
 	INTRN_EXTRACTPS,             "INTRN_EXTRACTPS",
 	INTRN_PINSRB,                "INTRN_PINSRB",
 	INTRN_PINSRD,                "INTRN_PINSRD",

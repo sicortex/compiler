@@ -7183,6 +7183,29 @@ EMT_Emit_PU ( FILE *asm_file, ST *pu, DST_IDX pu_dst, WN *rwn )
   }
   FOREACH_SYMBOL (CURRENT_SYMTAB, sym, i) {
     if (ST_is_not_used(sym)) continue;
+
+    ST *base_st;
+    INT64 base_ofst;
+    Base_Symbol_And_Offset (sym, &base_st, &base_ofst);
+
+    /* Allocate all unused and unallocated variables now instead
+     * of later so it doesnt introduce different sections to .cfi
+     * block. Switch to .text after the section initialization.
+     */
+    if (generate_dwarf && sym == base_st && ST_class(sym) == CLASS_VAR &&
+        ST_sclass(sym) == SCLASS_PSTATIC) {
+
+	Allocate_Object(sym);
+        Base_Symbol_And_Offset (sym, &base_st, &base_ofst);
+
+        bool switchBackToText = ST_elf_index(base_st) == 0;
+        /* Allocate .bss */
+        Init_Section(base_st);
+        /* Switch back if we initialized the base_st. */
+	if (switchBackToText)
+          fprintf ( Asm_File, "\n\t.text\n");
+        continue;
+    }
     if (ST_sclass(sym) == SCLASS_COMMON) {
       EMT_Put_Elf_Symbol (sym);
     }

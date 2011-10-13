@@ -477,6 +477,7 @@ char		*intrin_str[]		= {
 #ifdef KEY
                                 "Fstat_Intrinsic",
 #endif
+				"Gamma Intrinsic",
 				"Getpos_Intrinsic",
 				"Get_Ieee_Exceptions_Intrinsic",
 				"Get_Ieee_Interrupts_Intrinsic",
@@ -624,6 +625,7 @@ char		*intrin_str[]		= {
 				"Lock_Release_Intrinsic",
 				"Lock_Test_And_Set_Intrinsic",
 				"Log_Intrinsic",
+				"Log_Gamma_Intrinsic",
 				"Log10_Intrinsic",
 				"Log2_Images_Intrinsic",
 				"Logical_Intrinsic",
@@ -1402,6 +1404,8 @@ char		*operator_str[]		= {
 #endif /* KEY Bug 10410 */
 			"ProcPtr_Asg_Opr",
 			"ProcPtr_Opr",
+			"Gamma_Opr",
+			"Log_Gamma_Opr",
                         "The_Last_Opr"
 		};
 

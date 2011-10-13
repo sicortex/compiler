@@ -4570,6 +4570,8 @@ static	void	print_expanded_ir(int	ir_idx)
       case Sin_Opr:
       case Log_E_Opr:
       case Log_10_Opr:
+      case Gamma_Opr:
+      case Log_Gamma_Opr:
       case Tan_Opr:
       case Tanh_Opr:
       case Sinh_Opr:

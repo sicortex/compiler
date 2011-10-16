@@ -3023,6 +3023,11 @@ main()
   Instruction_Group("xzerov",
 		    TOP_xzero128v32,
 		    TOP_xzero128v64,
+		    /*avx added by hand*/
+            TOP_vxzero128v64,
+            TOP_vxzero128v32,
+            TOP_vxzero256v64,
+            TOP_vxzero256v32,
 		    TOP_UNDEFINED);
   Result(0, fp128);
 

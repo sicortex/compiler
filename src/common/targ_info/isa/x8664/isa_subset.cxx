@@ -97,6 +97,11 @@ main()
 		    TOP_xzero64,
 		    TOP_xzero128v32,
 		    TOP_xzero128v64,
+		    /*avx added by hand*/
+            TOP_vxzero128v64,
+            TOP_vxzero128v32,
+            TOP_vxzero256v64,
+            TOP_vxzero256v32,
 		    TOP_and8,
 		    TOP_and16,
 		    TOP_andx8,

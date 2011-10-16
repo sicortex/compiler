@@ -1206,6 +1206,11 @@ int main (int argc, char *argv[])
 		    TOP_xzero128v64,
 		    TOP_orps,
 		    TOP_orpd,
+		    /*avx added by hand*/
+            TOP_vxzero128v64,
+            TOP_vxzero128v32,
+            TOP_vxzero256v64,
+            TOP_vxzero256v32,
 		    TOP_UNDEFINED);
   Any_Operand_Access_Time(0);
   Any_Result_Available_Time(3);

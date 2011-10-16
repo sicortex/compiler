@@ -2270,6 +2270,11 @@ main()
 		     TOP_xzero64,
 		     TOP_xzero128v32,
 		     TOP_xzero128v64,
+		     /*avx added by hand*/
+            TOP_vxzero128v64,
+            TOP_vxzero128v32,
+            TOP_vxzero256v64,
+            TOP_vxzero256v32,
 		     TOP_fadd,
 		     TOP_faddp,
 		     TOP_fsub,
@@ -3349,6 +3354,11 @@ main()
 		     TOP_subus128v16,
 		     TOP_xzero128v32,
 		     TOP_xzero128v64,
+		     /*avx added by hand*/
+            TOP_vxzero128v64,
+            TOP_vxzero128v32,
+            TOP_vxzero256v64,
+            TOP_vxzero256v32,
 		     TOP_pavgb,
 		     TOP_pavgw,
 				 TOP_pavgb128,
@@ -4428,6 +4438,11 @@ main()
 		     TOP_fsqrt128v64,
 		     TOP_cmppd,
 		     TOP_xzero128v64,
+		     /*avx added by hand*/
+            TOP_vxzero128v64,
+            TOP_vxzero128v32,
+            TOP_vxzero256v64,
+            TOP_vxzero256v32,
 		     TOP_movmskpd,
 		     TOP_UNDEFINED);
 

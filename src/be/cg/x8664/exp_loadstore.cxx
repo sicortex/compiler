@@ -149,16 +149,16 @@ Pick_Load_Instruction (TYPE_ID rtype, TYPE_ID desc,
 	   is_reloc_x8664_64 ? TOP_ld64_abs : TOP_ld64;
   case MTYPE_F4:
     if (rclass == ISA_REGISTER_CLASS_float)
-      return base != NULL ? (Target_AVX? TOP_vmovss_f128_ofloat_base64_simm32 : TOP_ldss) : TOP_ldss_n32;
+      return base != NULL ? TOP_ldss : TOP_ldss_n32;
     else
       return base != NULL ? TOP_flds : TOP_flds_n32;
   case MTYPE_F8:
     if (rclass == ISA_REGISTER_CLASS_float)
-      return base != NULL ? (Target_AVX? TOP_vmovsd_f128_ofloat_base64_simm32 : TOP_ldsd) : TOP_ldsd_n32;
+      return base != NULL ? TOP_ldsd : TOP_ldsd_n32;
     else
       return base != NULL ? TOP_fldl : TOP_fldl_n32;
   case MTYPE_F16:
-      return (Target_AVX? TOP_vmovdqu_f128_ofloat_base64_simm32 : TOP_lddqu);
+      return TOP_lddqu;
   case MTYPE_FQ:
     return base != NULL ? TOP_fldt : TOP_fldt_n32;
   case MTYPE_V16F4:
@@ -408,16 +408,16 @@ Pick_Store_Instruction( TYPE_ID mtype,
 	   base == NULL ? TOP_store64_off : TOP_store64;
   case MTYPE_F4:
     if( rclass == ISA_REGISTER_CLASS_float )
-      return base != NULL ? (Target_AVX? TOP_vmovss_f128_obase64_simm32_float : TOP_stss) : TOP_stss_n32;
+      return base != NULL ? TOP_stss : TOP_stss_n32;
     else
       return base != NULL ? TOP_fstps : TOP_fstps_n32;
   case MTYPE_F8:
     if( rclass == ISA_REGISTER_CLASS_float )
-      return base != NULL ? (Target_AVX? TOP_vmovsd_f128_obase64_simm32_float : TOP_stsd) : TOP_stsd_n32;
+      return base != NULL ? TOP_stsd : TOP_stsd_n32;
     else
       return base != NULL ? TOP_fstpl : TOP_fstpl_n32;
   case MTYPE_F16:
-    return (Target_AVX? TOP_vmovdqu_f128_obase64_simm32_float: TOP_stdqu);
+    return TOP_stdqu;
   case MTYPE_FQ:
     return base != NULL ? TOP_fstpt : TOP_fstpt_n32;
   case MTYPE_V16F4: 

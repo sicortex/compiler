@@ -5593,6 +5593,7 @@ convert_stmt_list_to_OPs(WN *stmt)
 void 
 Convert_WHIRL_To_OPs (WN *tree)
 {
+  //Target_AVX = 1;//delete this line
   WN *stmt;
   CGRIN *cgrin;
   BB *last_bb;

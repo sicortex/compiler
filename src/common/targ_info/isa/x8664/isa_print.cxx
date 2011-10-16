@@ -1014,6 +1014,23 @@ main()
   			   TOP_xzero64,
   			   TOP_xzero128v32,
   			   TOP_xzero128v64,
+  			   /*avx added by hand*/
+            TOP_vxzero128v64,
+            TOP_vxzero128v32,
+            TOP_vxzero256v64,
+            TOP_vxzero256v32,
+			   TOP_UNDEFINED );
+  ISA_PRINT_TYPE rrr = ISA_Print_Type_Create("rrr", "%s %s, %s, %s");
+  Name();
+  Result(0);
+  Result(0);
+  Result(0);
+  Instruction_Print_Group( rr,
+  			   /*avx added by hand*/
+            TOP_vxzero128v64,
+            TOP_vxzero128v32,
+            TOP_vxzero256v64,
+            TOP_vxzero256v32,
 			   TOP_UNDEFINED );
 
   /* One result / one operand */

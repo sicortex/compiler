@@ -72,8 +72,6 @@
 	Instruction_Group("ofloat_float_int64",
 		TOP_vcvtsi2sd_int64_ofloat_float_int64,
 		TOP_vcvtsi2ss_int64_ofloat_float_int64,
-		TOP_vcvtsi2sdq_int64_ofloat_float_int64,
-		TOP_vcvtsi2ssq_int64_ofloat_float_int64,
 		TOP_UNDEFINED);
 	Result(0,fp128);
 	Operand(0, fp128,opnd1);
@@ -270,12 +268,8 @@
 		TOP_vpsrlq_f128_ofloat_float_base64_index64_uimm8_simm32,
 		TOP_vcvtsi2sd_int32_ofloat_float_base64_index64_uimm8_simm32,
 		TOP_vcvtsi2ss_int32_ofloat_float_base64_index64_uimm8_simm32,
-		TOP_vcvtsi2sdq_int32_ofloat_float_base64_index64_uimm8_simm32,
-		TOP_vcvtsi2ssq_int32_ofloat_float_base64_index64_uimm8_simm32,
 		TOP_vcvtsi2sd_int64_ofloat_float_base64_index64_uimm8_simm32,
 		TOP_vcvtsi2ss_int64_ofloat_float_base64_index64_uimm8_simm32,
-		TOP_vcvtsi2sdq_int64_ofloat_float_base64_index64_uimm8_simm32,
-		TOP_vcvtsi2ssq_int64_ofloat_float_base64_index64_uimm8_simm32,
 		TOP_vmaskmovps_f128_ofloat_float_base64_index64_uimm8_simm32,
 		TOP_vmaskmovps_f256_ofloat_float_base64_index64_uimm8_simm32,
 		TOP_vmaskmovpd_f128_ofloat_float_base64_index64_uimm8_simm32,
@@ -352,6 +346,8 @@
 	Instruction_Group("ofloat_int64",
 		TOP_vmovq_i64_ofloat_int64,
 		TOP_vmovd_i64_ofloat_int64,
+		TOP_vcvtsi2sdq_i64_ofloat_int64,
+		TOP_vcvtsi2ssq_i64_ofloat_int64,
 		TOP_UNDEFINED);
 	Result(0,fp128);
 	Operand(0, int64,opnd1);
@@ -422,6 +418,8 @@
 		TOP_vcvttss2si_int64_oint64_float,
 		TOP_vmovq_f128_oint64_float,
 		TOP_vmovd_f128_oint64_float,
+		TOP_vcvtsi2sdq_f128_oint64_float,
+		TOP_vcvtsi2ssq_f128_oint64_float,
 		TOP_vpmovmskb_int32_oint64_float,
 		TOP_UNDEFINED);
 	Result(0,int64);
@@ -514,6 +512,8 @@
 		TOP_i32_ofloat_base64_simm32,
 		TOP_vmovq_i64_ofloat_base64_simm32,
 		TOP_vmovd_i64_ofloat_base64_simm32,
+		TOP_vcvtsi2sdq_i64_ofloat_base64_simm32,
+		TOP_vcvtsi2ssq_i64_ofloat_base64_simm32,
 		TOP_vmovhpd_f128_ofloat_base64_simm32,
 		TOP_vmovhps_f128_ofloat_base64_simm32,
 		TOP_vmovntdqa_f128_ofloat_base64_simm32,
@@ -738,12 +738,8 @@
 		TOP_vpsrlq_f128_ofloat_float_base64_simm32,
 		TOP_vcvtsi2sd_int32_ofloat_float_base64_simm32,
 		TOP_vcvtsi2ss_int32_ofloat_float_base64_simm32,
-		TOP_vcvtsi2sdq_int32_ofloat_float_base64_simm32,
-		TOP_vcvtsi2ssq_int32_ofloat_float_base64_simm32,
 		TOP_vcvtsi2sd_int64_ofloat_float_base64_simm32,
 		TOP_vcvtsi2ss_int64_ofloat_float_base64_simm32,
-		TOP_vcvtsi2sdq_int64_ofloat_float_base64_simm32,
-		TOP_vcvtsi2ssq_int64_ofloat_float_base64_simm32,
 		TOP_vmaskmovps_f128_ofloat_float_base64_simm32,
 		TOP_vmaskmovps_f256_ofloat_float_base64_simm32,
 		TOP_vmaskmovpd_f128_ofloat_float_base64_simm32,
@@ -844,6 +840,8 @@
 		TOP_i32_ofloat_index64_uimm8_simm32,
 		TOP_vmovq_i64_ofloat_index64_uimm8_simm32,
 		TOP_vmovd_i64_ofloat_index64_uimm8_simm32,
+		TOP_vcvtsi2sdq_i64_ofloat_index64_uimm8_simm32,
+		TOP_vcvtsi2ssq_i64_ofloat_index64_uimm8_simm32,
 		TOP_vmovhpd_f128_ofloat_index64_uimm8_simm32,
 		TOP_vmovhps_f128_ofloat_index64_uimm8_simm32,
 		TOP_vmovntdqa_f128_ofloat_index64_uimm8_simm32,
@@ -965,6 +963,8 @@
 		TOP_i32_ofloat_base64_index64_uimm8_simm32,
 		TOP_vmovq_i64_ofloat_base64_index64_uimm8_simm32,
 		TOP_vmovd_i64_ofloat_base64_index64_uimm8_simm32,
+		TOP_vcvtsi2sdq_i64_ofloat_base64_index64_uimm8_simm32,
+		TOP_vcvtsi2ssq_i64_ofloat_base64_index64_uimm8_simm32,
 		TOP_vmovhpd_f128_ofloat_base64_index64_uimm8_simm32,
 		TOP_vmovhps_f128_ofloat_base64_index64_uimm8_simm32,
 		TOP_vmovntdqa_f128_ofloat_base64_index64_uimm8_simm32,
@@ -1110,8 +1110,6 @@
 	Instruction_Group("ofloat_float_int32",
 		TOP_vcvtsi2sd_int32_ofloat_float_int32,
 		TOP_vcvtsi2ss_int32_ofloat_float_int32,
-		TOP_vcvtsi2sdq_int32_ofloat_float_int32,
-		TOP_vcvtsi2ssq_int32_ofloat_float_int32,
 		TOP_UNDEFINED);
 	Result(0,fp128);
 	Operand(0, fp128,opnd1);
@@ -1658,12 +1656,8 @@
 		TOP_vpsrlq_f128_ofloat_float_index64_uimm8_simm32,
 		TOP_vcvtsi2sd_int32_ofloat_float_index64_uimm8_simm32,
 		TOP_vcvtsi2ss_int32_ofloat_float_index64_uimm8_simm32,
-		TOP_vcvtsi2sdq_int32_ofloat_float_index64_uimm8_simm32,
-		TOP_vcvtsi2ssq_int32_ofloat_float_index64_uimm8_simm32,
 		TOP_vcvtsi2sd_int64_ofloat_float_index64_uimm8_simm32,
 		TOP_vcvtsi2ss_int64_ofloat_float_index64_uimm8_simm32,
-		TOP_vcvtsi2sdq_int64_ofloat_float_index64_uimm8_simm32,
-		TOP_vcvtsi2ssq_int64_ofloat_float_index64_uimm8_simm32,
 		TOP_vmaskmovps_f128_ofloat_float_index64_uimm8_simm32,
 		TOP_vmaskmovps_f256_ofloat_float_index64_uimm8_simm32,
 		TOP_vmaskmovpd_f128_ofloat_float_index64_uimm8_simm32,

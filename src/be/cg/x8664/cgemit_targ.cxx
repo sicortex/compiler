@@ -1524,6 +1524,11 @@ static void Init_OP_Name()
     OP_Name[TOP_vstdqax] = "vmovdqa";
     OP_Name[TOP_vstdqaxx] = "vmovdqa";
     OP_Name[TOP_vstdqa_n32] = "vmovdqa";
+	/*avx added by hand*/
+	OP_Name[TOP_vxzero128v64] = "vxorpd";
+	OP_Name[TOP_vxzero128v32] = "vxorps";
+	OP_Name[TOP_vxzero256v64] = "vxorpd";
+	OP_Name[TOP_vxzero256v32] = "vxorps";
 #include "cgemit_targ_avx.cxx"
 
 

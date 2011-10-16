@@ -146,9 +146,9 @@ my @vmovd32_toxmm=["vmovd"];
 ## opnd(int32), result(xmm)
 my @int32_to_xmm=["vmovd"];
 ## opnd(int64), result(xmm)
-my @int64_to_xmm=["vmovq", "vmovd"];
+my @int64_to_xmm=["vmovq", "vmovd","vcvtsi2sdq","vcvtsi2ssq"];
 ## opnd(xmm), result(int64/mem)
-my @vmovd64_tomem=["vmovq", "vmovd"];
+my @vmovd64_tomem=["vmovq", "vmovd","vcvtsi2sdq","vcvtsi2ssq"];
 ## opnd(xmm), result(int32/int64)
 my @xmm_to_int = ["vpmovmskb"];
 ## opnd(xmm/mem),result(xmm)
@@ -164,9 +164,9 @@ my @vcvtsd2si64=["vcvtsd2si","vcvtss2si","vcvttsd2si","vcvttss2si"];
 ## opnd(xmm/ymm), result(int32)
 my @vmovmskpd=["vmovmskpd","vmovmskps"];
 ## opnd(xmm) opnd(int32/mem), result(xmm)
-my @vcvtsi2sd32=["vcvtsi2sd","vcvtsi2ss", "vcvtsi2sdq", "vcvtsi2ssq"];
+my @vcvtsi2sd32=["vcvtsi2sd","vcvtsi2ss"];
 ## opnd(xmm) opnd(int64/mem), result(xmm)
-my @vcvtsi2sd64=["vcvtsi2sd","vcvtsi2ss", "vcvtsi2sdq", "vcvtsi2ssq"];
+my @vcvtsi2sd64=["vcvtsi2sd","vcvtsi2ss"];
 ## opnd(xmm) opnd(int32/mem) opnd(imm8) result(xmm)
 my @xmm_int32omem_imm8_to_xmm=["vpinsrb","vpinsrw","vpinsrd"];
 ## opnd(xmm) opnd(int64/mem) opnd(imm8) result(xmm)

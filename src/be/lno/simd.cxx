@@ -105,7 +105,10 @@ static REDUCTION_MANAGER *curr_simd_red_manager;
 static void Simd_Mark_Code (WN* wn);
 
 static INT Last_Vectorizable_Loop_Id = 0;
-static BOOL *simd_op_avx;
+/* if simd_op_avx[i] = TRUE, means vec_simd_ops->Top_nth(i) is a expression can be vectorized 256-bits
+* 2 places to init it
+*/
+static BOOL *simd_op_avx; 
 
 
 static BOOL Too_Few_Iterations(INT64 iters, WN *body)
@@ -272,7 +275,7 @@ static BOOL is_vectorizable_op (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc) {
     else
       return FALSE;
   case OPR_MAX:
-  case OPR_MIN:
+  case OPR_MIN://TODO OPR_MINMAX
     if (rtype == MTYPE_F4 || rtype == MTYPE_F8 || rtype == MTYPE_I4)
       return TRUE;
     else
@@ -1324,23 +1327,34 @@ INT Vec_Unit_Size[11] = { 1, 1, 2, 2, 4, 4, 8, 8, 16, 16, -1 };
 
 static BOOL
 Simd_Suitable_32bytes_AVX(WN *simd_op){
-// TODO: ADD MORE
+// TODO: What about XORPD?
   OPERATOR oper = WN_operator(simd_op);
+  TYPE_ID rtype, desc;
+  rtype = WN_rtype(simd_op);
+  desc = WN_desc(simd_op);
   switch(oper){
   	case OPR_ADD:
 	case OPR_SUB:
 	case OPR_MPY:
 	case OPR_DIV:
 	case OPR_PAREN:
+	case OPR_SQRT:
+	case OPR_MIN:
+	case OPR_MAX:
+	
 	 return TRUE;
 	case OPR_CVT:{
-	  TYPE_ID rtype, desc;
-	  rtype = WN_rtype(simd_op);
-	  desc = WN_desc(simd_op);
 	  if(rtype == MTYPE_F8 && (desc == MTYPE_I4 || desc == MTYPE_U4) )
 	  	return TRUE;
 	  return FALSE;
 	}	
+	case OPR_RECIP:
+	case OPR_RSQRT:{
+	  if(rtype == MTYPE_F4)
+	  	return TRUE;
+	  else
+	  	return FALSE;
+	}
 	default: return FALSE;
   }
 }
@@ -2899,16 +2913,28 @@ static BOOL SA_Set_SimdOps_Info1(WN* body,
   return TRUE;  
 }
 
+
 static BOOL
 Simd_Op_In_Stack(WN *simd_op, STACK_OF_WN * simd_stack){
   INT i;
   for(i = 0; i < simd_stack->Elements(); i++){
-  	WN *vec_op = vec_simd_ops->Top_nth(i);
+  	WN *vec_op = simd_stack->Top_nth(i);
 	if(simd_op == vec_op)
 	 break;
   }
   return !(i==simd_stack->Elements());
 }
+
+static void
+Set_Kids_None_AVX(WN *op){
+  INT i;
+  for(i = vec_simd_ops->Elements()-1; i >= 0; i--){
+  	WN *simd_op = vec_simd_ops->Top_nth(i);
+	if(Wn_Is_Inside(simd_op, op))
+	  simd_op_avx[i] = FALSE;
+  }
+}
+
 
 static BOOL Is_STID_Kid_AVX(WN *op){
   for (INT i = 0; i < vec_simd_ops->Elements(); i++){
@@ -4220,6 +4246,12 @@ static WN *Simd_Vectorize_Constants(WN *const_wn,//to be vectorized
      case MTYPE_V16F4:
 	 	  WN_set_rtype(const_wn, MTYPE_V16F4);
 		  break;
+	 case MTYPE_V32F4:
+	 	  WN_set_rtype(const_wn, MTYPE_V32F4);
+		  break;
+	 case MTYPE_V32F8:
+	 	  WN_set_rtype(const_wn, MTYPE_V32F8);
+		  break;
 	 case MTYPE_F4:
 	 	  if(Target_AVX && simd_op_avx[num_simd_op])
 		  	WN_set_rtype(const_wn, MTYPE_V32F4);
@@ -4978,6 +5010,13 @@ static void Simd_Vectorize_Load_And_Equilvalent(WN *load, WN *innerloop, TYPE_ID
       WN_set_desc(scalar_ref, vmtype);
       if (WN_operator(scalar_ref) != OPR_STID)
               WN_set_rtype(scalar_ref, vmtype);
+	  else{
+	  	/*it's stid, and we the symbol is use before define
+	  	* we should set all the stid's kid to V16F* stuff.
+		*/ 
+	  	if(Target_AVX && !MTYPE_is_long_vector(vmtype))
+		  Set_Kids_None_AVX(scalar_ref);
+	  }
     }
    CXX_DELETE(equivalence_class, &LNO_local_pool);
 }
@@ -5014,9 +5053,7 @@ static void Simd_Vectorize_SimdOp_And_Kids(WN *simd_op, TYPE_ID vmtype, BOOL *in
       case MTYPE_F4: 
 	  	vec_desc = MTYPE_V16F4;
 		if(Target_AVX && simd_op_avx[nth]){
-		 TYPE_ID vec_rtype_kid0 = WN_rtype(WN_kid0(simd_op));
-		 if(vec_rtype_kid0 == MTYPE_V32F8)
-		   vec_desc = MTYPE_V32F4;
+		  vec_desc = MTYPE_V32F4;
 		}
 		break;
      default: FmtAssert(FALSE, ("NYI"));
@@ -5025,26 +5062,28 @@ static void Simd_Vectorize_SimdOp_And_Kids(WN *simd_op, TYPE_ID vmtype, BOOL *in
       case MTYPE_F8:
         vec_rtype =  MTYPE_V16F8;
 		if(Target_AVX && simd_op_avx[nth]){
-		  TYPE_ID vec_rtype_kid0, vec_desc_kid0;
-		  vec_rtype_kid0 = WN_rtype(WN_kid0(simd_op));
-		  if(vec_rtype_kid0 == MTYPE_V32F4 || vec_rtype_kid0 == MTYPE_V16I4)
+		  if(vec_desc == MTYPE_V32F4 || vec_desc == MTYPE_V16I4)
 		    vec_rtype = MTYPE_V32F8;
+		  else
+		  	FmtAssert(FALSE, ("CVT is illegal for 256-bits avx"));
 		}
-        if (vec_desc == MTYPE_V16I4) // bug 7334
+        if (vec_desc == MTYPE_V16I4 && vec_rtype != MTYPE_V32F8) // bug 7334
         {
-           if(Target_AVX && vec_rtype == MTYPE_V32F8)
-		     vec_desc = MTYPE_V16I4;
-		   else
-             vec_desc = MTYPE_V8I4;
+          vec_desc = MTYPE_V8I4;
         }
-		else if(Target_AVX && vec_rtype == MTYPE_V32F8)
-			vec_desc = MTYPE_V16F4;
-        else vec_desc = MTYPE_V8F4;
+		else if(vec_rtype != MTYPE_V32F8)
+         vec_desc = MTYPE_V8F4;
+		else {
+		  FmtAssert((vec_rtype == MTYPE_V32F8 && vec_desc == MTYPE_V16I4)||
+		  	        (vec_rtype == MTYPE_V32F8 && vec_desc == MTYPE_V32F4),
+		  	        ("Illegal CVT in simd"));
+		}
         break;
       case MTYPE_F4:
 	  	vec_rtype = MTYPE_V16F4;
-		if(Target_AVX && WN_rtype(WN_kid0(simd_op)) == MTYPE_V32F8 )
-		  vec_rtype = MTYPE_V32F4;
+		if(Target_AVX && simd_op_avx[nth]){
+		  FmtAssert(FALSE, ("NYI error in simd"));
+		}
 		break;
       case MTYPE_I4: vec_rtype = MTYPE_V16I4; break;
       default: FmtAssert(FALSE, ("NYI"));

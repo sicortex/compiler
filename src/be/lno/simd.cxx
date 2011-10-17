@@ -3038,7 +3038,7 @@ static void SA_Set_SimdOps_Info2()
 
   WN *istore, *simd_op;
   if(Target_AVX){
-    for (INT i = 0; i < vec_simd_ops->Elements(); i++){
+	for(INT i = vec_simd_ops->Elements()-1; i >= 0; i--){
   	  simd_op = vec_simd_ops->Top_nth(i);
   	  simd_op_avx[i] = Is_AVX_Simd_Op(simd_op);
     }

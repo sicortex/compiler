@@ -147,6 +147,7 @@ typedef struct local_spills {
 static LOCAL_SPILLS lra_float_spills, lra_int_spills;
 static LOCAL_SPILLS swp_float_spills, swp_int_spills;
 #ifdef TARG_X8664
+static LOCAL_SPILLS lra_avx_spills;
 static LOCAL_SPILLS lra_sse2_spills;
 static LOCAL_SPILLS lra_x87_spills;
 static LOCAL_SPILLS lra_mmx_spills;
@@ -314,6 +315,7 @@ CGSPILL_Reset_Local_Spills (void)
   LOCAL_SPILLS_Reset(&swp_float_spills);
   LOCAL_SPILLS_Reset(&swp_int_spills);
 #ifdef TARG_X8664
+  LOCAL_SPILLS_Reset(&lra_avx_spills);
   LOCAL_SPILLS_Reset(&lra_sse2_spills);
   LOCAL_SPILLS_Reset(&lra_x87_spills);
   LOCAL_SPILLS_Reset(&lra_mmx_spills);
@@ -356,6 +358,10 @@ CGSPILL_Initialize_For_PU(void)
   LOCAL_SPILLS_free(slc) = NULL;
   LOCAL_SPILLS_used(slc) = NULL;
 #ifdef TARG_X8664
+  slc = &lra_avx_spills;
+  LOCAL_SPILLS_mem_type(slc) = MTYPE_To_TY(MTYPE_F32);
+  LOCAL_SPILLS_free(slc) = NULL;
+  LOCAL_SPILLS_used(slc) = NULL;
   slc = &lra_sse2_spills;
   LOCAL_SPILLS_mem_type(slc) = Quad_Type;
   LOCAL_SPILLS_free(slc) = NULL;
@@ -540,6 +546,9 @@ CGSPILL_Get_TN_Spill_Location (TN *tn, CGSPILL_CLIENT client)
       } else if (TN_size(tn) == 16 || TN_size(tn) == 12) {
 	slc = TN_register_class(tn) == ISA_REGISTER_CLASS_x87
 	  ? &lra_x87_spills : &lra_sse2_spills;
+      }else if (TN_size(tn) == 32){
+        //AVX type
+        slc = &lra_avx_spills;
       }
 #endif /* TARG_X8664 */
 

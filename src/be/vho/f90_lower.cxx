@@ -5827,8 +5827,8 @@ void Strip_OMP_Workshare(WN * pu)
             WN_Delete(WN_EXTRACT_FromBlock(pragmas, pragma));
             WN *end_wn = WN_last(pragmas);
             if(end_wn && WN_opcode(end_wn) == OPC_PRAGMA &&
-              ((WN_PRAGMA_ID)WN_pragma(end_wn)==WN_PRAGMA_NOWAIT) ||
-              ((WN_PRAGMA_ID)WN_pragma(end_wn)==WN_PRAGMA_END_MARKER) ){
+              (((WN_PRAGMA_ID)WN_pragma(end_wn)==WN_PRAGMA_NOWAIT) ||
+              ((WN_PRAGMA_ID)WN_pragma(end_wn)==WN_PRAGMA_END_MARKER))){
               WN_Delete(WN_EXTRACT_FromBlock(pragmas, end_wn));
             }
           break;

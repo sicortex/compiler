@@ -6240,6 +6240,38 @@ Expand_Shuffle (OPCODE opc, TN* result, TN* op1, VARIANT variant, OPS *ops)
       Build_OP(Target_AVX? TOP_vpshufhw_f128_ofloat_float_simm8 : TOP_pshufhw, result, tmp2, Gen_Literal_TN(0x1B, 1), ops);
       break;
     }
+  case OPC_V32F4V32F4SHUFFLE:
+  	{
+	  TN* tmp_hi = Build_TN_Of_Mtype(MTYPE_V16F4);
+	  TN* tmp_low = Build_TN_Like(tmp_hi);
+	  TN* dest_hi = Build_TN_Like(tmp_hi);
+	  TN* dest_low = Build_TN_Like(dest_hi);
+	  Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_hi, op1, Gen_Literal_TN(0,1), ops);
+	  Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_low, op1, Gen_Literal_TN(1,1), ops);
+	  Build_OP(TOP_vpshufd_f128_ofloat_float_simm8, dest_hi, tmp_hi, Gen_Literal_TN(0x1B,1), ops);
+	  Build_OP(TOP_vpshufd_f128_ofloat_float_simm8, dest_low, tmp_low, Gen_Literal_TN(0x1B,1), ops);
+	  Build_OP(TOP_vxzero256v32, result, ops);
+	  Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, dest_low, Gen_Literal_TN(0,1),ops);
+	  Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, dest_hi, Gen_Literal_TN(1,1), ops);
+	  break;
+  	}
+  case OPC_V32F8V32F8SHUFFLE:
+  	{
+	  TN* tmp_hi = Build_TN_Of_Mtype(MTYPE_V16F4);
+	  TN* tmp_low = Build_TN_Like(tmp_hi);
+	  TN* dest_hi = Build_TN_Like(tmp_hi);
+	  TN* dest_low = Build_TN_Like(dest_hi);
+	  Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_hi, op1, Gen_Literal_TN(0,1), ops);
+	  Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_low, op1, Gen_Literal_TN(1,1), ops);
+	  Build_OP(TOP_vmovhlps_f128_ofloat_float_float, dest_hi, tmp_hi, tmp_hi, ops);
+	  Build_OP(TOP_vmovlhps_f128_ofloat_float_float, dest_hi, dest_hi, tmp_hi,ops);
+	  Build_OP(TOP_vmovhlps_f128_ofloat_float_float, dest_low, tmp_low, tmp_low, ops);
+	  Build_OP(TOP_vmovlhps_f128_ofloat_float_float, dest_low, dest_low, tmp_low, ops);
+	  Build_OP(TOP_vxzero256v64, result, ops);
+	  Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, dest_low, Gen_Literal_TN(0, 1), ops);
+	  Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, dest_hi, Gen_Literal_TN(1, 1), ops);
+	  break;
+  	}
   default:
     FmtAssert(FALSE, ("NYI"));
   }

@@ -3011,20 +3011,25 @@ static void SA_Set_SimdOps_Info2()
   	CXX_NEW_ARRAY(BOOL, vec_simd_ops->Elements(),&LNO_local_pool);
 
   WN *istore, *simd_op;
-  for (INT i = 0; i < vec_simd_ops->Elements(); i++){
-  	simd_op = vec_simd_ops->Top_nth(i);
-  	simd_op_avx[i] = Is_AVX_Simd_Op(simd_op);
-  }
-  //set all the kids AVX FALSE when the simd_op's AVX is FALSE
-  for (INT i = 0; i < vec_simd_ops->Elements(); i++){
-  	simd_op = vec_simd_ops->Top_nth(i);
-	for(INT j = i+1; j < vec_simd_ops->Elements(); j++){
-		WN *kid_simd_op = vec_simd_ops->Top_nth(j);
-		if(!Wn_Is_Inside(kid_simd_op, simd_op))
-		  continue;
-		simd_op_avx[j] = simd_op_avx[i]; 
+  if(Target_AVX){
+    for (INT i = 0; i < vec_simd_ops->Elements(); i++){
+  	  simd_op = vec_simd_ops->Top_nth(i);
+  	  simd_op_avx[i] = Is_AVX_Simd_Op(simd_op);
+    }
+    //set all the kids AVX FALSE when the simd_op's AVX is FALSE
+    for (INT i = 0; i < vec_simd_ops->Elements(); i++){
+  	  simd_op = vec_simd_ops->Top_nth(i);
+	  for(INT j = i+1; j < vec_simd_ops->Elements(); j++){
+		  WN *kid_simd_op = vec_simd_ops->Top_nth(j);
+		  if(!Wn_Is_Inside(kid_simd_op, simd_op))
+		    continue;
+		  simd_op_avx[j] = simd_op_avx[i]; 
+	  }
+    }
+  }else
+    for(INT i = 0; i < vec_simd_ops->Elements(); i++){
+      simd_op_avx[i] = FALSE;
 	}
-  }
 
   
   for (INT i=0; i < vec_simd_ops->Elements(); i++){
@@ -4016,20 +4021,30 @@ static void Simd_Handle_Negative_Coefficient(
                                       INT which_kid,/*which kid ?*/
                                       WN *array,/*array to shuffle*/
                                       WN *loop, /* the loop */
-                                      BOOL no_shuffle)
+                                      BOOL no_shuffle,
+                                      BOOL is_256_bits)
 {
   FmtAssert(WN_element_size(array), ("NYI"));
-  INT incr = 16/ABS(WN_element_size(array));
+  INT incr = (is_256_bits? 32 : 16)/ABS(WN_element_size(array));
   ACCESS_ARRAY* aa = (ACCESS_ARRAY*)WN_MAP_Get(LNO_Info_Map,array);
   if (aa->Dim(aa->Num_Vec()-1)->Loop_Coeff(Do_Loop_Depth(loop))==-1){
       TYPE_ID vector_type;
       WN *opnd = LWN_Get_Parent(array);
       switch(ABS(WN_element_size(array))) {
-      case 1: vector_type = MTYPE_V16I1; break;
-      case 2: vector_type = MTYPE_V16I2; break;
+      case 1:{
+	  	FmtAssert(!is_256_bits,("integer 256-bits simd detected"));
+	  	vector_type = MTYPE_V16I1; 
+		break;
+		}
+      case 2:{
+	  	FmtAssert(!is_256_bits,("integer 256-bits simd detected"));
+	  	vector_type = MTYPE_V16I2; 
+		break;
+      	}
       case 4:
             if (WN_opcode(parent) == OPC_F8I4CVT || 
 	        WN_opcode(parent) == OPC_F8U4CVT) { // bug 15050
+	        FmtAssert(!is_256_bits,("integer 256-bits simd detected"));
               if (MTYPE_is_float(WN_desc(opnd)))
                 vector_type = MTYPE_V8F4;
               else
@@ -4037,16 +4052,20 @@ static void Simd_Handle_Negative_Coefficient(
 	      incr = incr / 2;
 	    } else {
               if (MTYPE_is_float(WN_desc(opnd)))
-                vector_type = MTYPE_V16F4;
-              else
+                vector_type = (is_256_bits? MTYPE_V32F4 : MTYPE_V16F4);
+              else{
+			  	FmtAssert(!is_256_bits,("integer 256-bits simd detected"));
                 vector_type = MTYPE_V16I4;
+              }
 	    }
 	    break;
       case 8:
               if (MTYPE_is_float(WN_desc(opnd)))
-                vector_type = MTYPE_V16F8;
-              else
+                vector_type = (is_256_bits? MTYPE_V32F8: MTYPE_V16F8);
+              else{
+			  	FmtAssert(!is_256_bits, ("integer 256-bits simd detected"));
                 vector_type = MTYPE_V16I8;
+              }
               break;
       default: FmtAssert(FALSE, ("NYI"));
       }//end switch
@@ -4069,14 +4088,14 @@ static void Simd_Handle_Negative_Coefficient(
   }
 }
 
-static void Simd_Add_Shuffle_For_Negative_Coefficient(WN* simd_op, WN *loop)
+static void Simd_Add_Shuffle_For_Negative_Coefficient(WN* simd_op, WN *loop, INT i_nth)
 {
   //handle kids
   for (INT kid = 0; kid < WN_kid_count(simd_op); kid ++){
     WN *opnd = WN_kid(simd_op, kid);
     if (WN_operator(opnd) == OPR_ILOAD && 
             WN_operator(WN_kid0(opnd)) == OPR_ARRAY)
-       Simd_Handle_Negative_Coefficient(simd_op, kid, WN_kid0(opnd), loop, FALSE);
+       Simd_Handle_Negative_Coefficient(simd_op, kid, WN_kid0(opnd), loop, FALSE, simd_op_avx[i_nth]);
   }
   //handle parent
   WN *parent = LWN_Get_Parent(simd_op);
@@ -4088,7 +4107,7 @@ static void Simd_Add_Shuffle_For_Negative_Coefficient(WN* simd_op, WN *loop)
                 SYMBOL(WN_kid0(WN_kid0(parent))) != SYMBOL(WN_index(loop))) ||
                WN_operator(WN_kid0(WN_kid0(parent))) == OPR_INTCONST ||//constants
                WN_operator(WN_kid0(WN_kid0(parent))) == OPR_CONST));
-     Simd_Handle_Negative_Coefficient(parent,0,WN_kid1(parent), loop, no_shuffle);
+     Simd_Handle_Negative_Coefficient(parent,0,WN_kid1(parent), loop, no_shuffle, simd_op_avx[i_nth]);
   }        
 }
 
@@ -5638,7 +5657,7 @@ static INT Simd(WN* innerloop)
     //get vector type according to istore
     TYPE_ID vmtype = Simd_Get_Vector_Type(istore, simd_op, i);
     //add shuffle ops for cases of negative coefficient 
-    Simd_Add_Shuffle_For_Negative_Coefficient(simd_op,innerloop);
+    Simd_Add_Shuffle_For_Negative_Coefficient(simd_op,innerloop, i);
 
     BOOL invarkid[3]; //record invariant kids
     invarkid[0]=invarkid[1]=invarkid[2]=FALSE;

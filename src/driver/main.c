@@ -1459,6 +1459,9 @@ print_search_path ()
         lib_path = target_library_path();
         add_string(libdirs, lib_path);
 
+#ifdef __FreeBSD__
+	add_string(libdirs, ":/usr/lib");
+#else
 	if (abi == ABI_N32 || abi == ABI_M32) {
 		add_string(libdirs, ":/lib");
 		add_string(libdirs, ":/usr/lib");
@@ -1466,6 +1469,7 @@ print_search_path ()
 		add_string(libdirs, ":/lib64");
 		add_string(libdirs, ":/usr/lib64");
 	}
+#endif
 	
 #ifndef PATH64_ENABLE_PSCRUNTIME
 	if ((fp = read_gcc_output ("-print-search-dirs"))) {

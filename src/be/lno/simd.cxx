@@ -208,10 +208,12 @@ extern  UINT simd_2(
   return bit_position;
 }
 
-static BOOL is_vectorizable_op (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc) {
+static BOOL is_vectorizable_op (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc, BOOL is_256_bits) {
 
   switch (opr) {
   case OPR_SELECT:
+    if(is_256_bits)
+	  return FALSE;
     if (MTYPE_is_float(rtype) || MTYPE_is_integral(rtype))
       return TRUE;
     else
@@ -225,35 +227,75 @@ static BOOL is_vectorizable_op (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc) {
     else
       return FALSE;
   case OPR_TRUNC:
+  	if(is_256_bits)
+	 return FALSE;
     if (rtype == MTYPE_I4 && desc == MTYPE_F4)
       return TRUE;
     else
       return FALSE;
   case OPR_CVT:
+  	if(is_256_bits){
+	  if((rtype == MTYPE_F8 && desc == MTYPE_I4))
+	  	return TRUE;
+	  else
+	  	return FALSE;
+  	}
     if ((rtype == MTYPE_F8 || rtype == MTYPE_F4) && 
 	(desc == MTYPE_I4 || desc == MTYPE_F4))
       return TRUE;
     else
       return FALSE;
   case OPR_INTRINSIC_OP:
+  	if(is_256_bits)
+	  return false;
     return TRUE;
-  case OPR_PAREN:    
+  case OPR_PAREN:
+  	if(is_256_bits){
+	  if((rtype == MTYPE_F4 || rtype == MTYPE_F8))
+	    return TRUE;
+	  else
+	  	return FALSE;
+  	}
     return TRUE;
   case OPR_ABS:
+  	if(is_256_bits){
+	  if((rtype == MTYPE_F4 || rtype == MTYPE_F8))
+	    return TRUE;
+	  else
+	  	return FALSE;
+  	}
     if (rtype == MTYPE_F4 || rtype == MTYPE_F8)
       return TRUE;
     else
       return FALSE;
   // BUG 5701: vectorize NEG for integers
   case OPR_NEG:
+  	if(is_256_bits){
+	  if((rtype == MTYPE_F4 || rtype == MTYPE_F8))
+	    return TRUE;
+	  else
+	  	return FALSE;
+  	}
     if (rtype == MTYPE_C4)//why C4 is not good?
       return FALSE;
     else
       return TRUE;
   case OPR_ADD:
   case OPR_SUB:
+  	if(is_256_bits){
+	  if((rtype == MTYPE_F4 || rtype == MTYPE_F8))
+	    return TRUE;
+	  else
+	  	return FALSE;
+  	}
     return TRUE;
   case OPR_MPY:
+  	if(is_256_bits){
+	  if((rtype == MTYPE_F4 || rtype == MTYPE_F8))
+	    return TRUE;
+	  else
+	  	return FALSE;
+  	}
     if (rtype == MTYPE_F8 || rtype == MTYPE_F4 || 
 #ifdef TARG_X8664
 	((rtype == MTYPE_C4 || rtype == MTYPE_C8) && Is_Target_SSE3()) ||
@@ -265,7 +307,12 @@ static BOOL is_vectorizable_op (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc) {
     else
       return FALSE;
   case OPR_DIV:
-    // Look at icc
+    if(is_256_bits){
+	  if((rtype == MTYPE_F4 || rtype == MTYPE_F8))
+	    return TRUE;
+	  else
+	  	return FALSE;
+  	}
     if (rtype == MTYPE_F8 || rtype == MTYPE_F4
 #ifdef TARG_X8664
         || (rtype == MTYPE_C4 && Is_Target_SSE3())
@@ -275,7 +322,13 @@ static BOOL is_vectorizable_op (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc) {
     else
       return FALSE;
   case OPR_MAX:
-  case OPR_MIN://TODO OPR_MINMAX
+  case OPR_MIN:
+  	if(is_256_bits){
+	  if((rtype == MTYPE_F4 || rtype == MTYPE_F8))
+	    return TRUE;
+	  else
+	  	return FALSE;
+  	}
     if (rtype == MTYPE_F4 || rtype == MTYPE_F8 || rtype == MTYPE_I4)
       return TRUE;
     else
@@ -290,11 +343,23 @@ static BOOL is_vectorizable_op (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc) {
       return FALSE;    
 #endif
   case OPR_SQRT:
+  	if(is_256_bits){
+	  if((rtype == MTYPE_F4 || rtype == MTYPE_F8))
+	    return TRUE;
+	  else
+	  	return FALSE;
+  	}
     if (rtype == MTYPE_F4 || rtype == MTYPE_F8)
       return TRUE;
     else
       return FALSE;
   case OPR_RSQRT:
+  	if(is_256_bits){
+	  if((rtype == MTYPE_F4 || rtype == MTYPE_F8))
+	    return TRUE;
+	  else
+	  	return FALSE;
+  	}
 //case OPR_RECIP:
 #ifdef TARG_X8664
   case OPR_ATOMIC_RSQRT:
@@ -306,12 +371,24 @@ static BOOL is_vectorizable_op (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc) {
 //BUG 10136: allows F8RECIP to be vectorized here, and V16F8RECIP
 //           will be lowered down to DIV after LNO
   case OPR_RECIP:
+  	if(is_256_bits){
+	  if((rtype == MTYPE_F4 || rtype == MTYPE_F8))
+	    return TRUE;
+	  else
+	  	return FALSE;
+  	}
     if (rtype == MTYPE_F4 || rtype == MTYPE_F8)
       return TRUE;
     else
       return FALSE;
 
   case OPR_PARM:
+  	if(is_256_bits){
+	  if((rtype == MTYPE_F4 || rtype == MTYPE_F8))
+	    return TRUE;
+	  else
+	  	return FALSE;
+  	}
     return TRUE;
   default:
     return FALSE;
@@ -465,7 +542,7 @@ static BOOL Simd_Benefit (WN* wn) {
   // Bug 5582: If the CVT is for array address calculation and can not be vectorized
   // we can not say CVT is beneficial. Let others(e.g. alignment) to make decision.
   if (opr == OPR_CVT && 
-     (!Is_Under_Array(wn) || is_vectorizable_op(opr, WN_rtype(wn), WN_desc(wn)))) 
+     (!Is_Under_Array(wn) || is_vectorizable_op(opr, WN_rtype(wn), WN_desc(wn), FALSE))) 
    return TRUE;
 
     if((opr == OPR_RECIP && WN_rtype(wn) == MTYPE_F4) || 
@@ -519,7 +596,7 @@ extern BOOL Is_Vectorization_Beneficial (WN* wn)
   return Simd_Benefit(wn);
 }
 
-static BOOL Is_Vectorizable_Tree (WN* tree)
+static BOOL Is_Vectorizable_Tree (WN* tree, BOOL is_256_bits)
 {
    if(tree == NULL) return TRUE; //no kid2 is fine
 
@@ -528,14 +605,14 @@ static BOOL Is_Vectorizable_Tree (WN* tree)
       opr == OPR_CONST || opr == OPR_INTCONST)
     return TRUE; 
 
-  if (!is_vectorizable_op(opr, WN_rtype(tree), WN_desc(tree)))
+  if (!is_vectorizable_op(opr, WN_rtype(tree), WN_desc(tree),is_256_bits))
     return FALSE;
 
   if (WN_kid_count(tree) > 2)
     return FALSE;
 
   for(INT i=0; i<WN_kid_count(tree); i++){
-    if(!Is_Vectorizable_Tree(WN_kid(tree, i)))
+    if(!Is_Vectorizable_Tree(WN_kid(tree, i), is_256_bits))
       return FALSE;
   } 
   return TRUE;
@@ -710,7 +787,7 @@ BOOL Induction_Seen;
 BOOL Inconsistent_Induction;
 
 
-static BOOL Is_Well_Formed_Simd ( WN* wn, WN* loop)
+static BOOL Is_Well_Formed_Simd ( WN* wn, WN* loop, BOOL is_256_bits)
 {
   // for vectorizing copies
   if (WN_operator(wn) == OPR_ILOAD) {
@@ -823,7 +900,7 @@ static BOOL Is_Well_Formed_Simd ( WN* wn, WN* loop)
      
   if (WN_operator(parent) != OPR_ISTORE && WN_operator(parent) != OPR_STID &&
       !is_vectorizable_op(WN_operator(parent), 
-			  WN_rtype(parent), WN_desc(parent)))
+			  WN_rtype(parent), WN_desc(parent), is_256_bits))
     return FALSE;
 
   if (WN_operator(kid0) == OPR_ILOAD) {
@@ -888,7 +965,7 @@ static BOOL Is_Well_Formed_Simd ( WN* wn, WN* loop)
     }
   }
  
-  if(!Is_Vectorizable_Tree(kid0)||!Is_Vectorizable_Tree(kid1))
+  if(!Is_Vectorizable_Tree(kid0,is_256_bits)||!Is_Vectorizable_Tree(kid1,is_256_bits))
    return FALSE;
 
   // Two invariant operands
@@ -1045,7 +1122,7 @@ static WN* Find_Do_Body (WN* simd_op)
   return body;
 }
 
-static BOOL is_vectorizable_op_stmt(WN* stmt, WN* loop) {
+static BOOL is_vectorizable_op_stmt(WN* stmt, WN* loop, BOOL is_256_bits) {
 
   OPERATOR opr=WN_operator(stmt);
   if (opr==OPR_STID || opr==OPR_ISTORE) {
@@ -1053,8 +1130,8 @@ static BOOL is_vectorizable_op_stmt(WN* stmt, WN* loop) {
     opr=WN_operator(rhs);
     TYPE_ID rtype = WN_rtype(rhs);
     TYPE_ID desc = WN_desc(rhs);
-    if (is_vectorizable_op(opr, rtype, desc)) {
-      if (Is_Well_Formed_Simd(rhs, loop)) {
+    if (is_vectorizable_op(opr, rtype, desc,is_256_bits)) {
+      if (Is_Well_Formed_Simd(rhs, loop, is_256_bits)) {
 	return TRUE;
       }
     }
@@ -1067,7 +1144,8 @@ static UINT_DYN_ARRAY* simd_fis_merge_scc_to_form_new_loop(
         FF_STMT_LIST*      scc,            // list of statements for SCCs
         UINT*		scc_size,	// size of each scc
         WN*             loop,           // loop enclosing the SCCs
-        SCC_DIRECTED_GRAPH16 *scc_dep_g // SCC dependence graph
+        SCC_DIRECTED_GRAPH16 *scc_dep_g, // SCC dependence graph
+        BOOL is_256_bits
         )
 {
 
@@ -1101,7 +1179,7 @@ static UINT_DYN_ARRAY* simd_fis_merge_scc_to_form_new_loop(
       // after copy_propagation
       if (scc_size[i]==1) {
         WN* stmt=scc[i].Head()->Get_Stmt();
-        if (is_vectorizable_op_stmt(stmt,loop))
+        if (is_vectorizable_op_stmt(stmt,loop, is_256_bits))
           scc_queue[simd][head0++]=i;
         else
           scc_queue[non_simd][head1++]=i;
@@ -1169,7 +1247,7 @@ static UINT_DYN_ARRAY* simd_fis_merge_scc_to_form_new_loop(
       if (scc_dep_g->Get_In_Edge(v)==0) {
         if (scc_size[v]==1) {
           WN* stmt=scc[v].Head()->Get_Stmt();
-          if (is_vectorizable_op_stmt(stmt,loop))
+          if (is_vectorizable_op_stmt(stmt,loop, is_256_bits))
             scc_queue[simd][head0++]=v;
           else
             scc_queue[non_simd][head1++]=v;
@@ -1360,7 +1438,7 @@ Simd_Suitable_32bytes_AVX(WN *simd_op){
 }
 
 static SIMD_KIND 
-Find_Simd_Kind ( STACK_OF_WN *vec_simd_ops )
+Find_Simd_Kind ( STACK_OF_WN *vec_simd_ops, BOOL is_256_bits )
 {
   SIMD_KIND smallest_kind = INVALID;
 
@@ -1392,13 +1470,13 @@ Find_Simd_Kind ( STACK_OF_WN *vec_simd_ops )
     case MTYPE_F4:
       if (smallest_kind > V16F4)
 	smallest_kind = V16F4;
-	  if(Target_AVX && simd_op_avx[i]&& smallest_kind > V32F4)
+	  if(is_256_bits)
 	  	smallest_kind = V32F4;
       break;
     case MTYPE_F8:
       if (smallest_kind > V16F8)
 	smallest_kind = V16F8;
-	  if(Target_AVX && simd_op_avx[i] && smallest_kind > V32F8)
+	  if(is_256_bits)
 	  	smallest_kind = V32F8;
       break;
     case MTYPE_I1: case MTYPE_U1:
@@ -1467,12 +1545,12 @@ BOOL Is_Vectorizable_Intrinsic (WN *wn)
 }
 
 BOOL Gather_Vectorizable_Ops(
-  WN* wn, SCALAR_REF_STACK* simd_ops, MEM_POOL *pool, WN *loop)
+  WN* wn, SCALAR_REF_STACK* simd_ops, MEM_POOL *pool, WN *loop, BOOL is_256_bits)
 {
   if (WN_opcode(wn) == OPC_BLOCK){
     WN* kid = WN_first (wn);
     while(kid){
-      if (!Gather_Vectorizable_Ops(kid,simd_ops,pool,loop))
+      if (!Gather_Vectorizable_Ops(kid,simd_ops,pool,loop, is_256_bits))
 	return FALSE;
       kid = WN_next(kid);
     }
@@ -1487,9 +1565,9 @@ BOOL Gather_Vectorizable_Ops(
     Report_Non_Vectorizable_Op(wn);
     return FALSE;
   }
-  if (is_vectorizable_op(opr, rtype, desc)){
+  if (is_vectorizable_op(opr, rtype, desc, is_256_bits)){
     if ((opr != OPR_INTRINSIC_OP && 
-	 Is_Well_Formed_Simd(wn, loop)) ||
+	 Is_Well_Formed_Simd(wn, loop, is_256_bits)) ||
 	(opr == OPR_INTRINSIC_OP && 
 	 Is_Vectorizable_Intrinsic(wn))) {
       SCALAR_REF scalar_ref(wn,0);
@@ -1509,7 +1587,7 @@ BOOL Gather_Vectorizable_Ops(
           }
 
   // Bug 2986
-  if (opr == OPR_CVT && !is_vectorizable_op(opr, rtype, desc)){
+  if (opr == OPR_CVT && !is_vectorizable_op(opr, rtype, desc, is_256_bits)){
     // If the CVT is inside a OPR_ARRAY, then it is
     // not vectorizable but we do not abort vectorization.
     if(Is_Under_Array(wn)) return TRUE;
@@ -1519,7 +1597,7 @@ BOOL Gather_Vectorizable_Ops(
 
   for (INT kidno=0; kidno<WN_kid_count(wn); kidno++){
     WN* kid = WN_kid(wn,kidno);
-    if (!Gather_Vectorizable_Ops(kid,simd_ops,pool,loop))
+    if (!Gather_Vectorizable_Ops(kid,simd_ops,pool,loop, is_256_bits))
       return FALSE;
    }
 
@@ -1882,7 +1960,7 @@ BOOL Analyse_Dependencies(WN* innerloop)
   }
 
   for (stmt=WN_first(body); stmt; stmt=WN_next(stmt)) {
-    Gather_Vectorizable_Ops(stmt,simd_ops,&SIMD_default_pool, innerloop) ;
+    Gather_Vectorizable_Ops(stmt,simd_ops,&SIMD_default_pool, innerloop, FALSE) ;
   }
 
   if (LNO_Simd_Reduction && depanal_red_manager) {
@@ -2234,7 +2312,7 @@ extern BOOL Is_Vectorizable_Loop (WN* innerloop)
   Induction_Seen = FALSE;
   BOOL _stop = FALSE;
   for (stmt=WN_first(body); stmt; stmt=WN_next(stmt))
-    if (!Gather_Vectorizable_Ops(stmt, simd_ops,&SIMD_tmp_pool, innerloop)){
+    if (!Gather_Vectorizable_Ops(stmt, simd_ops,&SIMD_tmp_pool, innerloop, FALSE)){
         _stop = TRUE;
         break;
     }
@@ -2861,10 +2939,10 @@ static BOOL SA_Set_SimdOps_Info1(WN* body,
     TYPE_ID desc = WN_desc(simd_op);
 #if 1
     // CHANGED
-    FmtAssert(is_vectorizable_op(WN_operator(simd_op), rtype, desc),
+    FmtAssert(is_vectorizable_op(WN_operator(simd_op), rtype, desc, FALSE),
               ("Handle this piece"));
 #endif
-    if (!is_vectorizable_op(WN_operator(simd_op), rtype, desc))
+    if (!is_vectorizable_op(WN_operator(simd_op), rtype, desc, FALSE))
       continue; //will never happen due to the above assert
     
     for (INT kid_no=0; kid_no<WN_kid_count(simd_op); kid_no++){
@@ -2948,6 +3026,7 @@ static BOOL Is_STID_Kid_AVX(WN *op){
 }
 
 static BOOL Is_DU_AVX_Op(WN* op){
+  return TRUE;
   if(WN_operator(op) != OPR_LDID)
   	return TRUE;
   //now op must be lDID, look for the DU chane to see if any def must be V16* type
@@ -2987,6 +3066,8 @@ static BOOL Is_AVX_Simd_Op(WN *simd_op){
 	  	break;
 	}
 #endif
+    if(WN_operator(kid) == OPR_ARRAY)
+	  continue;
 	if(Simd_Op_In_Stack(kid, vec_simd_ops)){
 	  if(!Is_AVX_Simd_Op(kid))
 	  	return FALSE;
@@ -3020,7 +3101,7 @@ static BOOL Is_AVX_Simd_Op(WN *simd_op){
   return TRUE;
 }
 
-static void SA_Set_SimdOps_Info2()
+static void SA_Set_SimdOps_Info2(BOOL is_256_bits)
 {
  // For all SIMD ops that belong to same loop, we need to call Find_Simd_Kind
   // to find what the combination SIMD Kind is.
@@ -3033,10 +3114,11 @@ static void SA_Set_SimdOps_Info2()
     CXX_NEW_ARRAY(BOOL, vec_simd_ops->Elements(),&LNO_local_pool);
   simd_op_kind =
     CXX_NEW_ARRAY(SIMD_KIND, vec_simd_ops->Elements(),&LNO_local_pool);
-  simd_op_avx = 
-  	CXX_NEW_ARRAY(BOOL, vec_simd_ops->Elements(),&LNO_local_pool);
+  //simd_op_avx = 
+  	//CXX_NEW_ARRAY(BOOL, vec_simd_ops->Elements(),&LNO_local_pool);
 
   WN *istore, *simd_op;
+#if 0
   if(Target_AVX){
 	for(INT i = vec_simd_ops->Elements()-1; i >= 0; i--){
   	  simd_op = vec_simd_ops->Top_nth(i);
@@ -3053,9 +3135,12 @@ static void SA_Set_SimdOps_Info2()
 	  }
     }
   }else
+
     for(INT i = 0; i < vec_simd_ops->Elements(); i++){
       simd_op_avx[i] = FALSE;
 	}
+#endif
+
 
   
   for (INT i=0; i < vec_simd_ops->Elements(); i++){
@@ -3116,7 +3201,7 @@ static void SA_Set_SimdOps_Info2()
       CXX_NEW(STACK_OF_WN(&SIMD_default_pool),&SIMD_default_pool);
     for (j = 0; j < num; j++)
       vec_simd_ops_tmp->Push(newwn[j]);
-    simd_op_kind[i] = Find_Simd_Kind(vec_simd_ops_tmp);
+    simd_op_kind[i] = Find_Simd_Kind(vec_simd_ops_tmp, is_256_bits);
 	
   }
 }
@@ -3225,7 +3310,7 @@ static void SA_Version_F90_Loops_For_Contiguous(WN *innerloop)
 } 
 
 
-static BOOL Simd_Analysis(WN *innerloop, char *verbose_msg)
+static BOOL Simd_Analysis(WN *innerloop, char *verbose_msg, BOOL Is_256_bits)
 {
 
   WN *stmt;
@@ -3241,7 +3326,7 @@ static BOOL Simd_Analysis(WN *innerloop, char *verbose_msg)
   SCALAR_REF_STACK *simd_ops =
         CXX_NEW(SCALAR_REF_STACK(&SIMD_default_pool),&SIMD_default_pool);
   for (stmt=WN_first(body); stmt; stmt=WN_next(stmt)){
-    if (!Gather_Vectorizable_Ops(stmt, simd_ops, &SIMD_default_pool, innerloop)){
+    if (!Gather_Vectorizable_Ops(stmt, simd_ops, &SIMD_default_pool, innerloop, Is_256_bits)){
         if (!Inconsistent_Induction){
           if(non_vect_op==NULL) 
              Report_Non_Vectorizable_Op(stmt); //report the opcode name of the stmt
@@ -3493,7 +3578,7 @@ static BOOL Simd_Analysis(WN *innerloop, char *verbose_msg)
   WN *simd_op;
 
   new_loops=simd_fis_merge_scc_to_form_new_loop(total_scc,scc,scc_size,
-    innerloop,ac_g);
+    innerloop,ac_g, Is_256_bits);
 
   // new_loops[i] is the i-th seed SCC
   if (LNO_Run_Simd != 2 && new_loops->Lastidx() != 0) {
@@ -3534,7 +3619,7 @@ static BOOL Simd_Analysis(WN *innerloop, char *verbose_msg)
 
   // For all SIMD ops that belong to same loop, we need to call Find_Simd_Kind
   // to find what the combination SIMD Kind is.
-  SA_Set_SimdOps_Info2();
+  SA_Set_SimdOps_Info2(Is_256_bits);
 
   CXX_DELETE(dep_g_p, &SIMD_default_pool);
   CXX_DELETE(ac_g, &SIMD_default_pool);
@@ -4114,14 +4199,14 @@ static void Simd_Handle_Negative_Coefficient(
   }
 }
 
-static void Simd_Add_Shuffle_For_Negative_Coefficient(WN* simd_op, WN *loop, INT i_nth)
+static void Simd_Add_Shuffle_For_Negative_Coefficient(WN* simd_op, WN *loop, BOOL is_256_bits)
 {
   //handle kids
   for (INT kid = 0; kid < WN_kid_count(simd_op); kid ++){
     WN *opnd = WN_kid(simd_op, kid);
     if (WN_operator(opnd) == OPR_ILOAD && 
             WN_operator(WN_kid0(opnd)) == OPR_ARRAY)
-       Simd_Handle_Negative_Coefficient(simd_op, kid, WN_kid0(opnd), loop, FALSE, simd_op_avx[i_nth]);
+       Simd_Handle_Negative_Coefficient(simd_op, kid, WN_kid0(opnd), loop, FALSE, is_256_bits);
   }
   //handle parent
   WN *parent = LWN_Get_Parent(simd_op);
@@ -4133,11 +4218,11 @@ static void Simd_Add_Shuffle_For_Negative_Coefficient(WN* simd_op, WN *loop, INT
                 SYMBOL(WN_kid0(WN_kid0(parent))) != SYMBOL(WN_index(loop))) ||
                WN_operator(WN_kid0(WN_kid0(parent))) == OPR_INTCONST ||//constants
                WN_operator(WN_kid0(WN_kid0(parent))) == OPR_CONST));
-     Simd_Handle_Negative_Coefficient(parent,0,WN_kid1(parent), loop, no_shuffle, simd_op_avx[i_nth]);
+     Simd_Handle_Negative_Coefficient(parent,0,WN_kid1(parent), loop, no_shuffle, is_256_bits);
   }        
 }
 
-static TYPE_ID Simd_Get_Vector_Type(WN *istore, WN *simd_op, INT i_nth)
+static TYPE_ID Simd_Get_Vector_Type(WN *istore, WN *simd_op, BOOL is_256_bits)
 {
    TYPE_ID vmtype, type;
    if (!OPCODE_is_store(WN_opcode(istore))){
@@ -4166,9 +4251,7 @@ static TYPE_ID Simd_Get_Vector_Type(WN *istore, WN *simd_op, INT i_nth)
 		break;
 	  case MTYPE_F4:
 	  {
-	  	BOOL avx_simd;
-	  	avx_simd = Target_AVX && simd_op_avx[i_nth];
-        vmtype = avx_simd? MTYPE_V32F4: MTYPE_V16F4;
+        vmtype = is_256_bits? MTYPE_V32F4: MTYPE_V16F4;
       }
         break;
       case MTYPE_V16F8:
@@ -4176,9 +4259,7 @@ static TYPE_ID Simd_Get_Vector_Type(WN *istore, WN *simd_op, INT i_nth)
 		break;
 	  case MTYPE_F8:
 	  {
-	  	BOOL avx_simd;
-		avx_simd = Target_AVX && simd_op_avx[i_nth];
-        vmtype = avx_simd? MTYPE_V32F8: MTYPE_V16F8;
+        vmtype = is_256_bits? MTYPE_V32F8: MTYPE_V16F8;
       }
         break;
       case MTYPE_V16I1: case MTYPE_I1:
@@ -4213,7 +4294,7 @@ static TYPE_ID Simd_Get_Vector_Type(WN *istore, WN *simd_op, INT i_nth)
 static WN *Simd_Vectorize_Constants(WN *const_wn,//to be vectorized 
                                     WN *type_node,  //determine type 
                                     WN *simd_op,
-                                    INT num_simd_op) //const_wn's parent
+                                    BOOL is_256_bits) //const_wn's parent
 {
    FmtAssert(const_wn && (WN_operator(const_wn)==OPR_INTCONST ||
              WN_operator(const_wn)==OPR_CONST),("not a constant operand"));
@@ -4253,7 +4334,7 @@ static WN *Simd_Vectorize_Constants(WN *const_wn,//to be vectorized
 	 	  WN_set_rtype(const_wn, MTYPE_V32F8);
 		  break;
 	 case MTYPE_F4:
-	 	  if(Target_AVX && simd_op_avx[num_simd_op])
+	 	  if(is_256_bits)
 		  	WN_set_rtype(const_wn, MTYPE_V32F4);
 		  else
             WN_set_rtype(const_wn, MTYPE_V16F4);
@@ -4262,7 +4343,7 @@ static WN *Simd_Vectorize_Constants(WN *const_wn,//to be vectorized
 	 	  WN_set_rtype(const_wn, MTYPE_V16F8);
 		  break;
 	 case MTYPE_F8:
-	 	  if(Target_AVX && simd_op_avx[num_simd_op])
+	 	  if(is_256_bits)
 		  	WN_set_rtype(const_wn, MTYPE_V32F8);
 		  else
             WN_set_rtype(const_wn, MTYPE_V16F8);
@@ -4290,12 +4371,10 @@ static WN *Simd_Vectorize_Constants(WN *const_wn,//to be vectorized
 static WN *Simd_Vectorize_Invariants(WN *inv_wn, 
                                      WN *type_node,
                                      WN *simd_op,
-                                     INT nth)
+                                     BOOL is_256_bits)
 {
   TYPE_ID desc = WN_desc(inv_wn);
   TYPE_ID type;
-  BOOL is_avx;
-  is_avx = simd_op_avx[nth] && Target_AVX;
   if (WN_desc(type_node) == MTYPE_V)
       type = WN_rtype(type_node);
   else
@@ -4324,7 +4403,7 @@ static WN *Simd_Vectorize_Invariants(WN *inv_wn,
 		  break;
 	 case MTYPE_F4:
           inv_wn =
-            LWN_CreateExp1(OPCODE_make_op(OPR_REPLICATE, (is_avx? MTYPE_V32F4: MTYPE_V16F4), desc),
+            LWN_CreateExp1(OPCODE_make_op(OPR_REPLICATE, (is_256_bits? MTYPE_V32F4: MTYPE_V16F4), desc),
                            inv_wn);
           break;
      case MTYPE_V16F8:
@@ -4334,7 +4413,7 @@ static WN *Simd_Vectorize_Invariants(WN *inv_wn,
 		  break;
 	 case MTYPE_F8:
           inv_wn =
-            LWN_CreateExp1(OPCODE_make_op(OPR_REPLICATE, (is_avx? MTYPE_V32F8: MTYPE_V16F8), desc),
+            LWN_CreateExp1(OPCODE_make_op(OPR_REPLICATE, (is_256_bits? MTYPE_V32F8: MTYPE_V16F8), desc),
                            inv_wn);
           break;
      case MTYPE_V16I1: case MTYPE_U1: case MTYPE_I1:
@@ -5008,8 +5087,24 @@ static void Simd_Vectorize_Load_And_Equilvalent(WN *load, WN *innerloop, TYPE_ID
       WN_st_idx(scalar_ref)=ST_st_idx(new_symbol.St());
       WN_offset(scalar_ref)=new_symbol.WN_Offset();
       WN_set_desc(scalar_ref, vmtype);
-      if (WN_operator(scalar_ref) != OPR_STID)
+      if (WN_operator(scalar_ref) != OPR_STID){
+	  	// ldid
               WN_set_rtype(scalar_ref, vmtype);
+#if 0
+		if(Target_AVX && !MTYPE_is_long_vector(vmtype)){
+		  WN *stid = LWN_Get_Parent(scalar_ref);
+		  while(stid && (WN_operator(stid) != OPR_STID|| 
+			    WN_operator(stid) != OPR_ISTORE || 
+			    stid != WN_do_body(innerloop)))
+	        stid = LWN_Get_Parent(stid);
+
+		  if(!stid || stid == WN_do_body(innerloop))
+		    FmtAssert(FALSE, ("NYI: WFT"));
+		  Set_Kids_None_AVX(stid);
+		}
+#endif
+      }
+#if 0
 	  else{
 	  	/*it's stid, and we the symbol is use before define
 	  	* we should set all the stid's kid to V16F* stuff.
@@ -5017,11 +5112,13 @@ static void Simd_Vectorize_Load_And_Equilvalent(WN *load, WN *innerloop, TYPE_ID
 	  	if(Target_AVX && !MTYPE_is_long_vector(vmtype))
 		  Set_Kids_None_AVX(scalar_ref);
 	  }
+#endif
     }
+
    CXX_DELETE(equivalence_class, &LNO_local_pool);
 }
 
-static void Simd_Vectorize_SimdOp_And_Kids(WN *simd_op, TYPE_ID vmtype, BOOL *invarkid, INT nth)
+static void Simd_Vectorize_SimdOp_And_Kids(WN *simd_op, TYPE_ID vmtype, BOOL *invarkid, BOOL is_256_bits)
 {
 
   if (WN_operator(simd_op) != OPR_CVT && WN_operator(simd_op) != OPR_TRUNC){
@@ -5052,7 +5149,7 @@ static void Simd_Vectorize_SimdOp_And_Kids(WN *simd_op, TYPE_ID vmtype, BOOL *in
       case MTYPE_I4: vec_desc = MTYPE_V16I4; break;
       case MTYPE_F4: 
 	  	vec_desc = MTYPE_V16F4;
-		if(Target_AVX && simd_op_avx[nth]){
+		if(is_256_bits){
 		  vec_desc = MTYPE_V32F4;
 		}
 		break;
@@ -5061,7 +5158,7 @@ static void Simd_Vectorize_SimdOp_And_Kids(WN *simd_op, TYPE_ID vmtype, BOOL *in
     switch(WN_rtype(simd_op)) {
       case MTYPE_F8:
         vec_rtype =  MTYPE_V16F8;
-		if(Target_AVX && simd_op_avx[nth]){
+		if(is_256_bits){
 		  if(vec_desc == MTYPE_V32F4 || vec_desc == MTYPE_V16I4)
 		    vec_rtype = MTYPE_V32F8;
 		  else
@@ -5081,8 +5178,8 @@ static void Simd_Vectorize_SimdOp_And_Kids(WN *simd_op, TYPE_ID vmtype, BOOL *in
         break;
       case MTYPE_F4:
 	  	vec_rtype = MTYPE_V16F4;
-		if(Target_AVX && simd_op_avx[nth]){
-		  FmtAssert(FALSE, ("NYI error in simd"));
+		if(is_256_bits){// CVT integer to float vector
+		  FmtAssert(FALSE, ("can't use V32F4V32I4CVT so far"));
 		}
 		break;
       case MTYPE_I4: vec_rtype = MTYPE_V16I4; break;
@@ -5532,7 +5629,7 @@ static void Simd_Finalize_Loops(WN *innerloop, WN *remainderloop, INT vect, WN *
 }
 
 // Vectorize an innerloop
-static INT Simd(WN* innerloop)
+static INT Simd(WN* innerloop, BOOL Is_256_bits)
 {
 // Don't do anything for now for non-x8664
 #ifdef TARG_X8664
@@ -5568,7 +5665,7 @@ static INT Simd(WN* innerloop)
   Simd_Mark_Code(WN_do_body(innerloop)); 
   WN_Simplifier_Enable(save_simp_state);
 
-  if(!Simd_Analysis(innerloop,verbose_msg)){
+  if(!Simd_Analysis(innerloop,verbose_msg, Is_256_bits)){
     MEM_POOL_Pop(&SIMD_default_pool);
     if (debug || LNO_Simd_Verbose || LNO_Lno_Verbose){
         LNO_Trace( LNO_VECTORIZE_EVENT, 
@@ -5637,7 +5734,7 @@ static INT Simd(WN* innerloop)
     WN* innerloop=LWN_Get_Parent(Find_Do_Body(simd_op));
 	
     INT best_peel;
-	if(Target_AVX)
+	if(Is_256_bits)
 	  best_peel = Simd_Align_Best_Peel_AVX(vec_simd_ops, simd_op_kind,
 	                               simd_op_best_align, innerloop);
 	else
@@ -5694,9 +5791,9 @@ static INT Simd(WN* innerloop)
         remainderloop = Simd_Create_Remainder_Loop(innerloop);
 
     //get vector type according to istore
-    TYPE_ID vmtype = Simd_Get_Vector_Type(istore, simd_op, i);
+    TYPE_ID vmtype = Simd_Get_Vector_Type(istore, simd_op, Is_256_bits);
     //add shuffle ops for cases of negative coefficient 
-    Simd_Add_Shuffle_For_Negative_Coefficient(simd_op,innerloop, i);
+    Simd_Add_Shuffle_For_Negative_Coefficient(simd_op,innerloop, Is_256_bits);
 
     BOOL invarkid[3]; //record invariant kids
     invarkid[0]=invarkid[1]=invarkid[2]=FALSE;
@@ -5729,12 +5826,12 @@ static INT Simd(WN* innerloop)
           }else{
 	  if(MTYPE_is_vector(WN_rtype(inv_node))) continue; //next kid
           //bug 14814 and bug 14815: istore determine the vector type of simd_op
-          inv_node = Simd_Vectorize_Constants(inv_node, kid_type_control_node, simd_op , i);
+          inv_node = Simd_Vectorize_Constants(inv_node, kid_type_control_node, simd_op , Is_256_bits);
         }
       }
       else//real invariant (non-constant)
          //bug 14814 and bug 14815: istore determine the vector type of simd_op 
-         inv_node = Simd_Vectorize_Invariants(inv_node, kid_type_control_node, simd_op, i);
+         inv_node = Simd_Vectorize_Invariants(inv_node, kid_type_control_node, simd_op, Is_256_bits);
 
       if (WN_operator(WN_kid(simd_op, kid)) == OPR_PARM){
         WN_kid0(WN_kid(simd_op, kid)) = inv_node; //down one level
@@ -5768,7 +5865,7 @@ static INT Simd(WN* innerloop)
   }//end handling kids
   
   //Main phase. Here we use invarkid to guard not resetting kids handled above
-  Simd_Vectorize_SimdOp_And_Kids(simd_op, vmtype, invarkid, i);
+  Simd_Vectorize_SimdOp_And_Kids(simd_op, vmtype, invarkid, Is_256_bits);
   INT vect = Simd_Unroll_Times_By_SimdKind(simd_kind); //loop unroll time
 
  //Unroll statements for types that require unrolling loop other than "vect" times
@@ -5818,8 +5915,15 @@ static void Simd_Walk(WN* wn) {
   else if (opc==OPC_DO_LOOP) {
     if (Do_Loop_Is_Good(wn) && Do_Loop_Is_Inner(wn) && !Do_Loop_Has_Calls(wn)
 	&& !Do_Loop_Has_Gotos(wn)) {
-      if (Simd(wn))
-        Simd_Align = TRUE;
+	  if(Target_AVX){
+	  	if(Simd(wn, TRUE))
+		  Simd_Align = TRUE;
+		else if(Simd(wn, FALSE))
+		  Simd_Align = TRUE;
+	  }else{
+        if (Simd(wn, FALSE))
+          Simd_Align = TRUE;
+	  }
     } else
       Simd_Walk(WN_do_body(wn));
   } else if (opc==OPC_BLOCK)

@@ -1378,6 +1378,8 @@ extern void  fei_cosh            	  ( TYPE type );
 extern void  fei_exp             	  ( TYPE type );
 extern void  fei_log             	  ( TYPE type );
 extern void  fei_log10           	  ( TYPE type );
+extern void  fei_gamma   		  ( TYPE type );
+extern void  fei_log_gamma   		  ( TYPE type );
 extern void  fei_sin             	  ( TYPE type );
 extern void  fei_erf             	  ( TYPE type, int complement );
 extern void  fei_sind            	  ( TYPE type );

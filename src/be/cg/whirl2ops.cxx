@@ -2933,6 +2933,7 @@ Handle_Imm_Op (WN * expr, INT * kidno /* counted from 0 */)
 		case INTRN_PEXTRB:
 		case INTRN_PEXTRD:
 		case INTRN_PEXTRQ:
+		case INTRN_VEC_EXT_V4SF:
 		case INTRN_EXTRACTPS:
 		/*avx*/
 		case INTRN_VPERMILPS128:

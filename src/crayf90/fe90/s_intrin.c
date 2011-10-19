@@ -1028,6 +1028,14 @@ void    sin_intrinsic(opnd_type     *result_opnd,
          IR_OPR(ir_idx) = Log_10_Opr;
          break;
 
+      case Gamma_Intrinsic:
+	 IR_OPR(ir_idx) = Gamma_Opr;
+	 break;
+
+      case Log_Gamma_Intrinsic:
+	 IR_OPR(ir_idx) = Log_Gamma_Opr;
+	 break;
+
       case Tan_Intrinsic:
       case Dtan_Intrinsic:
       case Qtan_Intrinsic:

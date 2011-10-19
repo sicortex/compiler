@@ -398,6 +398,7 @@ enum    intrinsic_values       {Unknown_Intrinsic,
 #ifdef KEY
                                 Fstat_Intrinsic,
 #endif
+				Gamma_Intrinsic,
 				Getpos_Intrinsic,
 				Get_Ieee_Exceptions_Intrinsic,
 				Get_Ieee_Interrupts_Intrinsic,
@@ -536,6 +537,7 @@ enum    intrinsic_values       {Unknown_Intrinsic,
 				Lock_Release_Intrinsic,
 				Lock_Test_And_Set_Intrinsic,
 				Log_Intrinsic,
+				Log_Gamma_Intrinsic,
 				Log10_Intrinsic,
 				Log2_Images_Intrinsic,
 				Logical_Intrinsic,
@@ -1544,6 +1546,9 @@ enum    operator_values      {  Null_Opr,
 #endif /* KEY Bug 10410 */
 				ProcPtr_Asg_Opr,
 				ProcPtr_Opr,
+				Gamma_Opr,
+				Log_Gamma_Opr,
+
                                 /* PLACE NEW OPERATORS ABOVE THIS LINE. */
                                 /* DO NOT PUT ANY OPRS AFTER THIS ONE */
 				The_Last_Opr

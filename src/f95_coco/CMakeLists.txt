@@ -16,7 +16,7 @@ if(PATH64_ENABLE_FORTRAN)
         endif()
 
         string(REPLACE " " ";" build_flags_list "${build_flags}")
-        set(flags ${flags} ${bild_flags_list})
+        set(flags ${flags} ${build_flags_list})
 
         set(link_flags -lm)
 

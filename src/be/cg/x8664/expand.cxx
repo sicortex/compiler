@@ -5883,6 +5883,7 @@ Expand_Replicate (OPCODE op, TN *result, TN *op1, OPS *ops)
     Expand_Copy(tmp3, op1, MTYPE_F4, ops);
     Build_OP(TOP_vunpcklps_f128_ofloat_float_float, tmp3, tmp3, op1, ops);
 	Build_OP(TOP_vunpcklps_f128_ofloat_float_float, tmp3, tmp3, tmp3, ops);
+	Build_OP(TOP_vxzero256v32, result, ops);
 	Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, tmp3, Gen_Literal_TN(0, 1), ops);
 	Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, tmp3, Gen_Literal_TN(1, 1), ops);
   	break;
@@ -5892,6 +5893,7 @@ Expand_Replicate (OPCODE op, TN *result, TN *op1, OPS *ops)
   	TN *tmp3 = Build_TN_Of_Mtype(MTYPE_V16F8);
 	Expand_Copy(tmp3, op1, MTYPE_F8, ops);
 	Build_OP(TOP_vunpcklpd_f128_ofloat_float_float, tmp3, tmp3, op1, ops);
+	Build_OP(TOP_vxzero256v64, result, ops);
 	Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, tmp3, Gen_Literal_TN(0, 1), ops);
 	Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, tmp3, Gen_Literal_TN(1, 1), ops);
 	break;

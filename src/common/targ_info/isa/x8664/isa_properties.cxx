@@ -608,7 +608,7 @@ int main()
                      TOP_vldaps,
                      TOP_vldapsx,
                      TOP_vldapsxx,
-#include "isa_avx_properties_load_only.cxx";
+#include "isa_avx_properties_load_only.cxx"
                      TOP_UNDEFINED);
 
   /* ===== Memory load and extend operator ====== */

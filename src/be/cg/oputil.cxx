@@ -828,7 +828,7 @@ Mk_OP(TOP opr, ...)
 #endif // Is_True_On
 
 #ifdef TARG_X8664
-  if ( TOP_is_vector_high_loadstore ( OP_code ( op ) ) )
+  if ( TOP_is_vector_high_loadstore ( OP_code ( op ) ) || TOP_is_vector_lo_loadstore(OP_code(op)) )
     Set_OP_cond_def_kind(op, OP_ALWAYS_COND_DEF);
 #endif
   return op;

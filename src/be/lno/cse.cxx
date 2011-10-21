@@ -361,7 +361,10 @@ static EQUIVALENCE_TYPE Set_Up_Equivalence_Classes(WN *wn, WN *loop)
 #ifdef TARG_X8664
       if (WN_desc(wn) == MTYPE_V16I1 || WN_desc(wn) == MTYPE_V16I2 || 
 	  WN_desc(wn) == MTYPE_V16I4 || WN_desc(wn) == MTYPE_V16I8 || 
-	  WN_desc(wn) == MTYPE_V16F4 || WN_desc(wn) == MTYPE_V16F8)
+	  WN_desc(wn) == MTYPE_V16F4 || WN_desc(wn) == MTYPE_V16F8 ||
+	  WN_desc(wn) == MTYPE_V32I1 || WN_desc(wn) == MTYPE_V32I2 || 
+	  WN_desc(wn) == MTYPE_V32I4 || WN_desc(wn) == MTYPE_V32I8 || 
+	  WN_desc(wn) == MTYPE_V32F4 || WN_desc(wn) == MTYPE_V32F8)
 	return EQ_NONE;      
 #endif /* TARG_X8664 */
       if (Set_Up_Equivalence_Classes(WN_kid0(wn),loop) != EQ_NONE) {

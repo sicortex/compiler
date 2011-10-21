@@ -3707,6 +3707,9 @@ Targ_Print ( const char *fmt, TCON c )
       }
       break;
 
+    case MTYPE_V32I1:
+	case MTYPE_V32I2:
+	case MTYPE_V32I4:
     case MTYPE_V16I1:
     case MTYPE_V16I2:
     case MTYPE_V16I4:
@@ -3721,6 +3724,7 @@ Targ_Print ( const char *fmt, TCON c )
       sprintf(r, fmt, TCON_v0(c));
       break;
 
+    case MTYPE_V32I8:
     case MTYPE_V16I8:
     case MTYPE_I8:
     case MTYPE_U8:
@@ -3728,6 +3732,7 @@ Targ_Print ( const char *fmt, TCON c )
       sprintf(r, fmt, TCON_I8(c));
       break;
 
+	case MTYPE_V32F4:
     case MTYPE_V16F4:
     case MTYPE_F4:
       if (fmt == NULL) fmt = "%#12.7g";
@@ -3738,6 +3743,7 @@ Targ_Print ( const char *fmt, TCON c )
 #endif /* !(defined(FRONT_END_C) || defined(FRONT_END_CPLUSPLUS)) */
       break;
 
+    case MTYPE_V32F8:
     case MTYPE_V16F8:
     case MTYPE_F8:
       if (fmt == NULL) fmt = "%#21.16g";

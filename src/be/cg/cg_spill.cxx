@@ -776,7 +776,13 @@ CGSPILL_Load_From_Memory (TN *tn, ST *mem_loc, OPS *ops, CGSPILL_CLIENT client,
 	OPCODE_rtype(opcode) == MTYPE_V16I1 ||
 	OPCODE_rtype(opcode) == MTYPE_V16I2 ||
 	OPCODE_rtype(opcode) == MTYPE_V16I4 ||
-	OPCODE_rtype(opcode) == MTYPE_V16I8) {
+	OPCODE_rtype(opcode) == MTYPE_V16I8 ||
+	OPCODE_rtype(opcode) == MTYPE_V32F4 ||
+	OPCODE_rtype(opcode) == MTYPE_V32F8 ||
+	OPCODE_rtype(opcode) == MTYPE_V32I1 ||
+	OPCODE_rtype(opcode) == MTYPE_V32I2 ||
+	OPCODE_rtype(opcode) == MTYPE_V32I4 ||
+	OPCODE_rtype(opcode) == MTYPE_V32I8) {
       TCON then = ST_tcon_val(WN_st(home));
       TCON now  = Create_Simd_Const (OPCODE_rtype(opcode), then);
       ST *sym = New_Const_Sym (Enter_tcon (now), 

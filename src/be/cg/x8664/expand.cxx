@@ -8909,6 +8909,18 @@ void Expand_Const (TN *dest, TN *src, TYPE_ID mtype, OPS *ops)
       Build_OP( TOP_xzero128v64, dest, ops);
       return;
     }
+	if (TCON_ty(tcon) == MTYPE_V32F4 && Targ_Is_Zero(tcon)) {
+      FmtAssert(TCON_ty(tcon) == mtype && Is_Target_SSE2(),
+		("Expand_Const: inconsistent mtypes"));
+      Build_OP( TOP_vxzero256v32, dest, ops);
+      return;
+    }
+    if (TCON_ty(tcon) == MTYPE_V32F8 && Targ_Is_Zero(tcon)) {
+      FmtAssert(TCON_ty(tcon) == mtype && Is_Target_SSE2(),
+		("Expand_Const: inconsistent mtypes"));
+      Build_OP( TOP_vxzero256v64, dest, ops);
+      return;
+    }
   }
   Exp_Load( mtype, mtype, dest, TN_var(src), TN_offset(src), ops, 0 );
 }

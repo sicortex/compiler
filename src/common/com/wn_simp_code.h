@@ -1566,7 +1566,7 @@ static simpnode  simp_recip(OPCODE opc, simpnode k0, simpnode k1,
 #ifdef TARG_X8664
 	 if (Rsqrt_Allowed >= 1 &&
 	     // x86-64 rsqrt supports single-precision only.
-	     (ty == MTYPE_F4 || ty == MTYPE_V16F4) &&
+	     (ty == MTYPE_F4 || ty == MTYPE_V16F4 || ty == MTYPE_V32F4) &&
 	     Is_Target_SSE2())
 #else	    
 	 if (Rsqrt_Allowed)
@@ -1595,7 +1595,7 @@ static simpnode  simp_recip(OPCODE opc, simpnode k0, simpnode k1,
 #ifdef TARG_X8664
 	      Rsqrt_Allowed == 2 &&
 	      // x86-64 rsqrt supports single-precision only.
-	      (ty == MTYPE_F4 || ty == MTYPE_V16F4) &&
+	      (ty == MTYPE_F4 || ty == MTYPE_V16F4 || ty == MTYPE_V32F4) &&
 	      Is_Target_SSE2()
 #else
 	      Rsqrt_Allowed

@@ -3686,7 +3686,7 @@ static WN *lower_rsqrt(WN *block, WN *tree, LOWER_ACTIONS actions)
 #ifdef TARG_X8664	// bug 6123
   if (Rsqrt_Allowed == 0 ||
       // x86-64 rsqrt supports single-precision only.
-      !(type == MTYPE_F4 || type == MTYPE_V16F4) ||
+      !(type == MTYPE_F4 || type == MTYPE_V16F4 || type == MTYPE_V32F4) ||
       !Is_Target_SSE2())
 #else
   if (Rsqrt_Allowed == FALSE || MTYPE_is_quad(type))

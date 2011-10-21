@@ -7365,7 +7365,7 @@ Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, 
   case INTRN_LOADLPD:
     Build_OP( TOP_movapd, result, op0, ops );
     Build_OP( TOP_ldlpd, result, op1, Gen_Literal_TN (0,4), ops );
-    Set_OP_cond_def_kind(ops, OP_ALWAYS_COND_DEF);
+    Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
     break;
   case INTRN_LOADHPD:
     Build_OP( TOP_movapd, result, op0, ops );
@@ -7597,7 +7597,7 @@ Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, 
   case INTRN_LOADLPS:
     Build_OP( TOP_movaps, result, op0, ops );
     Build_OP( TOP_ldlps, result, op1, Gen_Literal_TN (0,4), ops );
-    Set_OP_cond_def_kind(ops, OP_ALWAYS_COND_DEF);
+    Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
     break;
   case INTRN_MOVMSKPS:
     Build_OP( TOP_movmskps, result, op0, ops );

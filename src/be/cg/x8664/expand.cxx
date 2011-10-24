@@ -5689,9 +5689,58 @@ void Expand_Flop( OPCODE opcode, TN *result, TN *src1, TN *src2, TN *src3, OPS *
 	  Build_OP(opc, result, src2, src3, src1, ops);
 	  return;
 	}
+  case OPC_V16F4MADD:	// (src2 * src3) + src1
+    if(Is_Target_Orochi()){
+      opc = TOP_vfmaddps_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+    }
+  case OPC_V16F4NMADD:	// -((src2 * src3) + src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmsubps_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+    }
+  case OPC_V16F4MSUB:	// (src2 * src3) - src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmsubps_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
+  case OPC_V16F4NMSUB:	// -((src2 * src3) - src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmaddps_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
+  case OPC_V16F8MADD:	// (src2 * src3) + src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmaddpd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
+  case OPC_V16F8NMADD:	// -((src2 * src3) + src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmsubpd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
+  case OPC_V16F8MSUB:	// (src2 * src3) - src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmsubpd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
+  case OPC_V16F8NMSUB:	// -((src2 * src3) - src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmaddpd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
     FmtAssert( false,
 	       ("Expand_Flop: Unsupported opcode (%s)", OPCODE_name(opcode)) );
     break;
+  
   case OPC_F4DIV:
     if( Is_Target_SSE2() ){
       opc = TOP_divss;
@@ -9557,4 +9606,15 @@ void Expand_Conv_From_Vector(TN * dest, TN * src, TYPE_ID desc, TYPE_ID rtype,
   }
 }
 
+void Expand_Madd(TN *dest, TN* src1, TN* src2, TN *src3, TYPE_ID mtype, OPS *ops)
+{
+  if(mtype == MTYPE_V16I4){//dest = (src2 * src3) + src1
+  	Build_OP(TOP_vpmacsdd_f128_oxmm_xmm_xmm_xmm, dest, src2, src3, src1, ops);
+  }else if(mtype == MTYPE_I4){
+    Build_OP(TOP_imul32, dest, src2, src3, ops);
+	Build_OP(TOP_addi32, dest, src1, dest, ops);
+  }else{
+    FmtAssert(FALSE, ("no such instructions about madd"));
+  }
+}
 

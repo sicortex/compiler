@@ -4021,7 +4021,7 @@ static Addr_Mode_Group Addr_Mode_Group_Table[] = {
   // OPs will have fxor128v32/fxor128v64 as the base mode.
   {TOP_xorps,	TOP_fxorx128v32,	TOP_fxorxx128v32,	TOP_fxorxxx128v32,	TOP_UNDEFINED},
   {TOP_xorpd,	TOP_fxorx128v64,	TOP_fxorxx128v64,	TOP_fxorxxx128v64,	TOP_UNDEFINED},
-#include "ebo_special_xop_fma.cxx"
+//#include "ebo_special_xop_fma.cxx"
 
   {TOP_fmax128v32,	TOP_fmaxx128v32,	TOP_fmaxxx128v32,	TOP_fmaxxxx128v32,	TOP_UNDEFINED},
   {TOP_fmax128v64,	TOP_fmaxx128v64,	TOP_fmaxxx128v64,	TOP_fmaxxxx128v64,	TOP_UNDEFINED},

@@ -315,6 +315,18 @@ static BOOL is_vectorizable_op (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc) {
 	  return TRUE;
 	else
   	  return FALSE;
+  case OPR_MADD:
+  	if(Is_Target_Orochi() && rtype == MTYPE_I4)
+	  return TRUE;
+  case OPR_MSUB:
+  case OPR_NMADD:
+  case OPR_NMSUB:
+  	if(Is_Target_Orochi()){
+  	  if(rtype == MTYPE_F4 || rtype ==MTYPE_F8)
+	  	return TRUE;
+	  else return FALSE;
+    }else
+     return FALSE;
   default:
     return FALSE;
   }  
@@ -725,9 +737,15 @@ static BOOL Is_Well_Formed_Simd ( WN* wn, WN* loop)
   WN* parent = LWN_Get_Parent(wn);
   WN* kid0 = WN_kid0(wn);
   WN* kid1 = WN_kid1(wn);
-
-  if (WN_kid_count(wn) > 2 && WN_operator(wn) != OPR_SELECT)
-    return FALSE;
+  //TODO: For madd simd ops detecting, consider all the cases when WN_kid_count(wn) == 3
+  if (WN_kid_count(wn) > 2 && 
+  	  (WN_operator(wn) != OPR_SELECT
+  	  && WN_operator(wn) != OPR_MADD
+  	  && WN_operator(wn) != OPR_MSUB
+  	  && WN_operator(wn) != OPR_NMADD
+  	  && WN_operator(wn) != OPR_NMSUB)){
+	return FALSE;
+  }
 
   if (WN_operator(wn) == OPR_SELECT) {
     WN *compare_wn = kid0;

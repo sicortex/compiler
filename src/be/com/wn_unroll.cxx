@@ -235,6 +235,10 @@ WN_UNROLL::Analyze_body_expr(WN *tree)
 
   // ternary
   case OPR_SELECT:
+  case OPR_MADD:
+  case OPR_MSUB:
+  case OPR_NMADD:
+  case OPR_NMSUB:
     Analyze_body_expr(WN_kid0(tree));
     Analyze_body_expr(WN_kid1(tree));
     Analyze_body_expr(WN_kid2(tree));

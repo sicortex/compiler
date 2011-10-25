@@ -412,8 +412,8 @@ Expand_OP (OPCODE opcode, TN *result, TN *op1, TN *op2, TN *op3, VARIANT variant
 	break;
 
   case OPR_MADD:
-  	if(Is_Target_Orochi() && rtype== MTYPE_I4){
-	  Expand_Madd(result, op1, op2, op3, MTYPE_I4, ops);
+  	if(Is_Target_Orochi() && (rtype== MTYPE_I4 || rtype == MTYPE_V16I4)){
+	  Expand_Madd(result, op1, op2, op3, rtype, ops);
 	  break;
   	}//fallthrough
   case OPR_NMADD:

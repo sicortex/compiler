@@ -212,33 +212,6 @@ Result(0);
 		TOP_UNDEFINED);
 
 
-ISA_PRINT_TYPE oymm_ymm_ymm_mem1 = ISA_Print_Type_Create("oymm_ymm_ymm_mem1",
-"%s %s%s(%s) ,%s ,%s ,%s");
-Name();
-Segment();
-Operand(3);
-Operand(2);
-Operand(1);
-Operand(0);
-Result(0);
-	Instruction_Print_Group(oymm_ymm_ymm_mem1,
-		TOP_vfmaddpd_f256_oymm_ymm_ymm_mem1,
-		TOP_vfmaddps_f256_oymm_ymm_ymm_mem1,
-		TOP_vfmaddsubpd_f256_oymm_ymm_ymm_mem1,
-		TOP_vfmaddsubps_f256_oymm_ymm_ymm_mem1,
-		TOP_vfmsubaddpd_f256_oymm_ymm_ymm_mem1,
-		TOP_vfmsubaddps_f256_oymm_ymm_ymm_mem1,
-		TOP_vfmsubpd_f256_oymm_ymm_ymm_mem1,
-		TOP_vfmsubps_f256_oymm_ymm_ymm_mem1,
-		TOP_vfnmaddpd_f256_oymm_ymm_ymm_mem1,
-		TOP_vfnmaddps_f256_oymm_ymm_ymm_mem1,
-		TOP_vfnmaddsd_f256_oymm_ymm_ymm_mem1,
-		TOP_vfnmsubpd_f256_oymm_ymm_ymm_mem1,
-		TOP_vfnmsubps_f256_oymm_ymm_ymm_mem1,
-		TOP_vpcmov_f256_oymm_ymm_ymm_mem1,
-		TOP_UNDEFINED);
-
-
 ISA_PRINT_TYPE oymm_ymm_mem3_ymm = ISA_Print_Type_Create("oymm_ymm_mem3_ymm",
 "%s %s ,%s%s(,%s,%s) ,%s ,%s");
 Name();
@@ -264,6 +237,33 @@ Result(0);
 		TOP_vfnmsubpd_f256_oymm_ymm_mem3_ymm,
 		TOP_vfnmsubps_f256_oymm_ymm_mem3_ymm,
 		TOP_vpcmov_f256_oymm_ymm_mem3_ymm,
+		TOP_UNDEFINED);
+
+
+ISA_PRINT_TYPE oymm_ymm_ymm_mem1 = ISA_Print_Type_Create("oymm_ymm_ymm_mem1",
+"%s %s%s(%s) ,%s ,%s ,%s");
+Name();
+Segment();
+Operand(3);
+Operand(2);
+Operand(1);
+Operand(0);
+Result(0);
+	Instruction_Print_Group(oymm_ymm_ymm_mem1,
+		TOP_vfmaddpd_f256_oymm_ymm_ymm_mem1,
+		TOP_vfmaddps_f256_oymm_ymm_ymm_mem1,
+		TOP_vfmaddsubpd_f256_oymm_ymm_ymm_mem1,
+		TOP_vfmaddsubps_f256_oymm_ymm_ymm_mem1,
+		TOP_vfmsubaddpd_f256_oymm_ymm_ymm_mem1,
+		TOP_vfmsubaddps_f256_oymm_ymm_ymm_mem1,
+		TOP_vfmsubpd_f256_oymm_ymm_ymm_mem1,
+		TOP_vfmsubps_f256_oymm_ymm_ymm_mem1,
+		TOP_vfnmaddpd_f256_oymm_ymm_ymm_mem1,
+		TOP_vfnmaddps_f256_oymm_ymm_ymm_mem1,
+		TOP_vfnmaddsd_f256_oymm_ymm_ymm_mem1,
+		TOP_vfnmsubpd_f256_oymm_ymm_ymm_mem1,
+		TOP_vfnmsubps_f256_oymm_ymm_ymm_mem1,
+		TOP_vpcmov_f256_oymm_ymm_ymm_mem1,
 		TOP_UNDEFINED);
 
 

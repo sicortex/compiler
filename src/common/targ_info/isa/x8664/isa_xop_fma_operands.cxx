@@ -167,28 +167,6 @@
 	Operand(5, simm32,offset);
 	Operand(6, simm8,opnd4);
 
-	Instruction_Group("oymm_ymm_ymm_mem1",
-		TOP_vfmaddpd_f256_oymm_ymm_ymm_mem1,
-		TOP_vfmaddps_f256_oymm_ymm_ymm_mem1,
-		TOP_vfmaddsubpd_f256_oymm_ymm_ymm_mem1,
-		TOP_vfmaddsubps_f256_oymm_ymm_ymm_mem1,
-		TOP_vfmsubaddpd_f256_oymm_ymm_ymm_mem1,
-		TOP_vfmsubaddps_f256_oymm_ymm_ymm_mem1,
-		TOP_vfmsubpd_f256_oymm_ymm_ymm_mem1,
-		TOP_vfmsubps_f256_oymm_ymm_ymm_mem1,
-		TOP_vfnmaddpd_f256_oymm_ymm_ymm_mem1,
-		TOP_vfnmaddps_f256_oymm_ymm_ymm_mem1,
-		TOP_vfnmaddsd_f256_oymm_ymm_ymm_mem1,
-		TOP_vfnmsubpd_f256_oymm_ymm_ymm_mem1,
-		TOP_vfnmsubps_f256_oymm_ymm_ymm_mem1,
-		TOP_vpcmov_f256_oymm_ymm_ymm_mem1,
-		TOP_UNDEFINED);
-	Result(0,fp128);
-	Operand(0, fp128,opnd1);
-	Operand(1, fp128,opnd2);
-	Operand(2, int64,base);
-	Operand(3, simm32,offset);
-
 	Instruction_Group("oymm_ymm_mem3_ymm",
 		TOP_vfmaddpd_f256_oymm_ymm_mem3_ymm,
 		TOP_vfmaddps_f256_oymm_ymm_mem3_ymm,
@@ -211,6 +189,28 @@
 	Operand(2, uimm8,scale);
 	Operand(3, simm32,offset);
 	Operand(4, fp128,opnd3);
+
+	Instruction_Group("oymm_ymm_ymm_mem1",
+		TOP_vfmaddpd_f256_oymm_ymm_ymm_mem1,
+		TOP_vfmaddps_f256_oymm_ymm_ymm_mem1,
+		TOP_vfmaddsubpd_f256_oymm_ymm_ymm_mem1,
+		TOP_vfmaddsubps_f256_oymm_ymm_ymm_mem1,
+		TOP_vfmsubaddpd_f256_oymm_ymm_ymm_mem1,
+		TOP_vfmsubaddps_f256_oymm_ymm_ymm_mem1,
+		TOP_vfmsubpd_f256_oymm_ymm_ymm_mem1,
+		TOP_vfmsubps_f256_oymm_ymm_ymm_mem1,
+		TOP_vfnmaddpd_f256_oymm_ymm_ymm_mem1,
+		TOP_vfnmaddps_f256_oymm_ymm_ymm_mem1,
+		TOP_vfnmaddsd_f256_oymm_ymm_ymm_mem1,
+		TOP_vfnmsubpd_f256_oymm_ymm_ymm_mem1,
+		TOP_vfnmsubps_f256_oymm_ymm_ymm_mem1,
+		TOP_vpcmov_f256_oymm_ymm_ymm_mem1,
+		TOP_UNDEFINED);
+	Result(0,fp128);
+	Operand(0, fp128,opnd1);
+	Operand(1, fp128,opnd2);
+	Operand(2, int64,base);
+	Operand(3, simm32,offset);
 
 	Instruction_Group("oymm_mem3",
 		TOP_vfrczpd_f128_oymm_mem3,

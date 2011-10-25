@@ -51,14 +51,21 @@ LNOTARGET_Whirl_To_Top (WN* wn)
   case OPC_F8MPY:
     return TOP_mulsd;
   case OPC_F4MADD:	// (src2 * src3) + src1
+    return TOP_vfmaddss_f128_oxmm_xmm_xmm_xmm;
   case OPC_F4NMADD:	// -((src2 * src3) + src1)
+    return TOP_vfnmaddss_f128_oxmm_xmm_xmm_xmm;
   case OPC_F4MSUB:	// (src2 * src3) - src1
+    return TOP_vfmsubss_f128_oxmm_xmm_xmm_xmm;
   case OPC_F4NMSUB:	// -((src2 * src3) - src1)
+    return TOP_vfnmsubss_f128_oxmm_xmm_xmm_xmm;
   case OPC_F8MADD:	// (src2 * src3) + src1
+    return TOP_vfmsubsd_f128_oxmm_xmm_xmm_xmm;
   case OPC_F8NMADD:	// -((src2 * src3) + src1)
+    return TOP_vfnmsubsd_f128_oxmm_xmm_xmm_xmm;
   case OPC_F8MSUB:	// (src2 * src3) - src1
+    return TOP_vfmsubsd_f128_oxmm_xmm_xmm_xmm;
   case OPC_F8NMSUB:	// -((src2 * src3) - src1)
-    FmtAssert( false, ("NYI") );
+    return TOP_vfnmsubsd_f128_oxmm_xmm_xmm_xmm;
     break;
   case OPC_F4DIV:
     return TOP_divss;

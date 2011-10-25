@@ -9612,7 +9612,7 @@ void Expand_Madd(TN *dest, TN* src1, TN* src2, TN *src3, TYPE_ID mtype, OPS *ops
   	Build_OP(TOP_vpmacsdd_f128_oxmm_xmm_xmm_xmm, dest, src2, src3, src1, ops);
   }else if(mtype == MTYPE_I4){
     Build_OP(TOP_imul32, dest, src2, src3, ops);
-	Build_OP(TOP_addi32, dest, src1, dest, ops);
+	Build_OP(TOP_add32, dest, src1, dest, ops);
   }else{
     FmtAssert(FALSE, ("no such instructions about madd"));
   }

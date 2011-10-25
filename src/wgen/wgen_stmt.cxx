@@ -3187,8 +3187,7 @@ append_eh_filter (INITV_IDX& iv)
       if (!next)
         break;
   
-      int next_val = TCON_ival (INITV_tc_val (next));
-      if (next_val == 0)
+      if (INITV_kind(next) == INITVKIND_ZERO)
         break;
   
       last = next;

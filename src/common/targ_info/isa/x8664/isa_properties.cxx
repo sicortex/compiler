@@ -598,7 +598,7 @@ int main()
 		     TOP_fmovshdupxxx,
 		     TOP_fmovddupxxx,
 #include "isa_avx_properties_load_only.cxx";
-#include "isa_xop_fma_properties_load_only.cxx"
+//#include "isa_xop_fma_properties_load_only.cxx"
                      TOP_UNDEFINED);
 
   /* ===== Memory load and extend operator ====== */
@@ -2377,7 +2377,7 @@ int main()
 			  TOP_vfnmsubsd_f128_oxmm_xmm_xmm_mem2,
 			  TOP_vfnmsubsd_f128_oxmm_xmm_xmm_mem3,
 #include "isa_avx_properties_flop_prop.cxx" 
-//#include "isa_xop_fma_properties_flop_prop.cxx"
+#include "isa_xop_fma_properties.cxx"
                      TOP_UNDEFINED);
 
   /* ===== FP add operator ====== */
@@ -2462,7 +2462,7 @@ int main()
 		     TOP_fsubr,
 		     TOP_fsubrp,		     
 #include "isa_avx_properties_fsub_prop.cxx"
-#include "isa_xop_fma_properties_fsub_prop.cxx"
+//#include "isa_xop_fma_properties_fsub_prop.cxx"
                      TOP_UNDEFINED);
 
   /* ===== FP multiply operator ====== */

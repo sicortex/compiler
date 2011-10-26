@@ -2056,6 +2056,12 @@ add_final_ld_args (string_list_t *args)
             add_arg(args, "-static-libgcc");
         }
 
+	/* Need to give ipa_link openmp flag or it will get lost during
+	 * final linking */
+	if(option_was_seen(O_fopenmp)) {
+            add_arg(args, "-openmp");
+        }
+
 	// Must add fstart or the Fortran main will get dropped by ipa
 	// processing.
 	if (shared != RELOCATABLE) {

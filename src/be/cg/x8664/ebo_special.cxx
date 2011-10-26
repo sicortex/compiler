@@ -5318,6 +5318,19 @@ BOOL EBO_Opt_Const_Array( OP* mem_op,
 }
 
 static
+BOOL EBO_Is_XOP(TOP top){
+  switch(top){
+  	case TOP_vpmacsdd_f128_oxmm_xmm_xmm_xmm:
+	case TOP_vpmacsdd_f128_oxmm_xmm_mem1_xmm:
+	case TOP_vpmacsdd_f128_oxmm_xmm_mem2_xmm:
+	case TOP_vpmacsdd_f128_oxmm_xmm_mem3_xmm:
+	  return TRUE;
+    default:
+	  return FALSE;
+  }
+}
+
+static
 BOOL EBO_Is_3opr(OP *op){
    TOP top = (TOP)op->opr;
    // TODO: add more intructions beside these FMA4/XOP instructions below
@@ -5409,7 +5422,8 @@ BOOL EBO_Load_Execution( OP* alu_op,
 
 	
 	// TODO: we might can swap op0 and op1 for madd/msub intruction
-	ld_i = (in_op2 && OP_load(in_op2))? 2: -1;
+	ld_i = (in_op2 && OP_load(in_op2) && !EBO_Is_XOP((TOP)alu_op->opr))? 2: -1;
+	//vpmacsdd only has memory in the src2
 	if(ld_i == -1)
 	  ld_i = (in_op1 && OP_load(in_op1))? 1 : -1;
 	if(ld_i == -1)
@@ -5557,7 +5571,7 @@ BOOL EBO_Load_Execution( OP* alu_op,
 
   TOP new_top = Load_Execute_Format( ld_op, alu_op, mode );
 
-  if(EBO_Is_3opr(alu_op) && ld_i == 1){
+  if(EBO_Is_3opr(alu_op) && ld_i == 1 && !EBO_Is_XOP(new_top)){
   	//it means the load in opnd1
   	FmtAssert(new_top != TOP_UNDEFINED, ("some fma/xop not yet implement"));
   	new_top = Reset_Execute_Format(new_top, mode);

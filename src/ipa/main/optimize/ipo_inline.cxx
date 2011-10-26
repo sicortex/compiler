@@ -1637,6 +1637,71 @@ Save_And_Restore_Stack (WN* call)
 
 } // Save_And_Restore_Stack
 
+bool IPO_INLINE::Find_Enclosing_EH_Region ()
+{
+    Set_Tables (Caller_node ()); // Set the globals: Scope_tab, Current_scope, Current_pu
+
+    for (WN* wn = Call_Wn(); wn != NULL;
+         wn = WN_Get_Parent(wn, Parent_Map, Current_Map_Tab)) {
+
+        if (WN_operator(wn) != OPR_REGION || WN_region_kind(wn) != REGION_KIND_EH)
+            continue;
+
+        INITO_IDX ereg_inito = WN_ereg_supp(wn);
+        INITV_IDX ereg_val = INITO_val(ereg_inito);
+
+        if (INITV_kind(ereg_val) != INITVKIND_BLOCK) {
+            // not an EH region
+            continue;
+        }
+
+        INITV_IDX initv = INITV_blk(INITO_val(ereg_inito));
+        if (INITV_kind(initv) != INITVKIND_LABEL) {
+            // no landing pad
+            continue;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+
+ST_IDX
+IPO_INLINE::Get_Unwind_Resume_or_Rethrow()
+{
+    int i;
+    ST *st;
+    FOREACH_SYMBOL (GLOBAL_SYMTAB, st, i) {
+        if (strcmp(ST_name(st), "_Unwind_Resume_or_Rethrow") == 0) {
+            return ST_st_idx(st);
+        }
+    }
+
+    // create new st for _Unwind_Resume_or_Rethrow
+
+    TY_IDX func_ty_idx;
+    TY &func_ty = New_TY(func_ty_idx);
+    TY_Init(func_ty, 0, KIND_FUNCTION, MTYPE_UNKNOWN, STR_IDX_ZERO);
+
+    uint32_t tylist_idx;
+    Set_TYLIST_type(New_TYLIST(tylist_idx), MTYPE_To_TY(MTYPE_V));
+    Set_TY_tylist(func_ty, tylist_idx);
+    Set_TYLIST_type(New_TYLIST(tylist_idx), MTYPE_To_TY(Pointer_Mtype));
+    Set_TYLIST_type(New_TYLIST(tylist_idx), 0);
+
+    PU_IDX pu_idx;
+    PU &pu = New_PU(pu_idx);
+    st = New_ST(GLOBAL_SYMTAB);
+    PU_Init(pu, func_ty_idx, CURRENT_SYMTAB);
+    ST_Init(st, Save_Str("_Unwind_Resume_or_Rethrow"), CLASS_FUNC,
+            SCLASS_EXTERN, EXPORT_PREEMPTIBLE, TY_IDX(pu_idx));
+
+    return ST_st_idx(st);
+}
+
+
 void
 IPO_INLINE::Pre_Process_Caller (LABEL_IDX& return_label)
 {
@@ -2073,21 +2138,30 @@ IPO_INLINE::Process_Op_Code (TREE_ITER& iter, IPO_INLINE_AUX& aux)
     {
         WN * kid0;
 	if (WN_kid_count(wn) == 1 && (kid0 = WN_kid0 (WN_kid0 (wn))))
-	{
+	{            
 	    if (WN_operator (kid0) == OPR_LDID &&
 	        ST_one_per_pu (&St_Table[WN_st_idx (kid0)]))
 	    {
     		ST_IDX i = WN_st_idx (wn);
 		char * func_name = ST_name (St_Table[i]);
-		Is_True (func_name && 
-			   (!strcmp (func_name, "_Unwind_Resume") || 
-			    !strcmp (func_name, "__cxa_call_unexpected") || 
-			    !strcmp (func_name, "__cxa_begin_catch") ||
-			    !strcmp (func_name, "__cxa_get_exception_ptr")), 
-			   ("Function %s has one-per-pu paramter", func_name));
-	    	// Fixup parameter
-	    	INITV_IDX exc_ptr = INITO_val (PU_misc_info (Get_Current_PU ()));
-		WN_st_idx (kid0) = TCON_uval (INITV_tc_val (exc_ptr));
+
+                // Replace call to _Unwind_Resume with call to _Unwind_Resume_or_Rethrow
+                // if there is enclosing EH region in caller
+                if (strcmp (func_name, "_Unwind_Resume") == 0 && aux.enclosing_eh) {
+                    WN_st_idx(wn) = Get_Unwind_Resume_or_Rethrow();
+                }
+
+                Is_True (func_name &&
+                           (!strcmp (func_name, "_Unwind_Resume_or_Rethrow") ||
+                            !strcmp (func_name, "_Unwind_Resume") ||
+                            !strcmp (func_name, "__cxa_call_unexpected") ||
+                            !strcmp (func_name, "__cxa_begin_catch") ||
+                            !strcmp (func_name, "__cxa_get_exception_ptr")),
+                           ("Function %s has one-per-pu paramter", func_name));
+
+                // Fixup parameter
+                INITV_IDX exc_ptr = INITO_val (PU_misc_info (Get_Current_PU ()));
+                WN_st_idx (kid0) = TCON_uval (INITV_tc_val (exc_ptr));
 	    }
 	}
     }
@@ -4623,7 +4697,6 @@ IPO_INLINE::Post_Process_Caller (IPO_INLINE_AUX& aux)
 } // IPO_INLINE::Post_Process_Caller() 
 
 
-
 //======================================================================
 // MAIN EXPORTED entry point: perform the actual inlining  
 //======================================================================
@@ -4660,6 +4733,9 @@ IPO_INLINE::Process()
          Header_File_Offsets[caller_file_index][callee_file_index];
   }
 #endif
+
+  // Search landing pad for outer EH region in caller
+  aux_info.enclosing_eh = Find_Enclosing_EH_Region ();
 
   // Pre_Process_Caller to initialize return_label
 

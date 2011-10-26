@@ -4536,7 +4536,9 @@ Load_Execute_Format (OP *ld_op, OP *ex_op, ADDR_MODE mode)
 static TOP
 Reset_Execute_Format(TOP top, ADDR_MODE mode){
   // please make sure they are near by
-  Addr_Mode_Group *new_group = Top_To_Addr_Mode_Group[top+1];
+  Addr_Mode_Group *group =  Top_To_Addr_Mode_Group[top];
+  Addr_Mode_Group *new_group = Top_To_Addr_Mode_Group[top] + 1;
+  FmtAssert(group->reg_mode== new_group->reg_mode, ("reg base instruction not the same in EBO"));
   if(new_group != NULL){
     switch(mode){
    	  case BASE_MODE:
@@ -5344,10 +5346,14 @@ BOOL EBO_Is_3opr(OP *op){
 	 case TOP_vfnmaddps_f128_oxmm_xmm_xmm_xmm:
 	 case TOP_vfnmaddpd_f256_oymm_ymm_ymm_ymm:
 	 case TOP_vfnmaddps_f256_oymm_ymm_ymm_ymm:
+	 case TOP_vfnmaddss_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfnmaddsd_f128_oxmm_xmm_xmm_xmm:
 	 case TOP_vfnmsubpd_f128_oxmm_xmm_xmm_xmm:
 	 case TOP_vfnmsubps_f128_oxmm_xmm_xmm_xmm:
 	 case TOP_vfnmsubpd_f256_oymm_ymm_ymm_ymm:
 	 case TOP_vfnmsubps_f256_oymm_ymm_ymm_ymm:
+	 case TOP_vfnmsubsd_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfnmsubss_f128_oxmm_xmm_xmm_xmm:
 	 case TOP_vpmacsdd_f128_oxmm_xmm_xmm_xmm:
 	  return TRUE;
 	 default:
@@ -5550,16 +5556,17 @@ BOOL EBO_Load_Execution( OP* alu_op,
   }
 
   TOP new_top = Load_Execute_Format( ld_op, alu_op, mode );
-  
-
-  if( new_top == TOP_UNDEFINED )
-    return FALSE;
 
   if(EBO_Is_3opr(alu_op) && ld_i == 1){
   	//it means the load in opnd1
   	FmtAssert(new_top != TOP_UNDEFINED, ("some fma/xop not yet implement"));
   	new_top = Reset_Execute_Format(new_top, mode);
   }
+
+  if( new_top == TOP_UNDEFINED )
+    return FALSE;
+
+ 
 
   if( EBO_flow_safe && (opnd0_indx == 1) ) {
     new_top = Fit_Cmp_By_Load_Usage( new_top, TRUE );

@@ -37,7 +37,7 @@ Result(0);
 ISA_PRINT_TYPE oxmm_mem3_simm8 = ISA_Print_Type_Create("oxmm_mem3_simm8",
 "%s %s ,%s%s(,%s,%s) ,%s");
 Name();
-Operand(1);
+Operand(3);
 Segment();
 Operand(2);
 Operand(0);
@@ -56,8 +56,8 @@ Result(0);
 ISA_PRINT_TYPE oymm_ymm_mem2_ymm_simm8 = ISA_Print_Type_Create("oymm_ymm_mem2_ymm_simm8",
 "%s %s ,%s ,%s%s(%s,%s,%s) ,%s ,%s");
 Name();
-Operand(3);
-Operand(2);
+Operand(6);
+Operand(5);
 Segment();
 Operand(4);
 Operand(1);
@@ -74,7 +74,7 @@ Result(0);
 ISA_PRINT_TYPE oxmm_mem2_xmm = ISA_Print_Type_Create("oxmm_mem2_xmm",
 "%s %s ,%s%s(%s,%s,%s) ,%s");
 Name();
-Operand(1);
+Operand(4);
 Segment();
 Operand(3);
 Operand(0);
@@ -137,8 +137,8 @@ Result(0);
 ISA_PRINT_TYPE oxmm_xmm_mem1_xmm_simm8 = ISA_Print_Type_Create("oxmm_xmm_mem1_xmm_simm8",
 "%s %s ,%s ,%s%s(%s) ,%s ,%s");
 Name();
+Operand(4);
 Operand(3);
-Operand(2);
 Segment();
 Operand(2);
 Operand(1);
@@ -168,7 +168,7 @@ Result(0);
 ISA_PRINT_TYPE oymm_ymm_mem2_ymm = ISA_Print_Type_Create("oymm_ymm_mem2_ymm",
 "%s %s ,%s%s(%s,%s,%s) ,%s ,%s");
 Name();
-Operand(2);
+Operand(5);
 Segment();
 Operand(4);
 Operand(1);
@@ -197,7 +197,7 @@ Result(0);
 ISA_PRINT_TYPE oxmm_xmm_xmm_mem2_simm8 = ISA_Print_Type_Create("oxmm_xmm_xmm_mem2_simm8",
 "%s %s ,%s%s(%s,%s,%s) ,%s ,%s ,%s");
 Name();
-Operand(3);
+Operand(6);
 Segment();
 Operand(5);
 Operand(2);
@@ -215,7 +215,7 @@ Result(0);
 ISA_PRINT_TYPE oymm_ymm_mem3_ymm = ISA_Print_Type_Create("oymm_ymm_mem3_ymm",
 "%s %s ,%s%s(,%s,%s) ,%s ,%s");
 Name();
-Operand(2);
+Operand(4);
 Segment();
 Operand(3);
 Operand(1);
@@ -345,7 +345,7 @@ Result(0);
 ISA_PRINT_TYPE oxmm_xmm_mem1_simm8 = ISA_Print_Type_Create("oxmm_xmm_mem1_simm8",
 "%s %s ,%s%s(%s) ,%s ,%s");
 Name();
-Operand(2);
+Operand(3);
 Segment();
 Operand(2);
 Operand(1);
@@ -377,7 +377,7 @@ Result(0);
 ISA_PRINT_TYPE oxmm_xmm_xmm_mem3_simm8 = ISA_Print_Type_Create("oxmm_xmm_xmm_mem3_simm8",
 "%s %s ,%s%s(,%s,%s) ,%s ,%s ,%s");
 Name();
-Operand(3);
+Operand(5);
 Segment();
 Operand(4);
 Operand(2);
@@ -418,7 +418,7 @@ Result(0);
 ISA_PRINT_TYPE oxmm_xmm_mem3_xmm = ISA_Print_Type_Create("oxmm_xmm_mem3_xmm",
 "%s %s ,%s%s(,%s,%s) ,%s ,%s");
 Name();
-Operand(2);
+Operand(4);
 Segment();
 Operand(3);
 Operand(1);
@@ -515,7 +515,7 @@ Result(0);
 ISA_PRINT_TYPE oxmm_mem1_simm8 = ISA_Print_Type_Create("oxmm_mem1_simm8",
 "%s %s ,%s%s(%s) ,%s");
 Name();
-Operand(1);
+Operand(2);
 Segment();
 Operand(1);
 Operand(0);
@@ -559,8 +559,8 @@ Result(0);
 ISA_PRINT_TYPE oxmm_xmm_mem2_xmm_simm8 = ISA_Print_Type_Create("oxmm_xmm_mem2_xmm_simm8",
 "%s %s ,%s ,%s%s(%s,%s,%s) ,%s ,%s");
 Name();
-Operand(3);
-Operand(2);
+Operand(6);
+Operand(5);
 Segment();
 Operand(4);
 Operand(1);
@@ -577,7 +577,7 @@ Result(0);
 ISA_PRINT_TYPE oxmm_xmm_mem3_simm8 = ISA_Print_Type_Create("oxmm_xmm_mem3_simm8",
 "%s %s ,%s%s(,%s,%s) ,%s ,%s");
 Name();
-Operand(2);
+Operand(4);
 Segment();
 Operand(3);
 Operand(1);
@@ -599,7 +599,7 @@ Result(0);
 ISA_PRINT_TYPE oxmm_mem3_xmm = ISA_Print_Type_Create("oxmm_mem3_xmm",
 "%s %s ,%s%s(,%s,%s) ,%s");
 Name();
-Operand(1);
+Operand(3);
 Segment();
 Operand(2);
 Operand(0);
@@ -624,7 +624,7 @@ Result(0);
 ISA_PRINT_TYPE oxmm_xmm_mem2_xmm = ISA_Print_Type_Create("oxmm_xmm_mem2_xmm",
 "%s %s ,%s%s(%s,%s,%s) ,%s ,%s");
 Name();
-Operand(2);
+Operand(5);
 Segment();
 Operand(4);
 Operand(1);
@@ -698,7 +698,7 @@ Result(0);
 ISA_PRINT_TYPE oymm_ymm_ymm_mem2_simm8 = ISA_Print_Type_Create("oymm_ymm_ymm_mem2_simm8",
 "%s %s ,%s%s(%s,%s,%s) ,%s ,%s ,%s");
 Name();
-Operand(3);
+Operand(6);
 Segment();
 Operand(5);
 Operand(2);
@@ -716,7 +716,7 @@ Result(0);
 ISA_PRINT_TYPE oxmm_xmm_xmm_mem1_simm8 = ISA_Print_Type_Create("oxmm_xmm_xmm_mem1_simm8",
 "%s %s ,%s%s(%s) ,%s ,%s ,%s");
 Name();
-Operand(3);
+Operand(4);
 Segment();
 Operand(3);
 Operand(2);
@@ -732,8 +732,8 @@ Result(0);
 ISA_PRINT_TYPE oymm_ymm_mem3_ymm_simm8 = ISA_Print_Type_Create("oymm_ymm_mem3_ymm_simm8",
 "%s %s ,%s ,%s%s(,%s,%s) ,%s ,%s");
 Name();
-Operand(3);
-Operand(2);
+Operand(5);
+Operand(4);
 Segment();
 Operand(3);
 Operand(1);
@@ -749,8 +749,8 @@ Result(0);
 ISA_PRINT_TYPE oymm_ymm_mem1_ymm_simm8 = ISA_Print_Type_Create("oymm_ymm_mem1_ymm_simm8",
 "%s %s ,%s ,%s%s(%s) ,%s ,%s");
 Name();
+Operand(4);
 Operand(3);
-Operand(2);
 Segment();
 Operand(2);
 Operand(1);
@@ -837,7 +837,7 @@ Result(0);
 ISA_PRINT_TYPE oxmm_mem1_xmm = ISA_Print_Type_Create("oxmm_mem1_xmm",
 "%s %s ,%s%s(%s) ,%s");
 Name();
-Operand(1);
+Operand(2);
 Segment();
 Operand(1);
 Operand(0);
@@ -970,7 +970,7 @@ Result(0);
 ISA_PRINT_TYPE oxmm_mem2_simm8 = ISA_Print_Type_Create("oxmm_mem2_simm8",
 "%s %s ,%s%s(%s,%s,%s) ,%s");
 Name();
-Operand(1);
+Operand(4);
 Segment();
 Operand(3);
 Operand(0);
@@ -990,7 +990,7 @@ Result(0);
 ISA_PRINT_TYPE oymm_ymm_ymm_mem1_simm8 = ISA_Print_Type_Create("oymm_ymm_ymm_mem1_simm8",
 "%s %s ,%s%s(%s) ,%s ,%s ,%s");
 Name();
-Operand(3);
+Operand(4);
 Segment();
 Operand(3);
 Operand(2);
@@ -1031,7 +1031,7 @@ Result(0);
 ISA_PRINT_TYPE oymm_ymm_mem1_ymm = ISA_Print_Type_Create("oymm_ymm_mem1_ymm",
 "%s %s ,%s%s(%s) ,%s ,%s");
 Name();
-Operand(2);
+Operand(3);
 Segment();
 Operand(2);
 Operand(1);
@@ -1058,7 +1058,7 @@ Result(0);
 ISA_PRINT_TYPE oymm_ymm_ymm_mem3_simm8 = ISA_Print_Type_Create("oymm_ymm_ymm_mem3_simm8",
 "%s %s ,%s%s(,%s,%s) ,%s ,%s ,%s");
 Name();
-Operand(3);
+Operand(5);
 Segment();
 Operand(4);
 Operand(2);
@@ -1160,7 +1160,7 @@ Result(0);
 ISA_PRINT_TYPE oxmm_xmm_mem2_simm8 = ISA_Print_Type_Create("oxmm_xmm_mem2_simm8",
 "%s %s ,%s%s(%s,%s,%s) ,%s ,%s");
 Name();
-Operand(2);
+Operand(5);
 Segment();
 Operand(4);
 Operand(1);
@@ -1183,8 +1183,8 @@ Result(0);
 ISA_PRINT_TYPE oxmm_xmm_mem3_xmm_simm8 = ISA_Print_Type_Create("oxmm_xmm_mem3_xmm_simm8",
 "%s %s ,%s ,%s%s(,%s,%s) ,%s ,%s");
 Name();
-Operand(3);
-Operand(2);
+Operand(5);
+Operand(4);
 Segment();
 Operand(3);
 Operand(1);
@@ -1200,7 +1200,7 @@ Result(0);
 ISA_PRINT_TYPE oxmm_xmm_mem1_xmm = ISA_Print_Type_Create("oxmm_xmm_mem1_xmm",
 "%s %s ,%s%s(%s) ,%s ,%s");
 Name();
-Operand(2);
+Operand(3);
 Segment();
 Operand(2);
 Operand(1);

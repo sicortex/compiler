@@ -109,9 +109,13 @@ sub how_many_opnds{
 	if($memory_op eq ""){
 	  return 0;
 	}
-	my @mem;
-	@mem=split("_",$memory_op);
-	return scalar(@mem);
+	if($memory_op eq "mem1"){ return 2;}
+ elsif($memory_op eq "mem2"){return 4;}
+ elsif($memory_op eq "mem3"){ return 3;}
+ else { return 1;}
+	#my @mem;
+	#@mem=split("_",$memory_op);
+	#return scalar(@mem);
 
 }
 
@@ -653,14 +657,13 @@ foreach (@tops){
   fprint("isa_properties_xop_fma_vector.cxx", $print_xop_fma_vector);
   copy_to('../src/common/targ_info/isa/x8664/',"isa_properties_xop_fma_vector.cxx") if($print_xop_fma_vector);
 
-if (1){
+if (0){
 fprint("isa_xop_fma.cxx", $isa_isa_print);
 fprint("isa_xop_fma_print.cxx",$isa_print_print);
 fprint("isa_xop_fma_operands.cxx",$isa_operands_print);
 fprint("isa_xop_fma_pack.cxx",$isa_pack_print);
 fprint("isa_xop_fma_subset.cxx",$isa_subset_print);
 fprint("xop_fma_si2.cxx", $isa_si_print);
-fprint("isa_xop_fma_properties.cxx",$isa_properties_print);
 fprint("cgemit_targ_xop_fma.cxx", $isa_cgemit_xop_fma_print);
 
 copy_to('../src/common/targ_info/isa/x8664/',"isa_xop_fma.cxx");
@@ -668,21 +671,23 @@ copy_to('../src/common/targ_info/isa/x8664/',"isa_xop_fma_print.cxx");
 copy_to('../src/common/targ_info/isa/x8664/',"isa_xop_fma_operands.cxx");
 copy_to('../src/common/targ_info/isa/x8664/',"isa_xop_fma_pack.cxx");
 copy_to('../src/common/targ_info/isa/x8664/',"isa_xop_fma_subset.cxx");
-copy_to('../src/common/targ_info/isa/x8664/',"isa_xop_fma_properties.cxx");
 copy_to('../src/common/targ_info/proc/x8664/',"xop_fma_si2.cxx");
 copy_to('../src/be/cg/x8664/cgemit_targ_xop_fma.cxx',"cgemit_targ_xop_fma.cxx");
-  
-fprint("isa_xop_fma_properties_load_only.cxx", $print_load_only);
-  fprint("isa_xop_fma_properties_load_exe.cxx", $print_load_exe);
-  fprint("isa_xop_fma_properties_store_only.cxx", $print_store_only);
-  fprint("isa_xop_fma_properties_move_prop.cxx", $print_move_prop);
-  fprint("isa_xop_fma_properties_fadd_prop.cxx", $print_fadd_prop);
-  fprint("isa_xop_fma_properties_fsub_prop.cxx", $print_fsub_prop);
-  fprint("isa_xop_fma_properties_fmul_prop.cxx", $print_fmul_prop);
-  fprint("isa_xop_fma_properties_flop_prop.cxx", $print_flop_prop);
-  fprint("isa_xop_fma_properties_change_rflags.cxx", $print_change_rflags);
-  fprint("isa_xop_fma_properties_xop_fma_vector.cxx", $print_xop_fma_vector);
-  fprint("ebo_special_xop_fma.cxx", $ebo_print);
+  if(0){
+		#change ebo_special and isa_properties by hand can be more effective
+    fprint("isa_xop_fma_properties_load_only.cxx", $print_load_only);
+    fprint("isa_xop_fma_properties_load_exe.cxx", $print_load_exe);
+    fprint("isa_xop_fma_properties_store_only.cxx", $print_store_only);
+    fprint("isa_xop_fma_properties_move_prop.cxx", $print_move_prop);
+    fprint("isa_xop_fma_properties_fadd_prop.cxx", $print_fadd_prop);
+    fprint("isa_xop_fma_properties_fsub_prop.cxx", $print_fsub_prop);
+    fprint("isa_xop_fma_properties_fmul_prop.cxx", $print_fmul_prop);
+    fprint("isa_xop_fma_properties_flop_prop.cxx", $print_flop_prop);
+    fprint("isa_xop_fma_properties_change_rflags.cxx", $print_change_rflags);
+    fprint("isa_xop_fma_properties_xop_fma_vector.cxx", $print_xop_fma_vector);
+    fprint("ebo_special_xop_fma.cxx", $ebo_print);
+    fprint("isa_xop_fma_properties.cxx",$isa_properties_print);
+  copy_to('../src/common/targ_info/isa/x8664/',"isa_xop_fma_properties.cxx");
 		copy_to('../src/be/cg/x8664/',"ebo_special_xop_fma.cxx") if($ebo_print);
   copy_to('../src/common/targ_info/isa/x8664/',"isa_xop_fma_properties_load_only.cxx") if($print_load_only);
   copy_to('../src/common/targ_info/isa/x8664/',"isa_xop_fma_properties_load_exe.cxx") if ($print_load_exe);
@@ -694,6 +699,7 @@ fprint("isa_xop_fma_properties_load_only.cxx", $print_load_only);
   copy_to('../src/common/targ_info/isa/x8664/',"isa_xop_fma_properties_flop_prop.cxx") if($print_flop_prop);
   copy_to('../src/common/targ_info/isa/x8664/',"isa_xop_fma_properties_change_rflags.cxx") if($print_change_rflags);
   copy_to('../src/common/targ_info/isa/x8664/',"isa_xop_fma_properties_xop_fma_vector.cxx") if($print_xop_fma_vector);
+		}
 }
 #sub copy_to_property{
 	#fprint("isa_avx_properties_load_only.cxx", $print_load_only);

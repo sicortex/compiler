@@ -2063,6 +2063,9 @@ preorder_visit_mark_emit (
 }
 #endif
 
+extern "C" {
+int dwarf_die_linked(Dwarf_P_Die die);
+}
 
 /* Do a preorder traversal of the DST node 'idx' and all its children. The
  * 'parent' and/or 'left_sibling' parameters indicate where in the 
@@ -2103,7 +2106,7 @@ preorder_visit (
     }
   }
   #ifdef KEY /* Bug 15029 */
-  else if (DST_INFO_tag(info) == DW_TAG_base_type && 0) {
+  else if (DST_INFO_tag(info) == DW_TAG_base_type && dwarf_die_linked(die)) {
     /* What a mess. Function Traverse_Global_DST() calls
      * DST_SET_info_mark() to indicate that it has already linked a DIE
      * into the Dwarf output tree, preventing it from being linked a second

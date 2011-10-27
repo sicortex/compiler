@@ -9611,8 +9611,11 @@ void Expand_Madd(TN *dest, TN* src1, TN* src2, TN *src3, TYPE_ID mtype, OPS *ops
   if(mtype == MTYPE_V16I4){//dest = (src2 * src3) + src1
   	Build_OP(TOP_vpmacsdd_f128_oxmm_xmm_xmm_xmm, dest, src2, src3, src1, ops);
   }else if(mtype == MTYPE_I4){
-    Build_OP(TOP_imul32, dest, src2, src3, ops);
-	Build_OP(TOP_add32, dest, src1, dest, ops);
+    TN* tmp = Build_TN_Like(src1);
+    Expand_Multiply(tmp, src2, src3, mtype, ops);
+    Expand_Add(dest, src1, tmp,mtype, ops);// src1 and dest may be alias
+    //Build_OP(TOP_imul32, dest, src2, src3, ops);
+	//Build_OP(TOP_add32, dest, src1, dest, ops);
   }else{
     FmtAssert(FALSE, ("no such instructions about madd"));
   }

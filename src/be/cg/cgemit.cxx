@@ -7203,7 +7203,7 @@ EMT_Emit_PU ( FILE *asm_file, ST *pu, DST_IDX pu_dst, WN *rwn )
         Init_Section(base_st);
         /* Switch back if we initialized the base_st. */
 	if (switchBackToText)
-          fprintf ( Asm_File, "\n\t.text\n");
+          fprintf (Asm_File, "\n\t%s %s\n", AS_SECTION, ST_name(text_base));
         continue;
     }
     if (ST_sclass(sym) == SCLASS_COMMON) {

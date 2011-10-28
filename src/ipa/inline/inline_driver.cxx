@@ -182,6 +182,10 @@ Process_Command_Line (INT argc, char **argv)
 			Opt_Level = 2;
 			INLINE_Enable_Split_Common = FALSE;
 			break;
+		    case '0':
+			Opt_Level = 0;
+			INLINE_Enable_Split_Common = FALSE;
+			break;
 		    default:
 			Opt_Level = 1;
 			INLINE_Enable_Split_Common = FALSE;

@@ -1615,6 +1615,14 @@ Mark_Deletable_Funcs (NODE_INDEX v, DFE_ACTION action, mUINT8 *visited)
 	    node->Set_Undeletable();
 	    action = MARK_USED;
 	    visited[v] = VISITED_AND_KEEP;
+#if defined(_LIGHTWEIGHT_INLINER)
+	    /* O0 does not delete functions with no inline attrib */
+	} else if (Opt_Level == 0 && ! node->Has_Inline_Attrib()) {
+	    node->Clear_Deletable();
+	    node->Set_Undeletable();
+	    action = MARK_USED;
+	    visited[v] = VISITED_AND_KEEP;
+#endif
 	} else {
 	    node->Set_Deletable ();
 	    IP_FILE_HDR& s = node->File_Header ();

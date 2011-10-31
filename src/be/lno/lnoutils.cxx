@@ -2113,6 +2113,49 @@ BOOL Solve_For(WN* wn_top, const SYMBOL& sym)
 {
   BOOL       ok = FALSE;
 
+  
+	
+  WN*		 l = WN_kid0(wn_top);
+  WN*		 r = WN_kid1(wn_top);
+
+#ifdef TARG_X8664
+  OPERATOR l_opr = WN_operator(l);
+  OPERATOR r_opr = WN_operator(r);
+  if(l_opr == OPR_MADD){
+	TYPE_ID ty = WN_rtype(l);
+	FmtAssert(ty == MTYPE_I4, ("unexpected MTYPE of MADD"));
+  WN *madd_kid0 = WN_COPY_Tree(WN_kid0(l));
+  LWN_Copy_Def_Use(WN_kid0(l), madd_kid0, Du_Mgr);
+  WN *madd_kid1 = WN_COPY_Tree(WN_kid1(l));
+  LWN_Copy_Def_Use(WN_kid1(l), madd_kid1, Du_Mgr);
+  WN *madd_kid2 = WN_COPY_Tree(WN_kid2(l));
+  LWN_Copy_Def_Use(WN_kid2(l), madd_kid2, Du_Mgr);
+	WN *new_mul = WN_Mpy(ty, madd_kid1, madd_kid2);
+	WN *new_add = WN_Add(ty , new_mul, madd_kid0);
+	WN_DELETE_Tree(l);
+	WN_kid0(wn_top) = new_add;
+	l = new_add;
+	LWN_Parentize(wn_top);
+  }
+  if(r_opr == OPR_MADD){
+	TYPE_ID ty = WN_rtype(r);
+	FmtAssert(ty == MTYPE_I4, ("unexpected MTYPE of MADD"));
+  WN *madd_kid0 = WN_COPY_Tree(WN_kid0(r));
+  LWN_Copy_Def_Use(WN_kid0(r), madd_kid0, Du_Mgr);
+  WN *madd_kid1 = WN_COPY_Tree(WN_kid1(r));
+  LWN_Copy_Def_Use(WN_kid1(r), madd_kid1, Du_Mgr);
+  WN *madd_kid2 = WN_COPY_Tree(WN_kid2(r));
+  LWN_Copy_Def_Use(WN_kid2(r), madd_kid2, Du_Mgr);
+	WN *new_mul = WN_Mpy(ty, madd_kid1, madd_kid2);
+	WN *new_add = WN_Add(ty , new_mul, madd_kid0);
+	WN_DELETE_Tree(r);
+	WN_kid1(wn_top) = new_add;
+	r = new_add;
+	LWN_Parentize(wn_top);
+  }
+#endif
+
+
   INT        lcount = Symbol_Count(WN_kid0(wn_top), sym);
   INT        rcount = Symbol_Count(WN_kid1(wn_top), sym);
   
@@ -2132,8 +2175,8 @@ BOOL Solve_For(WN* wn_top, const SYMBOL& sym)
     WN_kid1(wn_top) = wn0;
   }
 
-  WN*        l = WN_kid0(wn_top);
-  WN*        r = WN_kid1(wn_top);
+  l = WN_kid0(wn_top);
+  r = WN_kid1(wn_top);
 
   while (1) {
     // invariant at this location: the index is somewhere on the left (l))
@@ -3655,7 +3698,7 @@ void LS_IN_LOOP::Lexorder(WN* wn, ARRAY_DIRECTED_GRAPH16* dg, INT* lex,
       || OPCODE_is_store(op) 
 	&& (opr != OPR_STID || dg->Get_Vertex(wn) || use_scalars) 
       || OPCODE_is_call(op)) {
-    ++(*lex);
+  ++(*lex);
     _ht.Enter(wn, *lex);
   }
 }

@@ -1136,6 +1136,28 @@ static BOOL WN_Solve_For(WN* wn_top, const ST_IDX sym, const WN_OFFSET ofst)
   }
   WN*        l = WN_kid0(wn_top);
   WN*        r = WN_kid1(wn_top);
+#ifdef TARG_X8664
+  OPERATOR l_opr = WN_operator(l);
+  OPERATOR r_opr = WN_operator(r);
+  if(l_opr == OPR_MADD){
+  	TYPE_ID ty = WN_rtype(l);
+  	FmtAssert(ty == MTYPE_I4, ("unexpected MTYPE of MADD"));
+  	WN *new_mul = WN_Mpy(ty, WN_COPY_Tree(WN_kid1(l)), WN_COPY_Tree(WN_kid2(l)));
+  	WN *new_add = WN_Add(ty , WN_COPY_Tree(WN_kid0(l)), new_mul);
+	WN_DELETE_Tree(l);
+	WN_kid0(wn_top) = new_add;
+	l = new_add;
+  }
+  if(r_opr == OPR_MADD){
+  	TYPE_ID ty = WN_rtype(r);
+  	FmtAssert(ty == MTYPE_I4, ("unexpected MTYPE of MADD"));
+  	WN *new_mul = WN_Mpy(ty, WN_COPY_Tree(WN_kid1(r)), WN_COPY_Tree(WN_kid2(r)));
+  	WN *new_add = WN_Add(ty , WN_COPY_Tree(WN_kid0(r)), new_mul);
+	WN_DELETE_Tree(r);
+	WN_kid1(wn_top) = new_add;
+	r = new_add;
+  }
+#endif
   while (1) {
     // invariant at this location: the index is somewhere on the left (l))
     // invariant at this location: l and r will be wn_top's kids

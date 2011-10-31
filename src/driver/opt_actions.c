@@ -2043,6 +2043,7 @@ static struct
   { "shanghai",		"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE },
   { "istanbul",		"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE },
   { "sandy",		"sandy",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE,  TRUE,  TRUE,  TRUE },
+  { "bdverl", "bdverl", ABI_M64, TRUE, TRUE,  TRUE,  TRUE, FALSE, TRUE, TRUE, TRUE},
 //  -------------------+---------------+--------+------+------+------+------+------+------+------+-----
 //  CPU			Target		ABI      SSE2   SSE3   3DNow! SSSE3  SSE4a  SSE4.1 SSE4.2 AVX
   { NULL, NULL, },
@@ -2354,6 +2355,8 @@ get_x86_auto_cpu_name ()
         }
       case 16:
         return "barcelona";     // FIXME??
+      case 21:
+	  	return "bdverl";
     default:
       return "generic";
     }

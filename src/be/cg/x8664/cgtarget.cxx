@@ -200,6 +200,34 @@ UINT32 CGTARG_Mem_Ref_Bytes(const OP *memop)
       case TOP_cvtsi2ss_x:
       case TOP_cvtsi2ss_xx:
       case TOP_cvtsi2ss_xxx:
+    /*fma and xop load execute */
+	  case TOP_vfrczss_f128_oxmm_mem1:
+	  case TOP_vfrczss_f128_oxmm_mem2:
+	  case TOP_vfrczss_f128_oxmm_mem3:
+	  case TOP_vfmaddss_f128_oxmm_xmm_mem1_xmm:
+	  case TOP_vfmaddss_f128_oxmm_xmm_mem2_xmm:
+	  case TOP_vfmaddss_f128_oxmm_xmm_mem3_xmm:
+	  case TOP_vfmaddss_f128_oxmm_xmm_xmm_mem1:
+	  case TOP_vfmaddss_f128_oxmm_xmm_xmm_mem2:
+	  case TOP_vfmaddss_f128_oxmm_xmm_xmm_mem3:
+	  case TOP_vfmsubss_f128_oxmm_xmm_mem1_xmm:
+	  case TOP_vfmsubss_f128_oxmm_xmm_mem2_xmm:
+	  case TOP_vfmsubss_f128_oxmm_xmm_mem3_xmm:
+	  case TOP_vfmsubss_f128_oxmm_xmm_xmm_mem1:
+	  case TOP_vfmsubss_f128_oxmm_xmm_xmm_mem2:
+	  case TOP_vfmsubss_f128_oxmm_xmm_xmm_mem3:
+	  case TOP_vfnmaddss_f128_oxmm_xmm_mem1_xmm:
+	  case TOP_vfnmaddss_f128_oxmm_xmm_mem2_xmm:
+	  case TOP_vfnmaddss_f128_oxmm_xmm_mem3_xmm:
+			case TOP_vfnmaddss_f128_oxmm_xmm_xmm_mem1:
+			case TOP_vfnmaddss_f128_oxmm_xmm_xmm_mem2:
+			case TOP_vfnmaddss_f128_oxmm_xmm_xmm_mem3:
+	  case TOP_vfnmsubss_f128_oxmm_xmm_mem1_xmm:
+	  case TOP_vfnmsubss_f128_oxmm_xmm_mem2_xmm:
+	  case TOP_vfnmsubss_f128_oxmm_xmm_mem3_xmm:
+			case TOP_vfnmsubss_f128_oxmm_xmm_xmm_mem1:
+			case TOP_vfnmsubss_f128_oxmm_xmm_xmm_mem2:
+			case TOP_vfnmsubss_f128_oxmm_xmm_xmm_mem3:
 	return 4;
 
       case TOP_ldsd:		// 64 bit
@@ -241,6 +269,34 @@ UINT32 CGTARG_Mem_Ref_Bytes(const OP *memop)
       case TOP_cvtsi2ssq_x:
       case TOP_cvtsi2ssq_xx:
       case TOP_cvtsi2ssq_xxx:
+	  /*FMA XOP load excute*/
+	  case TOP_vfrczsd_f128_oxmm_mem1:
+	  case TOP_vfrczsd_f128_oxmm_mem2:
+	  case TOP_vfrczsd_f128_oxmm_mem3:
+	  case TOP_vfmaddsd_f128_oxmm_xmm_mem1_xmm:
+	  case TOP_vfmaddsd_f128_oxmm_xmm_mem2_xmm:
+	  case TOP_vfmaddsd_f128_oxmm_xmm_mem3_xmm:
+	  case TOP_vfmaddsd_f128_oxmm_xmm_xmm_mem1:
+	  case TOP_vfmaddsd_f128_oxmm_xmm_xmm_mem2:
+	  case TOP_vfmaddsd_f128_oxmm_xmm_xmm_mem3:
+	  case TOP_vfmsubsd_f128_oxmm_xmm_mem1_xmm:
+	  case TOP_vfmsubsd_f128_oxmm_xmm_mem2_xmm:
+	  case TOP_vfmsubsd_f128_oxmm_xmm_mem3_xmm:
+	  case TOP_vfmsubsd_f128_oxmm_xmm_xmm_mem1:
+	  case TOP_vfmsubsd_f128_oxmm_xmm_xmm_mem2:
+	  case TOP_vfmsubsd_f128_oxmm_xmm_xmm_mem3:
+	  case TOP_vfnmaddsd_f128_oxmm_xmm_mem1_xmm:
+	  case TOP_vfnmaddsd_f128_oxmm_xmm_mem2_xmm:
+	  case TOP_vfnmaddsd_f128_oxmm_xmm_mem3_xmm:
+			case TOP_vfnmaddsd_f128_oxmm_xmm_xmm_mem1:
+			case TOP_vfnmaddsd_f128_oxmm_xmm_xmm_mem2:
+			case TOP_vfnmaddsd_f128_oxmm_xmm_xmm_mem3:
+	  case TOP_vfnmsubsd_f128_oxmm_xmm_mem1_xmm:
+	  case TOP_vfnmsubsd_f128_oxmm_xmm_mem2_xmm:
+	  case TOP_vfnmsubsd_f128_oxmm_xmm_mem3_xmm:
+			case TOP_vfnmsubsd_f128_oxmm_xmm_xmm_mem1:
+			case TOP_vfnmsubsd_f128_oxmm_xmm_xmm_mem2:
+			case TOP_vfnmsubsd_f128_oxmm_xmm_xmm_mem3:
 	return 8;
 
       case TOP_lddqa:		// 128 bit

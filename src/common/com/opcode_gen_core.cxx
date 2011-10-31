@@ -2976,6 +2976,14 @@ Is_Valid_Opcode_Parts (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
 
       case OPR_SECONDPART:
       case OPR_MADD:
+#ifdef TARG_X8664
+		{//XOP has VPMACSDD for madd 
+		  if(Is_MTYPE_i[rtype] && desc == MTYPE_V){
+		  	valid = TRUE;
+			break;
+		  }
+		}
+#endif
       case OPR_MSUB:
       case OPR_NMADD:
       case OPR_NMSUB:

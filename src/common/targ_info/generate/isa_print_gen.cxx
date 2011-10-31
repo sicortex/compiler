@@ -59,7 +59,7 @@
  * (It would be better to get the max operands and results from the
  * generated targ_isa_operands.h file -- Ken)
  */
-#define MAX_OPNDS 6
+#define MAX_OPNDS 7
 #define MAX_RESULTS 2
 
 typedef enum {

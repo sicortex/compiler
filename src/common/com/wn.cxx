@@ -3076,7 +3076,14 @@ WN_set_st_addr_saved (WN* wn)
       break;
 
     case OPR_CSELECT:
-
+	  WN_set_st_addr_saved (WN_kid1(wn));
+      WN_set_st_addr_saved (WN_kid2(wn));
+      break;
+	case OPR_MADD:
+	case OPR_MSUB:
+	case OPR_NMADD:
+	case OPR_NMSUB:
+      WN_set_st_addr_saved (WN_kid0(wn));
       WN_set_st_addr_saved (WN_kid1(wn));
       WN_set_st_addr_saved (WN_kid2(wn));
       break;

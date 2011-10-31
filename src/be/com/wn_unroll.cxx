@@ -235,6 +235,10 @@ WN_UNROLL::Analyze_body_expr(WN *tree)
 
   // ternary
   case OPR_SELECT:
+  case OPR_MADD:
+  case OPR_MSUB:
+  case OPR_NMADD:
+  case OPR_NMSUB:
     Analyze_body_expr(WN_kid0(tree));
     Analyze_body_expr(WN_kid1(tree));
     Analyze_body_expr(WN_kid2(tree));
@@ -401,6 +405,10 @@ WN_UNROLL::Replicate_expr(WN *expr, INT rep_cnt)
 
   // ternary
   case OPR_SELECT:
+  case OPR_MSUB:
+  case OPR_MADD:
+  case OPR_NMSUB:
+  case OPR_NMADD:
     WN_kid0(new_expr) = Replicate_expr(WN_kid0(expr), rep_cnt);
     WN_kid1(new_expr) = Replicate_expr(WN_kid1(expr), rep_cnt);
     WN_kid2(new_expr) = Replicate_expr(WN_kid2(expr), rep_cnt);

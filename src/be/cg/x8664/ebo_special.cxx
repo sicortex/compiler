@@ -4021,6 +4021,7 @@ static Addr_Mode_Group Addr_Mode_Group_Table[] = {
   // OPs will have fxor128v32/fxor128v64 as the base mode.
   {TOP_xorps,	TOP_fxorx128v32,	TOP_fxorxx128v32,	TOP_fxorxxx128v32,	TOP_UNDEFINED},
   {TOP_xorpd,	TOP_fxorx128v64,	TOP_fxorxx128v64,	TOP_fxorxxx128v64,	TOP_UNDEFINED},
+#include "ebo_special_xop_fma.cxx"
 
   {TOP_fmax128v32,	TOP_fmaxx128v32,	TOP_fmaxxx128v32,	TOP_fmaxxxx128v32,	TOP_UNDEFINED},
   {TOP_fmax128v64,	TOP_fmaxx128v64,	TOP_fmaxxx128v64,	TOP_fmaxxxx128v64,	TOP_UNDEFINED},
@@ -4530,6 +4531,28 @@ Load_Execute_Format (OP *ld_op, OP *ex_op, ADDR_MODE mode)
   }
 
   return new_top;
+}
+
+static TOP
+Reset_Execute_Format(TOP top, ADDR_MODE mode){
+  // please make sure they are near by
+  Addr_Mode_Group *group =  Top_To_Addr_Mode_Group[top];
+  Addr_Mode_Group *new_group = Top_To_Addr_Mode_Group[top] + 1;
+  FmtAssert(group->reg_mode== new_group->reg_mode, ("reg base instruction not the same in EBO"));
+  if(new_group != NULL){
+    switch(mode){
+   	  case BASE_MODE:
+	  	return new_group->base_mode;
+	  case BASE_INDEX_MODE:
+	  	return new_group->base_index_mode;
+	  case INDEX_MODE:
+	  	return new_group->index_mode;
+	  case N32_MODE:
+	  	return new_group->n32_mode;
+	  default:
+	  	FmtAssert(FALSE, ("ERROR in addressing mode"));
+    }
+  }
 }
 
 
@@ -5294,6 +5317,64 @@ BOOL EBO_Opt_Const_Array( OP* mem_op,
   return ret_val;
 }
 
+static
+BOOL EBO_Is_XOP(TOP top){
+  switch(top){
+  	case TOP_vpmacsdd_f128_oxmm_xmm_xmm_xmm:
+	case TOP_vpmacsdd_f128_oxmm_xmm_mem1_xmm:
+	case TOP_vpmacsdd_f128_oxmm_xmm_mem2_xmm:
+	case TOP_vpmacsdd_f128_oxmm_xmm_mem3_xmm:
+	  return TRUE;
+    default:
+	  return FALSE;
+  }
+}
+
+static
+BOOL EBO_Is_3opr(OP *op){
+   TOP top = (TOP)op->opr;
+   // TODO: add more intructions beside these FMA4/XOP instructions below
+   switch(top){
+     case TOP_vfmaddpd_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfmaddsd_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfmaddss_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfmaddps_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfmaddpd_f256_oymm_ymm_ymm_ymm:
+	 case TOP_vfmaddps_f256_oymm_ymm_ymm_ymm:
+	 case TOP_vfmaddsubpd_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfmaddsubps_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfmsubaddpd_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfmsubaddps_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfmaddsubpd_f256_oymm_ymm_ymm_ymm:
+	 case TOP_vfmaddsubps_f256_oymm_ymm_ymm_ymm:
+	 case TOP_vfmsubaddpd_f256_oymm_ymm_ymm_ymm:
+	 case TOP_vfmsubaddps_f256_oymm_ymm_ymm_ymm:
+	 case TOP_vfmsubpd_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfmsubps_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfmsubpd_f256_oymm_ymm_ymm_ymm:
+	 case TOP_vfmsubps_f256_oymm_ymm_ymm_ymm:
+	 case TOP_vfmsubss_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfmsubsd_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfnmaddpd_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfnmaddps_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfnmaddpd_f256_oymm_ymm_ymm_ymm:
+	 case TOP_vfnmaddps_f256_oymm_ymm_ymm_ymm:
+	 case TOP_vfnmaddss_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfnmaddsd_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfnmsubpd_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfnmsubps_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfnmsubpd_f256_oymm_ymm_ymm_ymm:
+	 case TOP_vfnmsubps_f256_oymm_ymm_ymm_ymm:
+	 case TOP_vfnmsubsd_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vfnmsubss_f128_oxmm_xmm_xmm_xmm:
+	 case TOP_vpmacsdd_f128_oxmm_xmm_xmm_xmm:
+	  return TRUE;
+	 default:
+	  return FALSE;
+   }
+   
+}
+
 
 BOOL EBO_Load_Execution( OP* alu_op, 
                          TN** opnd_tn,     
@@ -5326,6 +5407,7 @@ BOOL EBO_Load_Execution( OP* alu_op,
 
   EBO_TN_INFO* tninfo = NULL;
   int opnd0_indx = 0;  // indicate which opnd will be kept for the new op.
+  int ld_i = -1;
 
   if( EBO_flow_safe ){
     int i = alu_cmp_idx;
@@ -5334,7 +5416,23 @@ BOOL EBO_Load_Execution( OP* alu_op,
       opnd0_indx = OP_opnds(alu_op) - 1 - i;
       Is_True( opnd0_indx >= 0, ("NYI") );
     }
-  } else {
+  }else if (EBO_Is_3opr(alu_op)){
+    OP *in_op1 = actual_tninfo[1]->in_op;
+	OP *in_op2 = actual_tninfo[2]->in_op;
+
+	
+	// TODO: we might can swap op0 and op1 for madd/msub intruction
+	ld_i = (in_op2 && OP_load(in_op2) && !EBO_Is_XOP((TOP)alu_op->opr))? 2: -1;
+	//vpmacsdd only has memory in the src2
+	if(ld_i == -1)
+	  ld_i = (in_op1 && OP_load(in_op1))? 1 : -1;
+	if(ld_i == -1)
+		return FALSE;
+
+	tninfo = actual_tninfo[ld_i];
+	opnd0_indx = 0;
+  }
+  else {
     for( int i = OP_opnds(alu_op) - 1; i >= 0; i-- ){
       if( TN_is_register( OP_opnd( alu_op, i ) ) ){
         tninfo = actual_tninfo[i];
@@ -5473,8 +5571,16 @@ BOOL EBO_Load_Execution( OP* alu_op,
 
   TOP new_top = Load_Execute_Format( ld_op, alu_op, mode );
 
+  if(EBO_Is_3opr(alu_op) && ld_i == 1 && !EBO_Is_XOP(new_top)){
+  	//it means the load in opnd1
+  	FmtAssert(new_top != TOP_UNDEFINED, ("some fma/xop not yet implement"));
+  	new_top = Reset_Execute_Format(new_top, mode);
+  }
+
   if( new_top == TOP_UNDEFINED )
     return FALSE;
+
+ 
 
   if( EBO_flow_safe && (opnd0_indx == 1) ) {
     new_top = Fit_Cmp_By_Load_Usage( new_top, TRUE );
@@ -5503,54 +5609,92 @@ BOOL EBO_Load_Execution( OP* alu_op,
   TN* scale  = index_reg >= 0 ?
     OP_opnd( ld_op, OP_find_opnd_use( ld_op, OU_scale ) ) : NULL;
 
-  TN* opnd1 = NULL;
-  TN* opnd0 = OP_opnd( alu_op, opnd0_indx );
-
-
-  // For TOP_cmpi cases
-  if( opnd0_indx == 1 && (TN_has_value(opnd0) || EBO_flow_safe ) ){
-    opnd1 = opnd0;
-    opnd0 = NULL;
-  }
-
   OP* new_op = NULL;
 
-  if( mode == BASE_MODE ){
-    // base + offset
-    if( OP_opnds(alu_op) == 1 ){
-      if( result == NULL )
-	new_op = Mk_OP( new_top, base, offset );
-      else
-	new_op = Mk_OP( new_top, result, base, offset );
-    } else if( opnd1 != NULL )
-      new_op = Mk_OP( new_top, result, base, offset, opnd1 );
-    else
-      new_op = Mk_OP( new_top, result, opnd0, base, offset );
+  if(EBO_Is_3opr(alu_op)){
+  	FmtAssert(ld_i != -1, ("ebo ld_i for FMA/XOP failed"));
+	TN* opnd0 = OP_opnd(alu_op, opnd0_indx);
+	TN* opnd2 = NULL;
+	TN* opnd1 = NULL;
+	
+	if(ld_i == 2){
+	  opnd1 = OP_opnd(alu_op, 1);
+	  opnd2 = NULL;
+	}else if (ld_i == 1){
+	  opnd2 = OP_opnd(alu_op, 2);
+	  opnd1 = NULL;
+	}else
+	  FmtAssert(FALSE, ("ld_i can't be opnd0 for FMA/XOP"));
+	FmtAssert(result != NULL, ("unknown FMA/XOP instructions with result is NULL"));
+	if(mode == BASE_MODE){
+	  if(ld_i == 2)
+	    new_op = Mk_OP(new_top, result, opnd0, opnd1, base, offset);
+	  else
+	  	new_op = Mk_OP(new_top, result, opnd0, base, offset, opnd2);
+	}else if ( mode == BASE_INDEX_MODE){
+	  if(ld_i == 2)
+	  	new_op = Mk_OP(new_top, result, opnd0, opnd1, base, index, scale, offset);
+	  else
+	  	new_op = Mk_OP(new_top, result, opnd0, base, index, scale, offset, opnd2);
+	}else if( mode == INDEX_MODE){
+	  if(ld_i == 2)
+	  	new_op = Mk_OP(new_top, result, opnd0, opnd1, index, scale, offset);
+	  else
+	  	new_op = Mk_OP(new_top, result, opnd0, index, scale, offset, opnd2);
+	}else
+	  FmtAssert(FALSE, ("wtf"));
+  	
+	
+  }else{
+    TN* opnd1 = NULL;
+    TN* opnd0 = OP_opnd( alu_op, opnd0_indx );
 
-  } else if( mode == BASE_INDEX_MODE ){
-    // offset + base + index * scale
-    if( OP_opnds(alu_op) == 1 ){
-      if( result == NULL )
-	new_op = Mk_OP( new_top, base, index, scale, offset );
+
+    // For TOP_cmpi cases
+    if( opnd0_indx == 1 && (TN_has_value(opnd0) || EBO_flow_safe ) ){
+      opnd1 = opnd0;
+      opnd0 = NULL;
+    }
+
+    
+
+    if( mode == BASE_MODE ){
+      // base + offset
+      if( OP_opnds(alu_op) == 1 ){
+        if( result == NULL )
+	  new_op = Mk_OP( new_top, base, offset );
+        else
+	  new_op = Mk_OP( new_top, result, base, offset );
+      } else if( opnd1 != NULL )
+        new_op = Mk_OP( new_top, result, base, offset, opnd1 );
       else
-	new_op = Mk_OP( new_top, result, base, index, scale, offset );
+        new_op = Mk_OP( new_top, result, opnd0, base, offset );
+
+    } else if( mode == BASE_INDEX_MODE ){
+      // offset + base + index * scale
+      if( OP_opnds(alu_op) == 1 ){
+      if( result == NULL )
+	  new_op = Mk_OP( new_top, base, index, scale, offset );
+        else
+	  new_op = Mk_OP( new_top, result, base, index, scale, offset );
       
-    } else if( opnd1 != NULL )
-      new_op = Mk_OP( new_top, result, base, index, scale, offset, opnd1 );
-    else
-      new_op = Mk_OP( new_top, result, opnd0, base, index, scale, offset );
-
-  } else {
-    // offset + index * scale
-    if( OP_opnds(alu_op) == 1 ){
-      if( result == NULL )
-	new_op = Mk_OP( new_top, index, scale, offset );
+      } else if( opnd1 != NULL )
+        new_op = Mk_OP( new_top, result, base, index, scale, offset, opnd1 );
       else
-	new_op = Mk_OP( new_top, result, index, scale, offset );
-    } else if( opnd1 != NULL )
-      new_op = Mk_OP( new_top, result, index, scale, offset, opnd1 );
-    else
-      new_op = Mk_OP( new_top, result, opnd0, index, scale, offset );
+        new_op = Mk_OP( new_top, result, opnd0, base, index, scale, offset );
+
+    } else {
+      // offset + index * scale
+      if( OP_opnds(alu_op) == 1 ){
+        if( result == NULL )
+	  new_op = Mk_OP( new_top, index, scale, offset );
+        else
+	  new_op = Mk_OP( new_top, result, index, scale, offset );
+      } else if( opnd1 != NULL )
+        new_op = Mk_OP( new_top, result, index, scale, offset, opnd1 );
+      else
+        new_op = Mk_OP( new_top, result, opnd0, index, scale, offset );
+    }
   }
 
   Is_True( !EBO_in_loop, ("EBO_Load_Execution: NYI (1)") );

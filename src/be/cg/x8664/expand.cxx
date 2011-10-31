@@ -3462,7 +3462,7 @@ Expand_Float_To_Float (TN *dest, TN *src, TYPE_ID rtype, TYPE_ID desc, OPS *ops)
       !MTYPE_is_quad( desc ) ){
     if (!MTYPE_is_vector(rtype)){
 #ifdef KEY //bug 14346: fp-fp scalar conversion for barcelona is special
-     if(Is_Target_Barcelona())
+     if(Is_Target_Orochi()||Is_Target_Barcelona())
       Build_OP( (rtype == MTYPE_F8) ? TOP_cvtps2pd : TOP_cvtpd2ps,
 		dest, src, ops );
      else
@@ -3883,7 +3883,8 @@ Expand_Int_To_Float (TN *dest, TN *src, TYPE_ID imtype, TYPE_ID fmtype, OPS *ops
     } else if( MTYPE_bit_size(imtype) == 32 ){
       if( MTYPE_is_signed(imtype) )
 #ifdef KEY //cvt signed integer to single precision scalar
-       if(Is_Target_Barcelona()){
+       if(Is_Target_Barcelona() ||
+	   	Is_Target_Orochi()){
          TN *tmp_dest = Build_TN_Like(dest);
          Build_OP(TOP_movg2x, tmp_dest, src, ops);
          src = tmp_dest;
@@ -3932,7 +3933,7 @@ Expand_Int_To_Float (TN *dest, TN *src, TYPE_ID imtype, TYPE_ID fmtype, OPS *ops
 
       if( MTYPE_is_signed(imtype) ){
 #ifdef KEY
-        if(Is_Target_Barcelona()){
+        if(Is_Target_Barcelona()|| Is_Target_Orochi()){
          TN *tmp_dest = Build_TN_Like(dest);
          Build_OP(TOP_movg2x, tmp_dest, src, ops); 
          src = tmp_dest;
@@ -5641,16 +5642,105 @@ void Expand_Flop( OPCODE opcode, TN *result, TN *src1, TN *src2, TN *src3, OPS *
     opc = TOP_pmullw;
     break;
   case OPC_F4MADD:	// (src2 * src3) + src1
+    if(Is_Target_Orochi()){
+      opc = TOP_vfmaddss_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+    }
   case OPC_F4NMADD:	// -((src2 * src3) + src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmsubss_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+    }
   case OPC_F4MSUB:	// (src2 * src3) - src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmsubss_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
   case OPC_F4NMSUB:	// -((src2 * src3) - src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmaddss_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
   case OPC_F8MADD:	// (src2 * src3) + src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmaddsd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
   case OPC_F8NMADD:	// -((src2 * src3) + src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmsubsd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
   case OPC_F8MSUB:	// (src2 * src3) - src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmsubsd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
   case OPC_F8NMSUB:	// -((src2 * src3) - src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmaddsd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
+  case OPC_V16F4MADD:	// (src2 * src3) + src1
+    if(Is_Target_Orochi()){
+      opc = TOP_vfmaddps_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+    }
+  case OPC_V16F4NMADD:	// -((src2 * src3) + src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmsubps_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+    }
+  case OPC_V16F4MSUB:	// (src2 * src3) - src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmsubps_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
+  case OPC_V16F4NMSUB:	// -((src2 * src3) - src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmaddps_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
+  case OPC_V16F8MADD:	// (src2 * src3) + src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmaddpd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
+  case OPC_V16F8NMADD:	// -((src2 * src3) + src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmsubpd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
+  case OPC_V16F8MSUB:	// (src2 * src3) - src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmsubpd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
+  case OPC_V16F8NMSUB:	// -((src2 * src3) - src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmaddpd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
     FmtAssert( false,
 	       ("Expand_Flop: Unsupported opcode (%s)", OPCODE_name(opcode)) );
     break;
+  
   case OPC_F4DIV:
     if( Is_Target_SSE2() ){
       opc = TOP_divss;
@@ -5701,7 +5791,7 @@ void Expand_Flop( OPCODE opcode, TN *result, TN *src1, TN *src2, TN *src3, OPS *
     #pragma mips_frequency_hint NEVER
     FmtAssert(FALSE, ("Unimplemented flop: %s", OPCODE_name(opcode)));
   }
-
+  
   Build_OP( opc, result, src1, src2, ops );
 }
 
@@ -9528,4 +9618,18 @@ void Expand_Conv_From_Vector(TN * dest, TN * src, TYPE_ID desc, TYPE_ID rtype,
   }
 }
 
+void Expand_Madd(TN *dest, TN* src1, TN* src2, TN *src3, TYPE_ID mtype, OPS *ops)
+{
+  if(mtype == MTYPE_V16I4){//dest = (src2 * src3) + src1
+  	Build_OP(TOP_vpmacsdd_f128_oxmm_xmm_xmm_xmm, dest, src2, src3, src1, ops);
+  }else if(mtype == MTYPE_I4){
+    TN* tmp = Build_TN_Like(src1);
+    Expand_Multiply(tmp, src2, src3, mtype, ops);
+    Expand_Add(dest, src1, tmp,mtype, ops);// src1 and dest may be alias
+    //Build_OP(TOP_imul32, dest, src2, src3, ops);
+	//Build_OP(TOP_add32, dest, src1, dest, ops);
+  }else{
+    FmtAssert(FALSE, ("no such instructions about madd"));
+  }
+}
 

@@ -1257,6 +1257,10 @@ Pre_Optimizer(INT32 phase, WN *wn_tree, DU_MANAGER *du_mgr,
     // is only represented in the lowered IOs.
 
     LOWER_ACTIONS lower_flags = LOWER_NULL;
+	if(Is_Target_Orochi()){
+	// for Bulldozer we can use FMA and XOP instruction to enhance more opportunity optimization
+	  lower_flags |= LOWER_MADD;
+	}
 
     if (PU_has_namelist(Get_Current_PU())) 
       lower_flags |= LOWER_IO_STATEMENT;

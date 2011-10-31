@@ -1501,29 +1501,8 @@ static void Init_OP_Name()
 	OP_Name[TOP_palignr] = "palignr";
 	OP_Name[TOP_pshufb128] = "pshufb";
 	OP_Name[TOP_pshufb] = "pshufb";
-/*AVX*/
-	OP_Name[TOP_vaddpd] = "vaddpd";
-	OP_Name[TOP_vldapd] = "vmovapd";
-    OP_Name[TOP_vldapdx] = "vmovapd";
-    OP_Name[TOP_vldapdxx] = "vmovapd";
-    OP_Name[TOP_vldapd_n32] = "vmovapd";
-	OP_Name[TOP_vstapd] = "vmovapd";
-    OP_Name[TOP_vstapdx] = "vmovapd";
-    OP_Name[TOP_vstapdxx] = "vmovapd";
-    OP_Name[TOP_vstapd_n32] = "vmovapd";
-	OP_Name[TOP_vldaps] = "vmovaps";
-    OP_Name[TOP_vldapsx] = "vmovaps";
-    OP_Name[TOP_vldapsxx] = "vmovaps";
-    OP_Name[TOP_vldaps_n32] = "vmovaps";
-    OP_Name[TOP_vstaps] = "vmovaps";
-    OP_Name[TOP_vstapsx] = "vmovaps";
-    OP_Name[TOP_vstapsxx] = "vmovaps";
-    OP_Name[TOP_vstaps_n32] = "vmovaps";
-	OP_Name[TOP_vstdqa] = "vmovdqa";
-    OP_Name[TOP_vstdqax] = "vmovdqa";
-    OP_Name[TOP_vstdqaxx] = "vmovdqa";
-    OP_Name[TOP_vstdqa_n32] = "vmovdqa";
 #include "cgemit_targ_avx.cxx"
+#include "cgemit_targ_xop_fma.cxx"
 
 
 //**********************************************************
@@ -1540,6 +1519,7 @@ static void Init_OP_Name()
       !Is_Target_Core() &&
       !Is_Target_Wolfdale() &&
       !Is_Target_Barcelona() &&
+      !Is_Target_Orochi()&&
       !Is_Target_Sandy_Bridge()){// bug 10295
     // Use movlpd only for loads.  Bug 5809.
     OP_Name[TOP_ldsd] = "movlpd";
@@ -1567,6 +1547,7 @@ static void Init_OP_Name()
 	Is_Target_EM64T()     || // em64t
         Is_Target_Wolfdale()  ||
 	Is_Target_Core() ||
+	Is_Target_Orochi() ||
 	Is_Target_Sandy_Bridge()) {	 // use movapd for woodcrest for bug 11548
       OP_Name[TOP_movsd] = "movapd";  
     }

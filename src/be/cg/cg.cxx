@@ -920,7 +920,7 @@ CG_Generate_Code(
 #ifdef TARG_X8664
   {
     /* Perform compute-to opts. */
-    if (Is_Target_Barcelona() && CG_compute_to) {
+    if ((Is_Target_Barcelona()|| Is_Target_Orochi()) && CG_compute_to) {
       for( BB* bb = REGION_First_BB; bb != NULL; bb = BB_next(bb) ){
         EBO_Compute_To(bb);
       }

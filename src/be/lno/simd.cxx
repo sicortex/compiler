@@ -315,6 +315,18 @@ static BOOL is_vectorizable_op (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc) {
 	  return TRUE;
 	else
   	  return FALSE;
+  case OPR_MADD:
+  	if(Is_Target_Orochi() && rtype == MTYPE_I4)
+	  return TRUE;
+  case OPR_MSUB:
+  case OPR_NMADD:
+  case OPR_NMSUB:
+  	if(Is_Target_Orochi()){
+  	  if(rtype == MTYPE_F4 || rtype ==MTYPE_F8)
+	  	return TRUE;
+	  else return FALSE;
+    }else
+     return FALSE;
   default:
     return FALSE;
   }  
@@ -533,7 +545,7 @@ static BOOL Is_Vectorizable_Tree (WN* tree)
   if (!is_vectorizable_op(opr, WN_rtype(tree), WN_desc(tree)))
     return FALSE;
 
-  if (WN_kid_count(tree) > 2)
+  if (WN_kid_count(tree) > 3)
     return FALSE;
 
   for(INT i=0; i<WN_kid_count(tree); i++){
@@ -721,13 +733,22 @@ static BOOL Is_Well_Formed_Simd ( WN* wn, WN* loop)
     else
       return FALSE;
   }
-  
+
+  INT kid_count = WN_kid_count(wn);
   WN* parent = LWN_Get_Parent(wn);
   WN* kid0 = WN_kid0(wn);
   WN* kid1 = WN_kid1(wn);
-
-  if (WN_kid_count(wn) > 2 && WN_operator(wn) != OPR_SELECT)
-    return FALSE;
+  WN* kid2 = kid_count>2 ? WN_kid2(wn): NULL;
+  
+  
+  if (WN_kid_count(wn) > 2 && 
+  	  (WN_operator(wn) != OPR_SELECT
+  	  && WN_operator(wn) != OPR_MADD
+  	  && WN_operator(wn) != OPR_MSUB
+  	  && WN_operator(wn) != OPR_NMADD
+  	  && WN_operator(wn) != OPR_NMSUB)){
+	return FALSE;
+  }
 
   if (WN_operator(wn) == OPR_SELECT) {
     WN *compare_wn = kid0;
@@ -764,6 +785,7 @@ static BOOL Is_Well_Formed_Simd ( WN* wn, WN* loop)
      !Is_Target_Core() && 
      !Is_Target_Wolfdale() &&
      !Is_Target_Barcelona() &&
+     !Is_Target_Orochi() &&
      !Is_Target_Sandy_Bridge() &&
      WN_operator(wn) == OPR_RECIP && WN_rtype(wn) == MTYPE_F8
      && WN_operator(parent) == OPR_MPY)
@@ -786,6 +808,14 @@ static BOOL Is_Well_Formed_Simd ( WN* wn, WN* loop)
         WN_desc(parent) == MTYPE_I1 ||
         WN_desc(parent) == MTYPE_I2))	 
      return FALSE;
+
+   if (kid_count > 2 && WN_operator(kid2) == OPR_LDID &&
+   	   (WN_desc(kid2) == MTYPE_I1 ||
+        WN_desc(kid2) == MTYPE_I2 ||
+        WN_desc(parent) == MTYPE_I1 ||
+        WN_desc(parent) == MTYPE_I2))
+     return FALSE;
+   	
   
   }
 
@@ -850,7 +880,7 @@ static BOOL Is_Well_Formed_Simd ( WN* wn, WN* loop)
 	return FALSE;
     }
   }
-  if (WN_kid_count(wn) > 1 && 
+  if (kid_count> 1 && 
       WN_operator(kid1) == OPR_ILOAD) {
     WN* array1 = WN_kid0(kid1);
     if (WN_operator(array1) == OPR_ARRAY &&
@@ -873,6 +903,30 @@ static BOOL Is_Well_Formed_Simd ( WN* wn, WN* loop)
 	return FALSE;
     }
   }
+  
+  if (kid_count > 2 && 
+		WN_operator(kid2) == OPR_ILOAD) {
+	  WN* array2 = WN_kid0(kid2);
+	  if (WN_operator(array2) == OPR_ARRAY &&
+	  WN_operator(WN_kid0(array2)) != OPR_LDID &&
+	  WN_operator(WN_kid0(array2)) != OPR_LDA) {
+		// Bug 5057 - tolerate base addresses of the form (+ const LDID).
+		// Bug 6649 - vectorize things like struct[index].array[loop_index]
+		//			  where is base is const + ARRAY
+		if (WN_operator(WN_kid0(array2)) == OPR_ADD) {
+	  WN* opnd0 = WN_kid0(WN_kid0(array2));
+	  WN* opnd1 = WN_kid1(WN_kid0(array2));
+	  if (((WN_operator(opnd0) == OPR_LDID || WN_operator(opnd0) == OPR_ARRAY) &&
+		   WN_operator(opnd1) == OPR_INTCONST) ||
+		  ((WN_operator(opnd1) == OPR_LDID || WN_operator(opnd0) == OPR_ARRAY) &&
+		   WN_operator(opnd0) == OPR_INTCONST))
+		;
+	  else
+		return FALSE;
+		} else
+	  return FALSE;
+	  }
+  }
 
   //bug 14155: we don't know how to unroll the statement, so give up for now
   if(WN_operator(kid0) == OPR_ILOAD && WN_operator(WN_kid0(kid0)) == OPR_ARRAY){
@@ -889,15 +943,31 @@ static BOOL Is_Well_Formed_Simd ( WN* wn, WN* loop)
       return FALSE;
     }
   }
+  if((kid_count > 2 )&& WN_operator(kid2) == OPR_ILOAD && WN_operator(WN_kid0(kid2)) == OPR_ARRAY){
+    WN * stmt = Find_Stmt_Under(wn, WN_do_body(loop));
+    if(stmt && WN_operator(stmt)==OPR_STID && Is_Unroll_Statement(stmt, WN_do_body(loop))){
+     if(WN_element_size(WN_kid0(kid2)) != MTYPE_byte_size(WN_desc(stmt)))
+      return FALSE;
+    }
+  }
  
-  if(!Is_Vectorizable_Tree(kid0)||!Is_Vectorizable_Tree(kid1))
+  if(!Is_Vectorizable_Tree(kid0)||!Is_Vectorizable_Tree(kid1)
+  	||(!Is_Vectorizable_Tree(kid2)))
    return FALSE;
 
   // Two invariant operands
-  if (WN_kid_count(wn) == 2 &&
+  if (kid_count == 2 &&
       ((WN_operator(kid0) == OPR_CONST || WN_operator(kid0) == OPR_INTCONST) &&
        (WN_operator(kid1) == OPR_CONST || WN_operator(kid1) == OPR_INTCONST)))
     return FALSE;  
+  if (kid_count == 3 &&
+      (((WN_operator(kid0) == OPR_CONST || WN_operator(kid0) == OPR_INTCONST) &&
+       (WN_operator(kid1) == OPR_CONST || WN_operator(kid1) == OPR_INTCONST))||
+      ((WN_operator(kid0) == OPR_CONST || WN_operator(kid0) == OPR_INTCONST) &&
+       (WN_operator(kid2) == OPR_CONST || WN_operator(kid2) == OPR_INTCONST))||
+      ((WN_operator(kid1) == OPR_CONST || WN_operator(kid1) == OPR_INTCONST) &&
+       (WN_operator(kid2) == OPR_CONST || WN_operator(kid2) == OPR_INTCONST))))
+    return FALSE;
 
   if (WN_operator(kid0) == OPR_LDID) {
     SYMBOL symbol1(kid0);
@@ -939,8 +1009,29 @@ static BOOL Is_Well_Formed_Simd ( WN* wn, WN* loop)
     }
   }
 
+  if (kid_count > 2&& kid2 && WN_operator(kid2) == OPR_LDID) {
+    SYMBOL symbol1(kid2);
+    SYMBOL symbol2(WN_index(loop));
+    if (symbol1 == symbol2) { 
+      // Bug 7255 - induction loop in MP region needs special treatment.
+      if (Do_Loop_Is_Mp(loop)) 
+	return FALSE;
+      INT Type_Size = MTYPE_byte_size(WN_rtype(wn));
+      if (WN_operator(wn) == OPR_CVT) 
+	Type_Size = MTYPE_byte_size(WN_desc(wn));
+      if (Induction_Seen &&
+	  Type_Size != Induction_Type_Size) {
+	Inconsistent_Induction = TRUE;
+	return FALSE;
+      }
+      Induction_Seen = TRUE;
+      Induction_Type_Size = Type_Size;
+    }
+  }
+
   if ((WN_operator(kid0) == OPR_ILOAD && WN_field_id(kid0) != 0) ||
       (kid1 && WN_operator(kid1) == OPR_ILOAD && WN_field_id(kid1) != 0) ||
+      (kid_count > 2 && kid2 && WN_operator(kid2) == OPR_ILOAD && WN_field_id(kid2) != 0) ||
       (WN_operator(parent) == OPR_ISTORE && WN_field_id(parent) != 0))
     return FALSE;
      
@@ -956,6 +1047,9 @@ static BOOL Is_Well_Formed_Simd ( WN* wn, WN* loop)
        WN_desc(kid0) != WN_desc(stmt)) ||
       (kid1 && WN_operator(kid1) == OPR_ILOAD && 
        WN_rtype(kid1) != WN_desc(kid1) &&
+       WN_desc(kid1) != WN_desc(stmt)) ||
+      (kid_count>2 && kid2 && WN_operator(kid2) == OPR_ILOAD &&
+       WN_rtype(kid2) != WN_desc(kid2) &&
        WN_desc(kid1) != WN_desc(stmt)))
     return FALSE;
 

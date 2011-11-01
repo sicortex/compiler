@@ -5916,9 +5916,16 @@ WGEN_Expand_Expr (gs_t exp,
     case GS_FIX_TRUNC_EXPR:
       {
         wn0 = WGEN_Expand_Expr (gs_tree_operand (exp, 0));
-	ty_idx = Get_TY (gs_tree_type(exp));
-	TYPE_ID mtyp = Widen_Mtype(TY_mtype(ty_idx));
-	wn = WN_Trunc(WN_rtype(wn0), mtyp, wn0);
+        ty_idx = Get_TY (gs_tree_type(exp));
+        TYPE_ID mtyp = TY_mtype(ty_idx);
+        TYPE_ID wmtyp = Widen_Mtype(mtyp);
+        wn = WN_Trunc(WN_rtype(wn0), wmtyp, wn0);
+
+        if (mtyp != wmtyp) {
+          FmtAssert(MTYPE_size_min(mtyp) < MTYPE_size_min(wmtyp),
+                    ("Bad widen type"));
+	      wn = WN_CreateCvtl(OPR_CVTL, wmtyp, MTYPE_V, MTYPE_size_min(mtyp), wn);
+        }
       }
       break;
 

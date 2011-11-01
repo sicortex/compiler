@@ -766,13 +766,15 @@ void flush_stmt_semantics(void)
 int save_arg_info_list_base, line, col, ir_idx, err_idx, null_idx;
 int save_curr_stmt_sh_idx, type_idx, type, kind_idx, m;
 int unit_idx, iomsg_idx, iostat_idx, iostat_kind_idx;
-int addr_idx, call_idx;
+int addr_idx, call_idx, result_idx;
 opnd_type err_opnd, iomsg_opnd, iostat_opnd, opnd_unit;
-
 
     SCP_DOES_IO(curr_scp_idx) = TRUE;
 
     ir_idx = SH_IR_IDX(curr_stmt_sh_idx);
+
+    result_idx = IR_IDX_L(ir_idx);
+    ir_idx     = IR_IDX_R(ir_idx);
 
    /* do memory management stuff to make sure the call tables are big enough */
 
@@ -922,8 +924,8 @@ opnd_type err_opnd, iomsg_opnd, iostat_opnd, opnd_unit;
 
 	IR_OPR(ir_idx) = Br_True_Opr;
 
-	IR_FLD_L(ir_idx)      = IR_Tbl_Idx;
-	IR_IDX_L(ir_idx)      = call_idx;
+	IR_FLD_L(ir_idx)      = AT_Tbl_Idx;
+	IR_IDX_L(ir_idx)      = result_idx;
 	IR_COL_NUM_L(ir_idx)  = col;
 	IR_LINE_NUM_L(ir_idx) = line;
 

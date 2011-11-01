@@ -7744,14 +7744,31 @@ Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, 
    	Expand_Intrinsic_Imm_Param(TOP_blendps, result, op0, op1, op2, ops, 5);
 	break;
    case INTRN_PBLENDVB128:
-	Build_OP(TOP_pblendvb, result, op0, op1, op2, ops);
+   	if(TN_is_dedicated(result) && TN_is_float(result) && TN_register(result) == 1){
+	  TN *tmp = Build_TN_Like(op0);
+	  Build_OP(TOP_pblendvb, tmp, op0, op1, op2, ops);
+	  Build_OP(TOP_movaps, result, tmp,ops);
+   	}else
+	  Build_OP(TOP_pblendvb, result, op0, op1, op2, ops);
 	break;
    case INTRN_BLENDVPD:
-	Build_OP(TOP_blendvpd, result, op0, op1, op2, ops);
+   	if(TN_is_dedicated(result) && TN_is_float(result) && TN_register(result) == 1){
+	  TN *tmp = Build_TN_Like(op0);
+	  Build_OP(TOP_blendvpd, tmp, op0, op1, op2, ops);
+	  Build_OP(TOP_movaps, result, tmp,ops);
+   	}else
+	  Build_OP(TOP_blendvpd, result, op0, op1, op2, ops);
 	break;
-   case INTRN_BLENDVPS:
-	Build_OP(TOP_blendvps, result, op0, op1, op2, ops);
+   case INTRN_BLENDVPS:{
+   	if(TN_is_dedicated(result) && TN_is_float(result) && TN_register(result) == 1){
+	//when the result processed xmm0, then the opnd2 can't be allocated xmm0
+	  TN *tmp = Build_TN_Like(op0);
+	  Build_OP(TOP_blendvps, tmp, op0, op1, op2, ops);
+	  Build_OP(TOP_movaps, result, tmp,ops);
+   	}else
+	  Build_OP(TOP_blendvps, result, op0, op1, op2, ops);
 	break;
+   }
   case INTRN_ROUNDPD:
    	Expand_Intrinsic_Imm_Param(TOP_roundpd, result, op0, op0, op1, ops, 4);
 	break;

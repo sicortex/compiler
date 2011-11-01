@@ -4380,6 +4380,27 @@ WGEN_target_builtins (gs_t exp, INTRINSIC * iopc, BOOL * intrinsic_op)
 		case GSBI_IX86_BUILTIN_PSHUFB:
 			*iopc = INTRN_PSHUFB;
 			break;
+		case GSBI_IX86_BUILTIN_AESDEC:
+			*iopc = INTRN_AESDEC;
+		    break;
+	    case GSBI_IX86_BUILTIN_AESENC:
+			*iopc = INTRN_AESENC;
+		    break;
+		case GSBI_IX86_BUILTIN_AESDECLAST:
+			*iopc = INTRN_AESDECLAST;
+		    break;
+	    case GSBI_IX86_BUILTIN_AESENCLAST:
+			*iopc = INTRN_AESENCLAST;
+		    break;
+	    case GSBI_IX86_BUILTIN_AESIMC:
+			*iopc = INTRN_AESIMC;
+		    break;
+	    case GSBI_IX86_BUILTIN_AESKEYGENASSIST:
+			*iopc = INTRN_AESKEYGENASSIST;
+		    break;
+	    case GSBI_IX86_BUILTIN_PCLMULDQD:
+			*iopc = INTRN_PCLMULDQD;
+		    break;
 /*AVX*/
 //    case GSBI_IX86_BUILTIN_ADDPD256:
 //      *iopc = INTRN_ADDPD256;

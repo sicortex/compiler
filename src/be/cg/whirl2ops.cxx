@@ -2896,6 +2896,7 @@ Handle_Imm_Op (WN * expr, INT * kidno /* counted from 0 */)
 		case INTRN_INSERTPS:
     case INTRN_PALIGNR128:
     case INTRN_PALIGNR:
+	case INTRN_PCLMULDQD:
     case INTRN_VBLENDPD256:
     case INTRN_VBLENDPS256:
     case INTRN_VDPPS256:
@@ -2935,6 +2936,7 @@ Handle_Imm_Op (WN * expr, INT * kidno /* counted from 0 */)
 		case INTRN_PEXTRQ:
 		case INTRN_VEC_EXT_V4SF:
 		case INTRN_EXTRACTPS:
+		case INTRN_AESKEYGENASSIST:
 		/*avx*/
 		case INTRN_VPERMILPS128:
 		case INTRN_VEXTRACTF128D:

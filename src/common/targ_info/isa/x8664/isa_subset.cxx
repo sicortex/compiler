@@ -790,6 +790,7 @@ int main()
 		    TOP_movsd,
 		    TOP_movss,
 		    TOP_movdq,
+		    TOP_aesmov,
 		    TOP_movapd,
 		    TOP_movaps,
 		    TOP_movq2dq,

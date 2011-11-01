@@ -921,6 +921,7 @@ int main ()
 	      "movsd",
 	      "movss",
 	      "movdq",
+	      "aesmov",
 	      "movapd",
 	      "movaps",
 	      "movq2dq",

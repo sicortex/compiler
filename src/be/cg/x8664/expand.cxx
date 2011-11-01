@@ -8119,6 +8119,48 @@ Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, 
   case INTRN_PSHUFB:
     Build_OP(TOP_pshufb, result, op0, op1, ops );
     break;
+ /*AES*/
+  case INTRN_AESDEC:
+  	Build_OP(TOP_aesmov, result, op0, ops);
+  	Build_OP(TOP_aesdec_f128_oxmm_xmm, result, op1, ops);
+	Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+  	break;
+  case	INTRN_AESENC:
+  	Build_OP(TOP_aesmov, result, op0, ops);
+  	Build_OP(TOP_aesenc_f128_oxmm_xmm, result, op1, ops);
+	Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+  	break;
+  case INTRN_AESDECLAST:
+  	//Build_OP(TOP_fmovddup, result, op0, ops);
+	//Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+	Build_OP(TOP_aesmov, result, op0, ops);
+	Build_OP(TOP_aesdeclast_f128_oxmm_xmm, result, op1, ops);
+	Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+	break;
+  case	INTRN_AESENCLAST:
+  	Build_OP(TOP_aesmov, result, op0, ops);
+  	Build_OP(TOP_aesenclast_f128_oxmm_xmm, result, op1, ops);
+	Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+  	break;
+  case	INTRN_AESIMC:
+  	Build_OP(TOP_aesimc_f128_oxmm_xmm, result, op0, ops);
+	Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+  	break;
+  case	INTRN_AESKEYGENASSIST:{
+  	INT32 imm = TN_value(op1); 
+  	Build_OP(TOP_aesmov, result, op0, ops);
+	Build_OP(TOP_aeskeygenassist_f128_oxmm_xmm_simm8, result, op0, Gen_Literal_TN(imm, 1), ops);
+	Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+  	break;
+  	}
+  /*PCLMUL*/
+  case	INTRN_PCLMULDQD:{
+  	INT32 imm = TN_value(op2);
+  	Build_OP(TOP_aesmov, result, op0, ops);
+  	Build_OP(TOP_pclmulqdq_f128_oxmm_xmm_simm8, result, op1, Gen_Literal_TN(imm, 1), ops);
+	Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+  	break;
+  	}
   case INTRN_PAND128:
     Build_OP(TOP_pand128, result, op0, op1, ops );
     break;

@@ -16059,6 +16059,21 @@ ix86_init_mmx_sse_builtins (void)
 #include "i386_avx.c"
 	//ftype = build_function_type_list(V4DF_type_node, V4DF_type_node, V4DF_type_node, NULL_TREE);
 
+/*AES */
+    // TODO: replace with MASK_AES
+	ftype = build_function_type_list(V2DI_type_node, V2DI_type_node, V2DI_type_node, NULL_TREE);
+	def_builtin(MASK_AVX, "__builtin_ia32_aesdec128", ftype, IX86_BUILTIN_AESDEC);
+	def_builtin(MASK_AVX, "__builtin_ia32_aesenc128", ftype, IX86_BUILTIN_AESENC);
+	def_builtin(MASK_AVX, "__builtin_ia32_aesdeclast128", ftype, IX86_BUILTIN_AESDECLAST);
+	def_builtin(MASK_AVX, "__builtin_ia32_aesenclast128", ftype, IX86_BUILTIN_AESENCLAST);
+	ftype = build_function_type_list(V2DI_type_node, V2DI_type_node, NULL_TREE);
+	def_builtin(MASK_AVX, "__builtin_ia32_aesimc128", ftype, IX86_BUILTIN_AESIMC);
+	ftype = build_function_type_list(V2DI_type_node, V2DI_type_node, integer_type_node, NULL_TREE);
+	def_builtin(MASK_AVX, "__builtin_ia32_aeskeygenassist128", ftype, IX86_BUILTIN_AESKEYGENASSIST);
+	/*PCLMUL*/
+	ftype = build_function_type_list(V2DI_type_node, V2DI_type_node, V2DI_type_node, integer_type_node, NULL_TREE);
+	def_builtin(MASK_AVX, "__builtin_ia32_pclmulqdq128", ftype, IX86_BUILTIN_PCLMULDQD);
+
 	//def_builtin (MASK_AVX, "__builtin_ia32_addpd256", ftype, IX86_BUILTIN_ADDPD256);
   /* Access to the vec_init patterns.  */
   ftype = build_function_type_list (V2SI_type_node, integer_type_node,

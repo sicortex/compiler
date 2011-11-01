@@ -148,6 +148,7 @@ int main()
     vector_packed_double,  /* SSE packed double-precision FPU op */
     vector_avx,			  /*AVX vector  256-bit operation*/
     cast_vector,	    /*for cast from 256 vector to 128*/
+    aesmov,             /*AES instruction which can't be deleted in EBO*/
     cfi;                /* CFI */
   
 
@@ -432,6 +433,7 @@ int main()
 		     TOP_movss,
 		     TOP_movsd,
 		     TOP_movdq,
+		     TOP_aesmov,
 				 TOP_movntdqa,
 		     TOP_movapd,
 		     TOP_movaps,
@@ -2034,6 +2036,7 @@ int main()
 		     TOP_movsd,
 		     TOP_movss,
 		     TOP_movdq, 
+		     TOP_aesmov,
 		     TOP_movapd,
 		     TOP_movaps,
 		     TOP_movg2x64,
@@ -3360,6 +3363,7 @@ int main()
 		     TOP_shufps,
 		     TOP_movhlps,
 		     TOP_movlhps,
+		     TOP_aesmov,
 		     TOP_psrldq,
 		     TOP_psrlq128v64,
 		     TOP_pslldq,
@@ -4497,6 +4501,11 @@ int main()
 #include "isa_avx_properties_avx_vector.cxx"
 #include "isa_properties_xop_fma_vector.cxx"
 		     TOP_UNDEFINED);
+
+  aesmov = ISA_Property_Create("aesmov");
+  Instruction_Group(aesmov,
+  	TOP_aesmov,
+  	TOP_UNDEFINED);
 
   cfi = ISA_Property_Create ("cfi");
   Instruction_Group (cfi,

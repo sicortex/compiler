@@ -1805,6 +1805,7 @@ int main()
 
   Instruction_Group("xmm to xmm",
 		    TOP_movdq,
+		    TOP_aesmov,
 		    TOP_movapd,
 		    TOP_movaps,
 		    TOP_fmovsldup,

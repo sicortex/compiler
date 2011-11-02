@@ -772,10 +772,6 @@ string_list_t *get_runtime_libraries_ld_flags()
         add_string(flags, "--start-group");
     }
 
-    if(option_was_seen(O_static_libgcc)) {
-        add_string(flags, "-Bstatic");
-    }
-
     add_library(flags, "gcc");
 
     // Exception support library (used by stl and gcc)
@@ -785,10 +781,6 @@ string_list_t *get_runtime_libraries_ld_flags()
        instr_used ||
        option_was_seen(O_fexceptions)) {
         add_library(flags, "eh");
-    }
-
-    if(option_was_seen(O_static_libgcc)) {
-        add_string(flags, "-Bdynamic");
     }
 
     add_library(flags, "c");

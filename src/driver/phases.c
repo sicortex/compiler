@@ -2052,9 +2052,6 @@ add_final_ld_args (string_list_t *args)
 	char *temp;
 
     if(ipa == TRUE) {
-        if(option_was_seen(O_static_libgcc)) {
-            add_arg(args, "-static-libgcc");
-        }
 
 	/* Need to give ipa_link openmp flag or it will get lost during
 	 * final linking */

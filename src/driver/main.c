@@ -1558,7 +1558,7 @@ display_version(boolean dump_version_only)
   }
   // TODO : Move this string to a configure option
 #ifdef PATH64_ENABLE_PSCRUNTIME
-  fprintf(stderr, "PathScale (tm) Compiler Suite: Version %s\n",
+  fprintf(stderr, "PathScale EKOPath(tm) Compiler Suite: Version %s\n",
 	  compiler_version);
 #else 
   fprintf(stderr, "Path64 Community Compiler: Version %s\n",
@@ -1571,8 +1571,4 @@ display_version(boolean dump_version_only)
   }
   fprintf(stderr, "Built on: %s\n", build_date);
   fprintf(stderr, "Thread model: posix\n");	// Bug 4608.
-
-  fprintf(stderr, "GNU gcc version %s", psc_gcc_version);
-  // TODO : Move this string to a configure option
-  fprintf(stderr, " (PathScale " PSC_FULL_VERSION " driver)\n");
 }

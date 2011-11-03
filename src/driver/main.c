@@ -1571,4 +1571,5 @@ display_version(boolean dump_version_only)
   }
   fprintf(stderr, "Built on: %s\n", build_date);
   fprintf(stderr, "Thread model: posix\n");	// Bug 4608.
+  fprintf(stderr, "GNU gcc compatible version 4.2.1\n");
 }

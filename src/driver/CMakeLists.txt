@@ -350,7 +350,7 @@ endif()
 site_name(BUILD_HOST)
 mark_as_advanced(BUILD_HOST)
 set(BUILD_USER $ENV{USER})
-set(BUILD_DATE $ENV{DATE})
+set(BUILD_DATE "${PATH64_BUILD_DATE}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version_hg.c.in ${CMAKE_CURRENT_BINARY_DIR}/version_hg.c ESCAPE_QUOTES @ONLY)
 
 add_custom_target(driver_gen_sources

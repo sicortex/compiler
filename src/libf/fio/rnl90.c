@@ -475,7 +475,7 @@ rrd:
 	rlen	= _fcdlen(namlist->group_name);	/* len of groupname	*/
 	nlvar	= namlist->goli;		/* group object ptr	*/
 
-	if (strncmp(rptr,buf,rlen)) {
+	if (strcmp(rptr,buf)) {
 		if (cup->ufnl_skip == 0) {
 			errn	= FENLIVGP;
 			ERROR1(errf, css, errn, buf);

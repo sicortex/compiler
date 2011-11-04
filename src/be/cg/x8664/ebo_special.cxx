@@ -4000,7 +4000,7 @@ static Addr_Mode_Group Addr_Mode_Group_Table[] = {
   {TOP_for128v32,	TOP_forx128v32,	TOP_forxx128v32,	TOP_forxxx128v32,	TOP_UNDEFINED},
   {TOP_for128v64,	TOP_forx128v64,	TOP_forxx128v64,	TOP_forxxx128v64,	TOP_UNDEFINED},
   /*AVX 256-bits*/
- //#include "ebo_special_avx.cxx"
+ #include "ebo_special_avx.cxx"
   // orps/orpd share the same load-execute OPs as for128v32/for128v64.  Must
   // put orps/orpd after for128v32/for128v64 so that the load-execute OPs will
   // have for128v32/for128v64 as the base mode.

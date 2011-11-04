@@ -654,6 +654,25 @@ main()
 		     TOP_fmovsldupxxx,
 		     TOP_fmovshdupxxx,
 		     TOP_fmovddupxxx,
+			/*AVX*/
+  			TOP_vmovsldup_f128_ofloat_base64_index64_uimm8_simm32,
+  			TOP_vmovsldup_f128_ofloat_base64_simm32,
+  			TOP_vmovsldup_f128_ofloat_index64_uimm8_simm32,
+  			TOP_vmovsldup_f256_ofloat_base64_index64_uimm8_simm32,
+  			TOP_vmovsldup_f256_ofloat_base64_simm32,
+  			TOP_vmovsldup_f256_ofloat_index64_uimm8_simm32,
+  			TOP_vmovshdup_f128_ofloat_base64_index64_uimm8_simm32,
+  			TOP_vmovshdup_f128_ofloat_base64_simm32,
+  			TOP_vmovshdup_f128_ofloat_index64_uimm8_simm32,
+  			TOP_vmovshdup_f256_ofloat_base64_index64_uimm8_simm32,
+  			TOP_vmovshdup_f256_ofloat_base64_simm32,
+  			TOP_vmovshdup_f256_ofloat_index64_uimm8_simm32,
+  			TOP_vmovddup_f128_ofloat_base64_index64_uimm8_simm32,
+  			TOP_vmovddup_f128_ofloat_base64_simm32,
+  			TOP_vmovddup_f128_ofloat_index64_uimm8_simm32,
+  			TOP_vmovddup_f256_ofloat_base64_index64_uimm8_simm32,
+  			TOP_vmovddup_f256_ofloat_base64_simm32,
+  			TOP_vmovddup_f256_ofloat_index64_uimm8_simm32,
                      TOP_UNDEFINED);
 
   /* x87 operations that use stack */
@@ -1208,7 +1227,23 @@ main()
              TOP_xchgx16,
              TOP_xchgx32,
              TOP_xchgx64,
-#include "isa_avx_properties_store_only.cxx"
+             /*AVX*/
+  			 TOP_vmovntdq_f256_obase64_offset_index64_uimm8_float,
+  			 TOP_vmovntdq_f256_obase64_simm32_float,
+  			 TOP_vmovntdq_f256_oindex64_uimm8_simm32_float,
+  			 TOP_vmovntdq_f256_on32_float,
+  			 TOP_vmovntpd_f256_obase64_offset_index64_uimm8_float,
+  			 TOP_vmovntpd_f256_obase64_simm32_float,
+  			 TOP_vmovntpd_f128_oindex64_uimm8_simm32_float,
+  			 TOP_vmovntpd_f128_on32_float,
+  			 TOP_vmovntpd_f256_obase64_offset_index64_uimm8_float,
+  			 TOP_vmovntpd_f256_obase64_simm32_float,
+  			 TOP_vmovntpd_f256_oindex64_uimm8_simm32_float,
+  			 TOP_vmovntpd_f256_on32_float,
+  			 TOP_vmovntps_f256_obase64_offset_index64_uimm8_float,
+  			 TOP_vmovntps_f256_obase64_simm32_float,
+  			 TOP_vmovntps_f256_oindex64_uimm8_simm32_float,
+  			 TOP_vmovntps_f256_on32_float,
                      TOP_UNDEFINED);
 
   /* ===== Non-temporal memory store operator ====== */

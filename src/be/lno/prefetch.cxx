@@ -295,6 +295,7 @@ Target_Proc_Run_Prefetch()
   if (Is_Target_Itanium()) return 2; // more aggressive
 #endif
 #ifdef TARG_X8664
+  if (Is_Target_Sandy_Bridge()) return NO_PREFETCH;
   if (Is_Target_x86_64()) return CONSERVATIVE_PREFETCH; // more aggressive
 #endif
   return 0;

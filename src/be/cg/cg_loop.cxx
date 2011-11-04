@@ -5453,6 +5453,18 @@ void CG_LOOP::Determine_Unroll_Factor()
       }
     }
   }
+
+  if(Is_Target_AVX()&&FALSE){
+  	for(OP *op = BB_first_op(head); op != NULL; op = OP_next(op)){
+	  if(TOP_is_vector_avx(OP_code(op))){
+	  	const char *reason = "AVX intruction unroll cost too much";
+		note_not_unrolled(head, reason);
+		if(trace) 
+		  fprintf(TFile, "<unroll> not unrolling; %s\n", reason);
+		return;
+	  }
+  	}
+  }
 #endif
 
   if (CG_LOOP_unroll_times_max < 2) {

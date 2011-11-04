@@ -1403,39 +1403,6 @@ typedef enum {V32I1, V16I1, V32I2, V16I2, V32I4, V16I4, V32I8, V16I8, V32I16, V1
 #define V16C4 V16F8
 INT Vec_Unit_Size[11] = { 1, 1, 2, 2, 4, 4, 8, 8, 16, 16, -1 };
 
-static BOOL
-Simd_Suitable_32bytes_AVX(WN *simd_op){
-// TODO: What about XORPD?
-  OPERATOR oper = WN_operator(simd_op);
-  TYPE_ID rtype, desc;
-  rtype = WN_rtype(simd_op);
-  desc = WN_desc(simd_op);
-  switch(oper){
-  	case OPR_ADD:
-	case OPR_SUB:
-	case OPR_MPY:
-	case OPR_DIV:
-	case OPR_PAREN:
-	case OPR_SQRT:
-	case OPR_MIN:
-	case OPR_MAX:
-	
-	 return TRUE;
-	case OPR_CVT:{
-	  if(rtype == MTYPE_F8 && (desc == MTYPE_I4 || desc == MTYPE_U4) )
-	  	return TRUE;
-	  return FALSE;
-	}	
-	case OPR_RECIP:
-	case OPR_RSQRT:{
-	  if(rtype == MTYPE_F4)
-	  	return TRUE;
-	  else
-	  	return FALSE;
-	}
-	default: return FALSE;
-  }
-}
 
 static SIMD_KIND 
 Find_Simd_Kind ( STACK_OF_WN *vec_simd_ops, BOOL is_256_bits )
@@ -2992,115 +2959,6 @@ static BOOL SA_Set_SimdOps_Info1(WN* body,
 }
 
 
-static BOOL
-Simd_Op_In_Stack(WN *simd_op, STACK_OF_WN * simd_stack){
-  INT i;
-  for(i = 0; i < simd_stack->Elements(); i++){
-  	WN *vec_op = simd_stack->Top_nth(i);
-	if(simd_op == vec_op)
-	 break;
-  }
-  return !(i==simd_stack->Elements());
-}
-
-static void
-Set_Kids_None_AVX(WN *op){
-  INT i;
-  for(i = vec_simd_ops->Elements()-1; i >= 0; i--){
-  	WN *simd_op = vec_simd_ops->Top_nth(i);
-	if(Wn_Is_Inside(simd_op, op))
-	  simd_op_avx[i] = FALSE;
-  }
-}
-
-
-static BOOL Is_STID_Kid_AVX(WN *op){
-  for (INT i = 0; i < vec_simd_ops->Elements(); i++){
-    WN *simd_op = vec_simd_ops->Top_nth(i);
-	if(!Wn_Is_Inside(simd_op, op))
-	  continue;
-	if(!simd_op_avx[i])
-	 return FALSE;
-  }
-  return TRUE;
-}
-
-static BOOL Is_DU_AVX_Op(WN* op){
-  return TRUE;
-  if(WN_operator(op) != OPR_LDID)
-  	return TRUE;
-  //now op must be lDID, look for the DU chane to see if any def must be V16* type
-  WN *loop_body = Find_Do_Body(op);
-  WN *loop = LWN_Get_Parent(loop_body);
-
-  STACK<WN *>* equivalence_class =
-  	Scalar_Equivalence_Class(op, Du_Mgr, &LNO_local_pool);
-  //We just care about STID operator to the same symbol so far
-  if(!equivalence_class)
-  	return TRUE;
-
-  for (INT i=0; i < equivalence_class->Elements(); i++){
-  	WN *scalar_ref = equivalence_class->Top_nth(i);
-	if(!Wn_Is_Inside(scalar_ref, loop) || WN_operator(scalar_ref) == OPR_LDID)
-	  continue;
-	FmtAssert(WN_operator(scalar_ref) == OPR_STID, 
-		("FIXME: DU AVX OP ecounter other types beside STID"));
-	if(Wn_Is_Inside(op, scalar_ref))
-	  continue;
-	if(!Is_STID_Kid_AVX(scalar_ref))
-	  return FALSE;
-  }
-  return TRUE;
-}
-
-/*determine if WN *simd_op is suitable for AVX simd or not*/
-static BOOL Is_AVX_Simd_Op(WN *simd_op){
-  INT i, j;
-  for(i = 0; i < WN_kid_count(simd_op); i++){
-  	WN *kid = WN_kid(simd_op, i);
-#if 0
-	INT elem_count = vec_simd_ops->Elements();
-	for(j=0; j < elem_count; j++){
-	  WN *vec_op = vec_simd_ops->Top_nth(j);
-	  if(vec_op == kid)
-	  	break;
-	}
-#endif
-    if(WN_operator(kid) == OPR_ARRAY)
-	  continue;
-	if(Simd_Op_In_Stack(kid, vec_simd_ops)){
-	  if(!Is_AVX_Simd_Op(kid))
-	  	return FALSE;
-	}else{
-	  if(!Is_DU_AVX_Op(kid))
-		  return FALSE;
-	  for(j = 0; j < WN_kid_count(kid); j++){
-	    if(!Is_AVX_Simd_Op(WN_kid(kid, j)))
-		  return FALSE;
-	  }
-	}
-  }
-#if 1
-  if(!Simd_Op_In_Stack(simd_op, vec_simd_ops)){
-  	if(Is_DU_AVX_Op(simd_op))
-	  return TRUE;
-	else
-	  return FALSE;
-  }
-#endif
-  TYPE_ID type = WN_rtype(simd_op);
-  switch(type){
-  	case MTYPE_F4:
-	case MTYPE_F8:
-	if( !Simd_Suitable_32bytes_AVX( simd_op))
-	  return FALSE;
-	break;
-	default:
-	  return FALSE;
-  }
-  return TRUE;
-}
-
 static void SA_Set_SimdOps_Info2(BOOL is_256_bits)
 {
  // For all SIMD ops that belong to same loop, we need to call Find_Simd_Kind
@@ -3118,29 +2976,6 @@ static void SA_Set_SimdOps_Info2(BOOL is_256_bits)
   	//CXX_NEW_ARRAY(BOOL, vec_simd_ops->Elements(),&LNO_local_pool);
 
   WN *istore, *simd_op;
-#if 0
-  if(Target_AVX){
-	for(INT i = vec_simd_ops->Elements()-1; i >= 0; i--){
-  	  simd_op = vec_simd_ops->Top_nth(i);
-  	  simd_op_avx[i] = Is_AVX_Simd_Op(simd_op);
-    }
-    //set all the kids AVX FALSE when the simd_op's AVX is FALSE
-    for (INT i = 0; i < vec_simd_ops->Elements(); i++){
-  	  simd_op = vec_simd_ops->Top_nth(i);
-	  for(INT j = i+1; j < vec_simd_ops->Elements(); j++){
-		  WN *kid_simd_op = vec_simd_ops->Top_nth(j);
-		  if(!Wn_Is_Inside(kid_simd_op, simd_op))
-		    continue;
-		  simd_op_avx[j] = simd_op_avx[i]; 
-	  }
-    }
-  }else
-
-    for(INT i = 0; i < vec_simd_ops->Elements(); i++){
-      simd_op_avx[i] = FALSE;
-	}
-#endif
-
 
   
   for (INT i=0; i < vec_simd_ops->Elements(); i++){

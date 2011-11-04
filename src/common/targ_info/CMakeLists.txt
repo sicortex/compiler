@@ -264,11 +264,11 @@ if(${x8664_enabled})
     set_property(TARGET em64t APPEND PROPERTY
                  COMPILE_FLAGS "-I${CMAKE_CURRENT_BINARY_DIR}/x8664")
 
-    install(TARGETS barcelona em64t core wolfdale sandy opteron
+    install(TARGETS barcelona em64t core wolfdale sandy opteron orochi
             RUNTIME DESTINATION bin
             LIBRARY DESTINATION ${PATH64_LIB_PATH}/x8664)
 
-    add_dependencies(be-all barcelona em64t core wolfdale sandy opteron)
+    add_dependencies(be-all barcelona em64t core wolfdale sandy opteron orochi)
 endif()
 
 # MIPS architecture specific

@@ -645,6 +645,25 @@ int main()
 		     TOP_fmovsldupxxx,
 		     TOP_fmovshdupxxx,
 		     TOP_fmovddupxxx,
+			/*AVX*/
+  			TOP_vmovsldup_f128_ofloat_base64_index64_uimm8_simm32,
+  			TOP_vmovsldup_f128_ofloat_base64_simm32,
+  			TOP_vmovsldup_f128_ofloat_index64_uimm8_simm32,
+  			TOP_vmovsldup_f256_ofloat_base64_index64_uimm8_simm32,
+  			TOP_vmovsldup_f256_ofloat_base64_simm32,
+  			TOP_vmovsldup_f256_ofloat_index64_uimm8_simm32,
+  			TOP_vmovshdup_f128_ofloat_base64_index64_uimm8_simm32,
+  			TOP_vmovshdup_f128_ofloat_base64_simm32,
+  			TOP_vmovshdup_f128_ofloat_index64_uimm8_simm32,
+  			TOP_vmovshdup_f256_ofloat_base64_index64_uimm8_simm32,
+  			TOP_vmovshdup_f256_ofloat_base64_simm32,
+  			TOP_vmovshdup_f256_ofloat_index64_uimm8_simm32,
+  			TOP_vmovddup_f128_ofloat_base64_index64_uimm8_simm32,
+  			TOP_vmovddup_f128_ofloat_base64_simm32,
+  			TOP_vmovddup_f128_ofloat_index64_uimm8_simm32,
+  			TOP_vmovddup_f256_ofloat_base64_index64_uimm8_simm32,
+  			TOP_vmovddup_f256_ofloat_base64_simm32,
+  			TOP_vmovddup_f256_ofloat_index64_uimm8_simm32,
                      TOP_UNDEFINED);
 
   /* x87 operations that use stack */
@@ -1201,7 +1220,23 @@ int main()
              TOP_xchgx16,
              TOP_xchgx32,
              TOP_xchgx64,
-#include "isa_avx_properties_store_only.cxx"
+             /*AVX*/
+  			 TOP_vmovntdq_f256_obase64_offset_index64_uimm8_float,
+  			 TOP_vmovntdq_f256_obase64_simm32_float,
+  			 TOP_vmovntdq_f256_oindex64_uimm8_simm32_float,
+  			 TOP_vmovntdq_f256_on32_float,
+  			 TOP_vmovntpd_f256_obase64_offset_index64_uimm8_float,
+  			 TOP_vmovntpd_f256_obase64_simm32_float,
+  			 TOP_vmovntpd_f128_oindex64_uimm8_simm32_float,
+  			 TOP_vmovntpd_f128_on32_float,
+  			 TOP_vmovntpd_f256_obase64_offset_index64_uimm8_float,
+  			 TOP_vmovntpd_f256_obase64_simm32_float,
+  			 TOP_vmovntpd_f256_oindex64_uimm8_simm32_float,
+  			 TOP_vmovntpd_f256_on32_float,
+  			 TOP_vmovntps_f256_obase64_offset_index64_uimm8_float,
+  			 TOP_vmovntps_f256_obase64_simm32_float,
+  			 TOP_vmovntps_f256_oindex64_uimm8_simm32_float,
+  			 TOP_vmovntps_f256_on32_float,
                      TOP_UNDEFINED);
 
   /* ===== Non-temporal memory store operator ====== */
@@ -2254,6 +2289,11 @@ int main()
 		     TOP_xzero64,
 		     TOP_xzero128v32,
 		     TOP_xzero128v64,
+		     /*avx added by hand*/
+            TOP_vxzero128v64,
+            TOP_vxzero128v32,
+            TOP_vxzero256v64,
+            TOP_vxzero256v32,
 		     TOP_fadd,
 		     TOP_faddp,
 		     TOP_fsub,
@@ -3391,6 +3431,11 @@ int main()
 		     TOP_subus128v16,
 		     TOP_xzero128v32,
 		     TOP_xzero128v64,
+		     /*avx added by hand*/
+            TOP_vxzero128v64,
+            TOP_vxzero128v32,
+            TOP_vxzero256v64,
+            TOP_vxzero256v32,
 		     TOP_pavgb,
 		     TOP_pavgw,
 				 TOP_pavgb128,
@@ -4449,6 +4494,11 @@ int main()
 		     TOP_fsqrt128v64,
 		     TOP_cmppd,
 		     TOP_xzero128v64,
+		     /*avx added by hand*/
+            TOP_vxzero128v64,
+            TOP_vxzero128v32,
+            TOP_vxzero256v64,
+            TOP_vxzero256v32,
 		     TOP_movmskpd,
 		     TOP_UNDEFINED);
 

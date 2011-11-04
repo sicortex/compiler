@@ -1317,6 +1317,11 @@ int main ()
 					"palignr",
 					"pshufb128",
 					"pshufb",
+					/*avx added by hand*/
+            "vxzero128v64",
+            "vxzero128v32",
+            "vxzero256v64",
+            "vxzero256v32",
 
 	      /* instructions to support Open MP. */
 	      "lock_add32",

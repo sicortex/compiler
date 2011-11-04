@@ -155,6 +155,11 @@ int main()
 		    TOP_xzero64,   0x000000ff,
 		    TOP_xzero128v32,   0x000000ff,
 		    TOP_xzero128v64,   0x000000ff,
+		    /*avx added by hand*/
+            TOP_vxzero128v64,  0x000000ff,
+            TOP_vxzero128v32,  0x000000ff,
+            TOP_vxzero256v64,  0x000000ff,
+            TOP_vxzero256v32,  0x000000ff,
 		    TOP_mul128v16,	0x000000ff,
 		    TOP_mulhw128v16,	0x000000ff,
 		    TOP_add128v8,	0x000000ff,

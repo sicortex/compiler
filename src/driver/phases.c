@@ -436,6 +436,11 @@ add_targ_options ( string_list_t *args )
     else
       add_string(args, "-TARG:sse4_2=off");
 
+	if (avx == TRUE)
+	  add_string(args, "-TARG:avx=on");
+	else
+	  add_string(args, "-TARG:avx=off");
+
     if (m3dnow == TRUE)
       add_string(args, "-TARG:3dnow=on");
     else

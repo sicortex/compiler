@@ -3505,7 +3505,13 @@ Expand_Expr (
 	WN_rtype(expr) == MTYPE_V16I1 ||
 	WN_rtype(expr) == MTYPE_V16I2 ||
 	WN_rtype(expr) == MTYPE_V16I4 ||
-	WN_rtype(expr) == MTYPE_V16I8) {
+	WN_rtype(expr) == MTYPE_V16I8 ||
+	WN_rtype(expr) == MTYPE_V32I1 ||
+	WN_rtype(expr) == MTYPE_V32I2 ||
+	WN_rtype(expr) == MTYPE_V32I4 ||
+	WN_rtype(expr) == MTYPE_V32I8 ||
+	WN_rtype(expr) == MTYPE_V32F4 ||
+	WN_rtype(expr) == MTYPE_V32F8) {
       TCON then = ST_tcon_val(WN_st(expr));
       TCON now  = Create_Simd_Const (WN_rtype(expr), then);
       ST *sym = New_Const_Sym (Enter_tcon (now), Be_Type_Tbl(WN_rtype(expr)));
@@ -5590,6 +5596,7 @@ convert_stmt_list_to_OPs(WN *stmt)
 void 
 Convert_WHIRL_To_OPs (WN *tree)
 {
+  //Target_AVX = 1;//delete this line
   WN *stmt;
   CGRIN *cgrin;
   BB *last_bb;

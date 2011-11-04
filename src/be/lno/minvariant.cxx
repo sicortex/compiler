@@ -1238,7 +1238,13 @@ static BOOL MIR_Hoistable_Ref(WN* loop,
 	   WN_desc(parent) == MTYPE_V16I1 ||
 	   WN_desc(parent) == MTYPE_V16I2 ||
 	   WN_desc(parent) == MTYPE_V16I4 ||
-	   WN_desc(parent) == MTYPE_V16I8))
+	   WN_desc(parent) == MTYPE_V16I8 ||
+	   WN_desc(parent) == MTYPE_V32F4 ||
+	   WN_desc(parent) == MTYPE_V32F8 ||
+	   WN_desc(parent) == MTYPE_V32I1 ||
+	   WN_desc(parent) == MTYPE_V32I2 ||
+	   WN_desc(parent) == MTYPE_V32I4 ||
+	   WN_desc(parent) == MTYPE_V32I8))
 	return FALSE;	    
     }
 #elif defined(TARG_MIPS)

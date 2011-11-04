@@ -1046,8 +1046,13 @@ Print_Common (FILE *pfile, ST *st)
 #if defined(BUILD_OS_DARWIN) || defined(_WIN32) /* .comm alignment arg not allowed */
     fprintf ( pfile, ", %" SCNd64 "\n", TY_size(ST_type(st)));
 #else /* defined(BUILD_OS_DARWIN) */
-    if (LNO_Run_Simd && Simd_Align && TY_size(ST_type(st)) >= 16)
-      fprintf ( pfile, ", %" SCNd64 ", 16\n", TY_size(ST_type(st)));
+    if (LNO_Run_Simd && Simd_Align && TY_size(ST_type(st)) >= 16){
+	//always make sandy bridge align to 32
+	  if(Target_AVX)
+	    fprintf( pfile, ", %" SCNd64 ",32\n", TY_size(ST_type(st)));
+	  else
+        fprintf ( pfile, ", %" SCNd64 ", 16\n", TY_size(ST_type(st)));
+    }
     else
       fprintf ( pfile, ", %" SCNd64 ", %d\n", 
  	TY_size(ST_type(st)), TY_align(ST_type(st)));

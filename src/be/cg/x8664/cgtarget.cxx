@@ -1983,6 +1983,20 @@ INT CGTARG_Copy_Operand(OP *op)
   case TOP_movm_2i64:
   case TOP_movi32_2m:
   case TOP_movi64_2m:
+  case TOP_vmovapd_f128_ofloat_float:
+  case TOP_vmovaps_f128_ofloat_float:
+  case TOP_vmovdqu_f128_ofloat_float:
+  case TOP_vmovupd_f128_ofloat_float:
+  case TOP_vmovups_f128_ofloat_float:
+  case TOP_vmovdqa_f128_ofloat_float:
+  case TOP_vmovapd_f256_ofloat_float:
+  case TOP_vmovaps_f256_ofloat_float:
+  case TOP_vmovdqu_f256_ofloat_float:
+  case TOP_vmovupd_f256_ofloat_float:
+  case TOP_vmovups_f256_ofloat_float:
+  case TOP_vmovdqa_f256_ofloat_float:
+  case TOP_vmovss_f128_ofloat_float:
+  case TOP_vmovsd_f128_ofloat_float:
     return 0;
 
   case TOP_mov32:

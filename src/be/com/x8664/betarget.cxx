@@ -109,7 +109,15 @@ OPCODE_To_TOP (OPCODE opcode)
     else if (rtype == MTYPE_V16I4) return TOP_noop;
     else if (rtype == MTYPE_V16I8) return TOP_noop;    
     else if (rtype == MTYPE_V16C4) return TOP_noop;
-    else if (rtype == MTYPE_V16C8) return TOP_noop;    
+    else if (rtype == MTYPE_V16C8) return TOP_noop;   
+	else if (rtype == MTYPE_V32F4) return TOP_noop;
+    else if (rtype == MTYPE_V32F8) return TOP_noop;    
+    else if (rtype == MTYPE_V32I1) return TOP_noop;
+    else if (rtype == MTYPE_V32I2) return TOP_noop;    
+    else if (rtype == MTYPE_V32I4) return TOP_noop;
+    else if (rtype == MTYPE_V32I8) return TOP_noop;    
+    else if (rtype == MTYPE_V32C4) return TOP_noop;
+    else if (rtype == MTYPE_V32C8) return TOP_noop;  
 #endif
     else                        return TOP_UNDEFINED;
 

@@ -2419,10 +2419,12 @@ WN *WN_Floatconst( TYPE_ID type, double value)
     return Make_Const (Host_To_Targ_Float (type, value));
 #ifdef TARG_X8664
   case MTYPE_V16F4:
+  case MTYPE_V32F4:
     return Make_Const (Create_Simd_Const (type, 
 					  Host_To_Targ_Float (MTYPE_F4, 
 							      value )));
   case MTYPE_V16F8:
+  case MTYPE_V32F8:
     return Make_Const (Create_Simd_Const (type, 
 					  Host_To_Targ_Float (MTYPE_F8, 
 								value )));

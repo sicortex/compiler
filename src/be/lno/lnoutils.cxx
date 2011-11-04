@@ -2296,8 +2296,14 @@ BOOL Solve_For(WN* wn_top, const SYMBOL& sym)
   (void) WN_Simplifier_Enable(simp_state_save);
 #endif
 
+  /*it would be better for alignment in SIMD if foding two constant ADD or SUB*/
+  if((WN_operator(r) == OPR_ADD || WN_operator(r) == OPR_SUB) &&
+  	WN_operator(WN_kid0(r)) == OPR_INTCONST && 
+  	WN_operator(WN_kid1(r)) == OPR_INTCONST)
+  	r = WN_SimplifyExp2(WN_opcode(r), WN_kid0(r), WN_kid1(r));
   WN_kid0(wn_top) = l;
   WN_kid1(wn_top) = r;
+  
   LWN_Parentize(wn_top);
 
   return ok;

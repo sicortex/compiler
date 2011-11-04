@@ -1156,7 +1156,16 @@ Is_MTYPE_b_f_i_M_p_z [MTYPE_LAST+1] = {
   1, /* MTYPE_M8I1    */
   1, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  1  /* MTYPE_M8F4    */
+  1,  /* MTYPE_M8F4    */
+  1, /*MTYPE_V32C4	  */  
+  1,  /*MTYPE_V32C8	*/    
+  1,  /*MTYPE_V32I1    */ 
+  1,  /*MTYPE_V32I2    */ 
+  1,  /*MTYPE_V32I4    */ 
+  1,  /*MTYPE_V32I8   */  
+  1,  /*MTYPE_V32F4  */   
+  1,  /*MTYPE_V32F8 */    
+  1  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -1400,7 +1409,16 @@ Is_MTYPE_bs_I1_I2_I4_I8 [MTYPE_LAST+1] = {
   0, /* MTYPE_M8I1    */
   0, /* MTYPE_M8I2    */
   0, /* MTYPE_M8I4    */
-  0  /* MTYPE_M8F4    */
+  0,  /* MTYPE_M8F4    */
+  0, /*MTYPE_V32C4	  */  
+  0,  /*MTYPE_V32C8	*/    
+  0,  /*MTYPE_V32I1    */ 
+  0,  /*MTYPE_V32I2    */ 
+  0,  /*MTYPE_V32I4    */ 
+  0,  /*MTYPE_V32I8   */  
+  0,  /*MTYPE_V32F4  */   
+  0,  /*MTYPE_V32F8 */    
+  0  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -1456,7 +1474,16 @@ Is_MTYPE_bs_U1_U2_U4_U8 [MTYPE_LAST+1] = {
   0, /* MTYPE_M8I1    */
   0, /* MTYPE_M8I2    */
   0, /* MTYPE_M8I4    */
-  0  /* MTYPE_M8F4    */
+  0,  /* MTYPE_M8F4    */
+  0, /*MTYPE_V32C4	  */  
+  0,  /*MTYPE_V32C8	*/    
+  0,  /*MTYPE_V32I1    */ 
+  0,  /*MTYPE_V32I2    */ 
+  0,  /*MTYPE_V32I4    */ 
+  0,  /*MTYPE_V32I8   */  
+  0,  /*MTYPE_V32F4  */   
+  0,  /*MTYPE_V32F8 */    
+  0  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -1512,7 +1539,16 @@ Is_MTYPE_b_bs_f_i_p_s_z [MTYPE_LAST+1] = {
   1, /* MTYPE_M8I1    */
   1, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  1  /* MTYPE_M8F4    */
+  1,  /* MTYPE_M8F4    */
+  1, /*MTYPE_V32C4	  */  
+  1,  /*MTYPE_V32C8	*/    
+  1,  /*MTYPE_V32I1    */ 
+  1,  /*MTYPE_V32I2    */ 
+  1,  /*MTYPE_V32I4    */ 
+  1,  /*MTYPE_V32I8   */  
+  1,  /*MTYPE_V32F4  */   
+  1,  /*MTYPE_V32F8 */    
+  1  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -1568,7 +1604,16 @@ Is_MTYPE_b_bs_f_i_M_p_s_z [MTYPE_LAST+1] = {
   1, /* MTYPE_M8I1    */
   1, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  1  /* MTYPE_M8F4    */
+  1,  /* MTYPE_M8F4    */
+  1, /*MTYPE_V32C4	  */  
+  1,  /*MTYPE_V32C8	*/    
+  1,  /*MTYPE_V32I1    */ 
+  1,  /*MTYPE_V32I2    */ 
+  1,  /*MTYPE_V32I4    */ 
+  1,  /*MTYPE_V32I8   */  
+  1,  /*MTYPE_V32F4  */   
+  1,  /*MTYPE_V32F8 */    
+  1  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -1624,7 +1669,16 @@ Is_MTYPE_f [MTYPE_LAST+1] = {
   0, /* MTYPE_M8I1    */
   0, /* MTYPE_M8I2    */
   0, /* MTYPE_M8I4    */
-  1  /* MTYPE_M8F4    */
+  1,  /* MTYPE_M8F4    */
+  0, /*MTYPE_V32C4	  */  
+  0,  /*MTYPE_V32C8	*/    
+  0,  /*MTYPE_V32I1    */ 
+  0,  /*MTYPE_V32I2    */ 
+  0,  /*MTYPE_V32I4    */ 
+  0,  /*MTYPE_V32I8   */  
+  1,  /*MTYPE_V32F4  */   
+  1,  /*MTYPE_V32F8 */    
+  1  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -1680,7 +1734,16 @@ Is_MTYPE_f_I4_I8_I16 [MTYPE_LAST+1] = {
   0, /* MTYPE_M8I1    */
   0, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  1  /* MTYPE_M8F4    */
+  1,  /* MTYPE_M8F4    */
+  0, /*MTYPE_V32C4	  */  
+  0,  /*MTYPE_V32C8	*/    
+  1,  /*MTYPE_V32I1    */ 
+  1,  /*MTYPE_V32I2    */ 
+  1,  /*MTYPE_V32I4    */ 
+  1,  /*MTYPE_V32I8   */  
+  1,  /*MTYPE_V32F4  */   
+  1,  /*MTYPE_V32F8 */    
+  1  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -1736,7 +1799,16 @@ Is_MTYPE_f_i_M_p_V_z [MTYPE_LAST+1] = {
   1, /* MTYPE_M8I1    */
   1, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  1  /* MTYPE_M8F4    */
+  1,  /* MTYPE_M8F4    */
+  1, /*MTYPE_V32C4	  */  
+  1,  /*MTYPE_V32C8	*/    
+  1,  /*MTYPE_V32I1    */ 
+  1,  /*MTYPE_V32I2    */ 
+  1,  /*MTYPE_V32I4    */ 
+  1,  /*MTYPE_V32I8   */  
+  1,  /*MTYPE_V32F4  */   
+  1,  /*MTYPE_V32F8 */    
+  1  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -1792,7 +1864,16 @@ Is_MTYPE_f_i_M_p_s_V_z [MTYPE_LAST+1] = {
   1, /* MTYPE_M8I1    */
   1, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  1  /* MTYPE_M8F4    */
+  1,  /* MTYPE_M8F4    */
+  1, /*MTYPE_V32C4	  */  
+  1,  /*MTYPE_V32C8	*/    
+  1,  /*MTYPE_V32I1    */ 
+  1,  /*MTYPE_V32I2    */ 
+  1,  /*MTYPE_V32I4    */ 
+  1,  /*MTYPE_V32I8   */  
+  1,  /*MTYPE_V32F4  */   
+  1,  /*MTYPE_V32F8 */    
+  1  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -1848,7 +1929,16 @@ Is_MTYPE_f_i_M_p_s_z [MTYPE_LAST+1] = {
   1, /* MTYPE_M8I1    */
   1, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  1  /* MTYPE_M8F4    */
+  1,  /* MTYPE_M8F4    */
+  1, /*MTYPE_V32C4	  */  
+  1,  /*MTYPE_V32C8	*/    
+  1,  /*MTYPE_V32I1    */ 
+  1,  /*MTYPE_V32I2    */ 
+  1,  /*MTYPE_V32I4    */ 
+  1,  /*MTYPE_V32I8   */  
+  1,  /*MTYPE_V32F4  */   
+  1,  /*MTYPE_V32F8 */    
+  1  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -1904,7 +1994,16 @@ Is_MTYPE_f_i_M_p_z [MTYPE_LAST+1] = {
   1, /* MTYPE_M8I1    */
   1, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  1  /* MTYPE_M8F4    */
+  1,  /* MTYPE_M8F4    */
+  1, /*MTYPE_V32C4	  */  
+  1,  /*MTYPE_V32C8	*/    
+  1,  /*MTYPE_V32I1    */ 
+  1,  /*MTYPE_V32I2    */ 
+  1,  /*MTYPE_V32I4    */ 
+  1,  /*MTYPE_V32I8   */  
+  1,  /*MTYPE_V32F4  */   
+  1,  /*MTYPE_V32F8 */    
+  1  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -1960,7 +2059,16 @@ Is_MTYPE_f_i_M_z [MTYPE_LAST+1] = {
   1, /* MTYPE_M8I1    */
   1, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  1  /* MTYPE_M8F4    */
+  1,  /* MTYPE_M8F4    */
+  1, /*MTYPE_V32C4	  */  
+  1,  /*MTYPE_V32C8	*/    
+  1,  /*MTYPE_V32I1    */ 
+  1,  /*MTYPE_V32I2    */ 
+  1,  /*MTYPE_V32I4    */ 
+  1,  /*MTYPE_V32I8   */  
+  1,  /*MTYPE_V32F4  */   
+  1,  /*MTYPE_V32F8 */    
+  1  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -2016,7 +2124,16 @@ Is_MTYPE_f_i [MTYPE_LAST+1] = {
   1, /* MTYPE_M8I1    */
   1, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  1  /* MTYPE_M8F4    */
+  1,  /* MTYPE_M8F4    */
+  0, /*MTYPE_V32C4	  */  
+  0,  /*MTYPE_V32C8	*/    
+  1,  /*MTYPE_V32I1    */ 
+  1,  /*MTYPE_V32I2    */ 
+  1,  /*MTYPE_V32I4    */ 
+  1,  /*MTYPE_V32I8   */  
+  1,  /*MTYPE_V32F4  */   
+  1,  /*MTYPE_V32F8 */    
+  1  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -2072,7 +2189,16 @@ Is_MTYPE_f_i_p [MTYPE_LAST+1] = {
   1, /* MTYPE_M8I1    */
   1, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  1  /* MTYPE_M8F4    */
+  1,  /* MTYPE_M8F4    */
+  0, /*MTYPE_V32C4	  */  
+  0,  /*MTYPE_V32C8	*/    
+  1,  /*MTYPE_V32I1    */ 
+  1,  /*MTYPE_V32I2    */ 
+  1,  /*MTYPE_V32I4    */ 
+  1,  /*MTYPE_V32I8   */  
+  1,  /*MTYPE_V32F4  */   
+  1,  /*MTYPE_V32F8 */    
+  1  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -2128,7 +2254,16 @@ Is_MTYPE_f_i_p_s_z [MTYPE_LAST+1] = {
   1, /* MTYPE_M8I1    */
   1, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  1  /* MTYPE_M8F4    */
+  1,  /* MTYPE_M8F4    */
+  1, /*MTYPE_V32C4	  */  
+  1,  /*MTYPE_V32C8	*/    
+  1,  /*MTYPE_V32I1    */ 
+  1,  /*MTYPE_V32I2    */ 
+  1,  /*MTYPE_V32I4    */ 
+  1,  /*MTYPE_V32I8   */  
+  1,  /*MTYPE_V32F4  */   
+  1,  /*MTYPE_V32F8 */    
+  1  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -2184,7 +2319,16 @@ Is_MTYPE_f_i_p_z [MTYPE_LAST+1] = {
   1, /* MTYPE_M8I1    */
   1, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  1  /* MTYPE_M8F4    */
+  1,  /* MTYPE_M8F4    */
+  0, /*MTYPE_V32C4	  */  
+  0,  /*MTYPE_V32C8	*/    
+  1,  /*MTYPE_V32I1    */ 
+  1,  /*MTYPE_V32I2    */ 
+  1,  /*MTYPE_V32I4    */ 
+  1,  /*MTYPE_V32I8   */  
+  1,  /*MTYPE_V32F4  */   
+  1,  /*MTYPE_V32F8 */    
+  1  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -2240,7 +2384,16 @@ Is_MTYPE_f_i_z [MTYPE_LAST+1] = {
   1, /* MTYPE_M8I1    */
   1, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  1  /* MTYPE_M8F4    */
+  1,  /* MTYPE_M8F4    */
+  1, /*MTYPE_V32C4	  */  
+  1,  /*MTYPE_V32C8	*/    
+  1,  /*MTYPE_V32I1    */ 
+  1,  /*MTYPE_V32I2    */ 
+  1,  /*MTYPE_V32I4    */ 
+  1,  /*MTYPE_V32I8   */  
+  1,  /*MTYPE_V32F4  */   
+  1,  /*MTYPE_V32F8 */    
+  1  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -2296,7 +2449,16 @@ Is_MTYPE_f_z [MTYPE_LAST+1] = {
   0, /* MTYPE_M8I1    */
   0, /* MTYPE_M8I2    */
   0, /* MTYPE_M8I4    */
-  1  /* MTYPE_M8F4    */
+  1,  /* MTYPE_M8F4    */
+  1, /*MTYPE_V32C4	  */  
+  1,  /*MTYPE_V32C8	*/    
+  0,  /*MTYPE_V32I1    */ 
+  0,  /*MTYPE_V32I2    */ 
+  0,  /*MTYPE_V32I4    */ 
+  0,  /*MTYPE_V32I8   */  
+  1,  /*MTYPE_V32F4  */   
+  1,  /*MTYPE_V32F8 */    
+  1  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -2352,7 +2514,16 @@ Is_MTYPE_i [MTYPE_LAST+1] = {
   1, /* MTYPE_M8I1    */
   1, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  0  /* MTYPE_M8F4    */
+  0,  /* MTYPE_M8F4    */
+  0, /*MTYPE_V32C4	  */  
+  0,  /*MTYPE_V32C8	*/    
+  1,  /*MTYPE_V32I1    */ 
+  1,  /*MTYPE_V32I2    */ 
+  1,  /*MTYPE_V32I4    */ 
+  1,  /*MTYPE_V32I8   */  
+  0,  /*MTYPE_V32F4  */   
+  0,  /*MTYPE_V32F8 */    
+  0  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -2408,7 +2579,16 @@ Is_MTYPE_b_i_p [MTYPE_LAST+1] = {
   1, /* MTYPE_M8I1    */
   1, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  0  /* MTYPE_M8F4    */
+  0,  /* MTYPE_M8F4    */
+  0, /*MTYPE_V32C4	  */  
+  0,  /*MTYPE_V32C8	*/    
+  1,  /*MTYPE_V32I1    */ 
+  1,  /*MTYPE_V32I2    */ 
+  1,  /*MTYPE_V32I4    */ 
+  1,  /*MTYPE_V32I8   */  
+  0,  /*MTYPE_V32F4  */   
+  0,  /*MTYPE_V32F8 */    
+  0  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -2464,7 +2644,16 @@ Is_MTYPE_p [MTYPE_LAST+1] = {
   0, /* MTYPE_M8I1    */
   0, /* MTYPE_M8I2    */
   0, /* MTYPE_M8I4    */
-  0  /* MTYPE_M8F4    */
+  0,  /* MTYPE_M8F4    */
+  0, /*MTYPE_V32C4	  */  
+  0,  /*MTYPE_V32C8	*/    
+  0,  /*MTYPE_V32I1    */ 
+  0,  /*MTYPE_V32I2    */ 
+  0,  /*MTYPE_V32I4    */ 
+  0,  /*MTYPE_V32I8   */  
+  0,  /*MTYPE_V32F4  */   
+  0,  /*MTYPE_V32F8 */    
+  0  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -2520,7 +2709,16 @@ Is_MTYPE_s [MTYPE_LAST+1] = {
   0, /* MTYPE_M8I1    */
   0, /* MTYPE_M8I2    */
   0, /* MTYPE_M8I4    */
-  0  /* MTYPE_M8F4    */
+  0,  /* MTYPE_M8F4    */
+  0, /*MTYPE_V32C4	  */  
+  0,  /*MTYPE_V32C8	*/    
+  0,  /*MTYPE_V32I1    */ 
+  0,  /*MTYPE_V32I2    */ 
+  0,  /*MTYPE_V32I4    */ 
+  0,  /*MTYPE_V32I8   */  
+  0,  /*MTYPE_V32F4  */   
+  0,  /*MTYPE_V32F8 */    
+  0  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -2576,7 +2774,16 @@ Is_MTYPE_b_i_s [MTYPE_LAST+1] = {
   1, /* MTYPE_M8I1    */
   1, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  0  /* MTYPE_M8F4    */
+  0,  /* MTYPE_M8F4    */
+  0, /*MTYPE_V32C4	  */  
+  0,  /*MTYPE_V32C8	*/    
+  1,  /*MTYPE_V32I1    */ 
+  1,  /*MTYPE_V32I2    */ 
+  1,  /*MTYPE_V32I4    */ 
+  1,  /*MTYPE_V32I8   */  
+  0,  /*MTYPE_V32F4  */   
+  0,  /*MTYPE_V32F8 */    
+  0  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -2632,7 +2839,16 @@ Is_MTYPE_z [MTYPE_LAST+1] = {
   0, /* MTYPE_M8I1    */
   0, /* MTYPE_M8I2    */
   0, /* MTYPE_M8I4    */
-  0  /* MTYPE_M8F4    */
+  0,  /* MTYPE_M8F4    */
+  1, /*MTYPE_V32C4	  */  
+  1,  /*MTYPE_V32C8	*/    
+  0,  /*MTYPE_V32I1    */ 
+  0,  /*MTYPE_V32I2    */ 
+  0,  /*MTYPE_V32I4    */ 
+  0,  /*MTYPE_V32I8   */  
+  0,  /*MTYPE_V32F4  */   
+  0,  /*MTYPE_V32F8 */    
+  0  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -2689,7 +2905,16 @@ Is_MTYPE_64v_i [MTYPE_LAST+1] = {
   1, /* MTYPE_M8I1    */
   1, /* MTYPE_M8I2    */
   1, /* MTYPE_M8I4    */
-  0  /* MTYPE_M8F4    */
+  0,  /* MTYPE_M8F4    */
+  0, /*MTYPE_V32C4	  */  
+  0,  /*MTYPE_V32C8	*/    
+  0,  /*MTYPE_V32I1    */ 
+  0,  /*MTYPE_V32I2    */ 
+  0,  /*MTYPE_V32I4    */ 
+  0,  /*MTYPE_V32I8   */  
+  0,  /*MTYPE_V32F4  */   
+  0,  /*MTYPE_V32F8 */    
+  0  /*MTYPE_F32    */ 
 #endif // TARG_X8664
 };
 
@@ -2958,7 +3183,9 @@ Is_Valid_Opcode_Parts (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
 			  (rtype == MTYPE_V16F4 && desc == MTYPE_V16F4) || 
 			  (rtype == MTYPE_V16F8 && desc == MTYPE_V16F8) ||
 			  (rtype == MTYPE_V16C4 && desc == MTYPE_V16C4) ||
-			  (rtype == MTYPE_V16C8 && desc == MTYPE_V16C8));
+			  (rtype == MTYPE_V16C8 && desc == MTYPE_V16C8) ||
+			  (rtype == MTYPE_V32F4 && desc == MTYPE_V32F4) ||
+			  (rtype == MTYPE_V32F8 && desc == MTYPE_V32F8));
 
 	valid = valid || (Is_MTYPE_64v_i [desc] && Is_MTYPE_64v_i [rtype] &&
 	                  rtype == desc);
@@ -3028,7 +3255,8 @@ Is_Valid_Opcode_Parts (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
 			 (desc == MTYPE_V16I1 || desc == MTYPE_V16I2 || 
 			  desc == MTYPE_V16I4 || desc == MTYPE_V16I8 || 
 			  desc == MTYPE_V16F4 || desc == MTYPE_V16F8 ||
-			  desc == MTYPE_V16C4 || desc == MTYPE_V16C8));
+			  desc == MTYPE_V16C4 || desc == MTYPE_V16C8||
+			  desc == MTYPE_V32F4 || desc == MTYPE_V32F8));
 #endif /* TARG_X8664 */
 #ifdef TARG_MIPS
 	// [RTYPE] & [DESC]  : could be one of the vector MTYPEs
@@ -3070,7 +3298,8 @@ Is_Valid_Opcode_Parts (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
 		  rtype == MTYPE_V16C4 || rtype == MTYPE_V16C8 ||
 		  rtype == MTYPE_V16F4 || rtype == MTYPE_V16F8 ||
 		  rtype == MTYPE_V16I1 || rtype == MTYPE_V16I2 ||
-		  rtype == MTYPE_V16I4 || rtype == MTYPE_V16I8) &&
+		  rtype == MTYPE_V16I4 || rtype == MTYPE_V16I8 ||
+		  rtype == MTYPE_V32F4 || rtype == MTYPE_V32F8) &&
 		 desc == MTYPE_V);
         break;
 #endif
@@ -3139,7 +3368,9 @@ Is_Valid_Opcode_Parts (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
 		 (rtype == MTYPE_V16I8 && desc == MTYPE_I8) ||
 		 (rtype == MTYPE_V16C4 && desc == MTYPE_F8) ||
 		 (rtype == MTYPE_V16F4 && desc == MTYPE_F4) ||
-		 (rtype == MTYPE_V16F8 && desc == MTYPE_F8));
+		 (rtype == MTYPE_V16F8 && desc == MTYPE_F8) ||
+		 (rtype == MTYPE_V32F4 && desc == MTYPE_F4) ||
+		 (rtype == MTYPE_V32F8 && desc == MTYPE_F8) );
 	break;
 
       case OPR_REDUCE_ADD: 
@@ -3148,18 +3379,24 @@ Is_Valid_Opcode_Parts (OPERATOR opr, TYPE_ID rtype, TYPE_ID desc)
 		 (desc == MTYPE_V16I4 && rtype == MTYPE_I4) ||
 		 (desc == MTYPE_V16I8 && rtype == MTYPE_I8) ||
 		 (desc == MTYPE_V16F4 && rtype == MTYPE_F4) ||
-		 (desc == MTYPE_V16F8 && rtype == MTYPE_F8));
+		 (desc == MTYPE_V16F8 && rtype == MTYPE_F8) ||
+		 (desc == MTYPE_V32F4 && rtype == MTYPE_F4) ||
+		 (desc == MTYPE_V32F8 && rtype == MTYPE_F8));
 	break;
 
       case OPR_REDUCE_MPY:
 	valid = ((desc == MTYPE_V16I2 && rtype == MTYPE_I4) ||
 		 (desc == MTYPE_V16F4 && rtype == MTYPE_F4) ||
-		 (desc == MTYPE_V16F8 && rtype == MTYPE_F8));
+		 (desc == MTYPE_V16F8 && rtype == MTYPE_F8) ||
+		 (desc == MTYPE_V32F4 && rtype == MTYPE_F4) ||
+		 (desc == MTYPE_V32F8 && rtype == MTYPE_F8));
 	break;
 
       case OPR_REDUCE_MAX: case OPR_REDUCE_MIN:
 	valid = ((desc == MTYPE_V16F4 && rtype == MTYPE_F4) ||
 		 (desc == MTYPE_V16F8 && rtype == MTYPE_F8) ||
+		 (desc == MTYPE_V32F4 && rtype == MTYPE_F4) ||
+		 (desc == MTYPE_V32F8 && rtype == MTYPE_F8) ||
 		 (desc == MTYPE_V16I1 && rtype == MTYPE_I1) ||
 		 (desc == MTYPE_V16I2 && rtype == MTYPE_I2) ||
 		 (desc == MTYPE_V16I4 && rtype == MTYPE_I4));

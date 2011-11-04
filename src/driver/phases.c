@@ -904,6 +904,11 @@ add_sse_cc1_options(string_list_t *args, boolean sys_cpp)
 			add_string(args, "-msse4_2");
 		else
 			add_string(args, "-mno-sse4_2");
+
+		if (avx == TRUE)
+			add_string(args, "-mavx");
+		else
+			add_string(args, "-mno-avx");
         }
 #endif // PATH64_ENABLE_PSCRUNTIME
 }

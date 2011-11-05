@@ -106,6 +106,9 @@ static boolean target_supports_sse4a = FALSE;
 static boolean target_supports_sse41 = FALSE;
 static boolean target_supports_sse42 = FALSE;
 static boolean target_supports_avx = FALSE;
+static boolean target_supports_fma = FALSE;
+static boolean target_supports_xop = FALSE;
+static boolean target_supports_aes = FALSE;
 #endif
 
 extern boolean parsing_default_options;
@@ -2007,43 +2010,46 @@ static struct
   boolean supports_sse41;	// TRUE if support SSE4.1
   boolean supports_sse42;	// TRUE if support SSE4.2
   boolean supports_avx;		// TRUE if support AVX
+  boolean supports_fma;
+  boolean supports_xop;
+  boolean supports_aes;
 } supported_cpu_types[] = {
-//  CPU			Target		ABI      SSE2   SSE3   3DNow! SSSE3  SSE4a  SSE4.1 SSE4.2 AVX
+//  CPU			Target		ABI      SSE2   SSE3   3DNow! SSSE3  SSE4a  SSE4.1 SSE4.2 AVX FMA XOP AES
 //  -------------------+---------------+--------+------+------+------+------+------+------+------+-----
-  { "any_64bit_x86",	"generic",	ABI_M64,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "any_32bit_x86",	"generic",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "i386",		"generic",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "i486",		"generic",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "i586",		"generic",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "athlon",		"athlon",	ABI_M32, FALSE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "athlon-mp",	"athlon",	ABI_M32, FALSE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "athlon-xp",	"athlon",	ABI_M32, FALSE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "athlon64",		"athlon64",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "athlon64-sse3",	"athlon64",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "athlon64fx",	"opteron",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "turion",		"athlon64",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "i686",		"pentium4",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "ia32",		"pentium4",	ABI_M32,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "k7",		"athlon",	ABI_M32, FALSE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "k8",		"opteron",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "k8-sse3",		"opteron",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "opteron",		"opteron",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "opteron-sse3",	"opteron",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "pentium4",		"pentium4",	ABI_M32,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "xeon",		"xeon",		ABI_M32,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "em64t",		"em64t",	ABI_M64,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "nocona",		"em64t",	ABI_M64,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "prescott",		"em64t",	ABI_M64,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "core",		"core",		ABI_M64,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "core2",		"wolfdale",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE },
-  { "wolfdale",		"wolfdale",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE },
-  { "harpertown",	"wolfdale",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE },
-  { "nehalem",		"wolfdale",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE,  TRUE, FALSE, FALSE },
-  { "barcelona",	"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE },
-  { "shanghai",		"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE },
-  { "istanbul",		"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE },
-  { "sandy",		"sandy",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE,  TRUE,  TRUE,  TRUE },
-  { "bdverl", "bdverl", ABI_M64, TRUE, TRUE,  TRUE,  TRUE, FALSE, TRUE, TRUE, TRUE},
+  { "any_64bit_x86",	"generic",	ABI_M64,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE},
+  { "any_32bit_x86",	"generic",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "i386",		"generic",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "i486",		"generic",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "i586",		"generic",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "athlon",		"athlon",	ABI_M32, FALSE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "athlon-mp",	"athlon",	ABI_M32, FALSE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "athlon-xp",	"athlon",	ABI_M32, FALSE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "athlon64",		"athlon64",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "athlon64-sse3",	"athlon64",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE , FALSE, FALSE, FALSE},
+  { "athlon64fx",	"opteron",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE , FALSE, FALSE, FALSE},
+  { "turion",		"athlon64",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE , FALSE, FALSE, FALSE},
+  { "i686",		"pentium4",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "ia32",		"pentium4",	ABI_M32,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "k7",		"athlon",	ABI_M32, FALSE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "k8",		"opteron",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "k8-sse3",		"opteron",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "opteron",		"opteron",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "opteron-sse3",	"opteron",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "pentium4",		"pentium4",	ABI_M32,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "xeon",		"xeon",		ABI_M32,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "em64t",		"em64t",	ABI_M64,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "nocona",		"em64t",	ABI_M64,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "prescott",		"em64t",	ABI_M64,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "core",		"core",		ABI_M64,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "core2",		"wolfdale",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "wolfdale",		"wolfdale",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "harpertown",	"wolfdale",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "nehalem",		"wolfdale",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "barcelona",	"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "shanghai",		"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "istanbul",		"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "sandy",		"sandy",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE,  TRUE,  TRUE,  TRUE , FALSE, FALSE, FALSE},
+  { "bdverl", "bdverl", ABI_M64, TRUE, TRUE,  TRUE,  TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE},
 //  -------------------+---------------+--------+------+------+------+------+------+------+------+-----
 //  CPU			Target		ABI      SSE2   SSE3   3DNow! SSSE3  SSE4a  SSE4.1 SSE4.2 AVX
   { NULL, NULL, },
@@ -2456,6 +2462,9 @@ Get_x86_ISA ()
       target_supports_sse41 = supported_cpu_types[i].supports_sse41;
       target_supports_sse42 = supported_cpu_types[i].supports_sse42;
       target_supports_avx = supported_cpu_types[i].supports_avx;
+	  target_supports_fma = supported_cpu_types[i].supports_fma;
+	  target_supports_xop = supported_cpu_types[i].supports_xop;
+	  target_supports_aes = supported_cpu_types[i].supports_aes;
       break;
     }
   }
@@ -2519,6 +2528,15 @@ Get_x86_ISA_extensions ()
 
   if(sse4_2 == UNDEFINED && target_supports_sse42)
   	sse4_2 = TRUE;
+
+  if(fma == UNDEFINED && target_supports_fma)
+  	fma = TRUE;
+
+  if(xop == UNDEFINED && target_supports_xop)
+  	xop = TRUE;
+
+  if(aes == UNDEFINED && target_supports_aes)
+  	aes = TRUE;
 
 
 #if 0 //temporarily disable it until we have assembler and linker support for

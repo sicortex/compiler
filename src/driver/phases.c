@@ -440,6 +440,26 @@ add_targ_options ( string_list_t *args )
 	  add_string(args, "-TARG:avx=on");
 	else
 	  add_string(args, "-TARG:avx=off");
+			
+	if (fma == TRUE)
+	  add_string(args, "-TARG:fma=on");
+	else
+	  add_string(args, "-TARG:fma=off");
+
+	if (xop == TRUE)
+	  add_string(args, "-TARG:xop=on");
+	else
+	  add_string(args, "-TARG:xop=off");
+
+	if (aes == TRUE)
+	  add_string(args, "-TARG:aes=on");
+	else
+	  add_string(args, "-TARG:aes=off");
+
+	if (pclmul == TRUE)
+	  add_string(args, "-TARG:pclmul=on");
+	else
+	  add_string(args, "-TARG:pclmul=off");
 
     if (m3dnow == TRUE)
       add_string(args, "-TARG:3dnow=on");

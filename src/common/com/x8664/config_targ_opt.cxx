@@ -102,6 +102,19 @@ BOOL Target_SSE4_2_Set = FALSE;
 BOOL Target_AVX = FALSE;         //-TARG:avx=on/off
 BOOL Target_AVX_Set = FALSE;
 
+BOOL Target_FMA = FALSE;         //-TARG:fma=on/off
+BOOL Target_FMA_Set = FALSE;
+
+BOOL Target_XOP = FALSE;         //-TARG:fma=on/off
+BOOL Target_XOP_Set = FALSE;
+
+BOOL Target_AES = FALSE;         //-TARG:fma=on/off
+BOOL Target_AES_Set = FALSE;
+
+BOOL Target_PCLMUL = FALSE;         //-TARG:fma=on/off
+BOOL Target_PCLMUL_Set = FALSE;
+
+
 // bug 4327
 int Target_x87_Precision = 80;	// -TARG:x87_precision=32/64/80
 
@@ -161,6 +174,18 @@ static OPTION_DESC Options_TARG[] = {
   { OVK_BOOL,   OV_VISIBLE,     FALSE, "avx",            "avx",
     0, 0, 0,    &Target_AVX,     &Target_AVX_Set,
     "Enable_AVX_extensions"},
+  { OVK_BOOL,   OV_VISIBLE,     FALSE, "fma",            "fma",
+    0, 0, 0,    &Target_FMA,     &Target_FMA_Set,
+    "Enable_FMA_extensions"},
+  { OVK_BOOL,   OV_VISIBLE,     FALSE, "xop",            "xop",
+    0, 0, 0,    &Target_XOP,     &Target_XOP_Set,
+    "Enable_XOP_extensions"},
+  { OVK_BOOL,   OV_VISIBLE,     FALSE, "aes",            "aes",
+    0, 0, 0,    &Target_AES,     &Target_AES_Set,
+    "Enable_AES_extensions"},
+  { OVK_BOOL,   OV_VISIBLE,     FALSE, "pclmul",            "pclmul",
+    0, 0, 0,    &Target_PCLMUL,     &Target_PCLMUL_Set,
+    "Enable_PCLMUL_extensions"},
   { OVK_INT32,	OV_VISIBLE,	FALSE, "x87-precision", "x87-precision",
     80, 32, 80, &Target_x87_Precision,	NULL,
     "Specify the precision of x87 floating-point calculations (32, 64, or 80)"},

@@ -216,7 +216,7 @@ WN *
 Perform_Loop_Nest_Optimization (PU_Info* current_pu, WN *pu_wn, 
 			        WN *region_wn, BOOL alloca)
 {
-    //Target_AVX=0; //AVX delete this line 
+    
     WN *opt_pu = NULL;
     struct DU_MANAGER *du_mgr;
     struct ALIAS_MANAGER *alias_mgr;

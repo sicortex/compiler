@@ -159,7 +159,7 @@ my @ov16f4_v16f4mem_v16i4=["VMASKMOVPS128 __builtin_ia32_maskloadps"];
 #my @ov16f4_flmem_v16i4=["VMASKMOVPS128 __builtin_ia32_maskloadps"];
 #my @ov32f8_dbmem=["VMOVAPD"];
 my @ovoid_dbmem_v32f8=["VMOVAPD256 __builtin_ia32_storeupd256","VMOVNTPD256 __builtin_ia32_movntpd256"];
-my @ovoid_flmem_v32f4=["VMOVAPS256 __builtin_ia32_storeups256","VMOVNTPS256 __builtin_ia32_movntpd256"];
+my @ovoid_flmem_v32f4=["VMOVAPS256 __builtin_ia32_storeups256","VMOVNTPS256 __builtin_ia32_movntps256"];
 my @ovoid_v32i4mem_v32i4=["VMOVNTDQ256 __builtin_ia32_movntdq256"];
 my @ovoid_charmem_v32i4=["VMOVDQA256ST __builtin_ia32_storedqu256"];
 #my @ovoid_dbmem_v32f8=["VMOVNTPD256 __builtin_ia32_movntpd256"];
@@ -282,6 +282,8 @@ my @ops=(
 		[["NAME"],@ov32i4_v16i4,["OPS"],["V32I4ov32i4"],["v16i4"]],
 		[["NAME"],@ov16f8_v16f8mem_v16i8,["OPS"],["V16F8ov16f8"],["memv16f8"],["v16i8"]],
 		[["NAME"],@ov16f4_v16f4mem_v16i4,["OPS"],["V16F4ov16f4"],["memv16f4"],["v16i4"]],
+		[["NAME"],@ovoid_dbmem_v32f8,["OPS"],["Vovd"],["memdb"],["v32f8"]],
+		[["NAME"],@ovoid_flmem_v32f4,["OPS"],["Vovd"],["memfl"],["v32f4"]],
 	);
 my @isa;
 my @tops; 		#for isa pack and subset
@@ -479,9 +481,11 @@ fprint("wgen_expr_avx.cxx",$print_wgen_expr_cxx);
 print $print_wgen_expr_cxx;
 print "\n\n";
 print "expand.cxx\n";
-fprint("expand_avx.cxx",$expand_cxx);
-print $expand_cxx;
-print "\n\n";
+if(0){
+ fprint("expand_avx.cxx",$expand_cxx);
+ print $expand_cxx;
+ print "\n\n";
+}
 
 copy_all_file();
 #copy_to('../src/be/cg/x8664/',"expand_avx.cxx");

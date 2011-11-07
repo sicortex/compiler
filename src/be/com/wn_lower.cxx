@@ -4414,6 +4414,12 @@ static WN *lower_return_ldid(WN *block, WN *tree, LOWER_ACTIONS actions)
     case MTYPE_V16I8:
     case MTYPE_V16F4:
     case MTYPE_V16F8:
+	case MTYPE_V32I1:
+    case MTYPE_V32I2:
+    case MTYPE_V32I4:
+    case MTYPE_V32I8:
+    case MTYPE_V32F4:
+    case MTYPE_V32F8:
     case MTYPE_V8I1:
     case MTYPE_V8I2:
     case MTYPE_V8I4:

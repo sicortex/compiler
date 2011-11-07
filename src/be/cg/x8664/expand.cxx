@@ -8855,7 +8855,19 @@ Exp_Intrinsic_Call (WN *intrncall, TN *op0, TN *op1, TN *op2,
   case INTRN_VMASKMOVPS256ST:
     Build_OP(TOP_vmaskmovps_f256_obase64_simm32_float_float,op1,op2, op0, Gen_Literal_TN(0,1),ops);
   break;
-  default:  
+  case INTRN_VMOVAPD256:
+  	Build_OP(TOP_vmovupd_f256_obase64_simm32_float, op1, op0, Gen_Literal_TN(0,4), ops);
+  break;
+  case INTRN_VMOVAPS256:
+  	Build_OP(TOP_vmovups_f256_obase64_simm32_float, op1, op0, Gen_Literal_TN(0,4), ops);
+  break;
+  case INTRN_VMOVNTPD256:
+  	Build_OP(TOP_vmovntpd_f256_obase64_simm32_float, op1, op0, Gen_Literal_TN(0,4), ops);
+  break; 
+  case INTRN_VMOVNTPS256:
+  	Build_OP(TOP_vmovntps_f256_obase64_simm32_float, op1, op0, Gen_Literal_TN(0,4), ops);
+  break;
+  default:
     FmtAssert(FALSE, ("Exp_Intrinsic_Call: unimplemented"));
   }
   return result;

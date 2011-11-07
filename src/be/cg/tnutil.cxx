@@ -340,6 +340,7 @@ Dup_TN_Even_If_Dedicated(
  */
 static TN *f4_ded_tns[REGISTER_MAX + 1];
 #ifdef KEY
+static TN *v32_ded_tns[REGISTER_MAX + 1];
 static TN *v16_ded_tns[REGISTER_MAX + 1];
 static TN *i1_ded_tns[REGISTER_MAX + 1];
 static TN *i2_ded_tns[REGISTER_MAX + 1];
@@ -436,6 +437,9 @@ Init_Dedicated_TNs (void)
 	++tnum;
         v16_ded_tns[reg] = Create_Dedicated_TN(ISA_REGISTER_CLASS_float, reg);
   	Set_TN_size(v16_ded_tns[reg], 16);
+	++tnum;
+	    v32_ded_tns[reg] = Create_Dedicated_TN(ISA_REGISTER_CLASS_float, reg);
+	Set_TN_size(v32_ded_tns[reg], 32);
 #endif
     }
 #ifdef KEY
@@ -478,6 +482,7 @@ Build_Dedicated_TN (ISA_REGISTER_CLASS rclass, REGISTER reg, INT size)
         switch(size) {
 	  case 4:  return f4_ded_tns[reg];
 	  case 16: return v16_ded_tns[reg];
+	  case 32: return v32_ded_tns[reg];
 	}
   }
 #else

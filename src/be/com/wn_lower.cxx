@@ -5181,7 +5181,8 @@ static WN *lower_expr(WN *block, WN *tree, LOWER_ACTIONS actions)
 #endif
          )
   {
-    tree = lower_nary_madd(block, tree, actions);
+    if(MTYPE_id(type) == MTYPE_F4 || MTYPE_id(type) == MTYPE_F8 )
+      tree = lower_nary_madd(block, tree, actions);
     tree = lower_madd(block, tree, actions);
   }
   if (Action(LOWER_TREEHEIGHT)	&&

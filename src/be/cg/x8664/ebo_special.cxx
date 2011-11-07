@@ -5320,12 +5320,153 @@ BOOL EBO_Opt_Const_Array( OP* mem_op,
 }
 
 static
-BOOL EBO_Is_XOP(TOP top){
+BOOL EBO_load_in_2OP(TOP top){
   switch(top){
   	case TOP_vpmacsdd_f128_oxmm_xmm_xmm_xmm:
 	case TOP_vpmacsdd_f128_oxmm_xmm_mem1_xmm:
 	case TOP_vpmacsdd_f128_oxmm_xmm_mem2_xmm:
 	case TOP_vpmacsdd_f128_oxmm_xmm_mem3_xmm:
+	/*AVX*/
+	 case TOP_vblendpd_f128_ofloat_float_float_simm8:
+	 case TOP_vblendpd_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vblendpd_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vblendpd_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vblendps_f128_ofloat_float_float_simm8:
+	 case TOP_vblendps_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vblendps_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vblendps_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vblendvpd_f128_ofloat_float_float_float:
+	 case TOP_vblendvpd_f128_ofloat_float_base64_index64_uimm8_simm32_float:
+	 case TOP_vblendvpd_f128_ofloat_float_base64_simm32_float:
+	 case TOP_vblendvpd_f128_ofloat_float_index64_uimm8_simm32_float:
+	 case TOP_vblendvps_f128_ofloat_float_float_float:
+	 case TOP_vblendvps_f128_ofloat_float_base64_index64_uimm8_simm32_float:
+	 case TOP_vblendvps_f128_ofloat_float_base64_simm32_float:
+	 case TOP_vblendvps_f128_ofloat_float_index64_uimm8_simm32_float:
+	 case TOP_vblendpd_f256_ofloat_float_float_simm8:
+	 case TOP_vblendpd_f256_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vblendpd_f256_ofloat_float_base64_simm32_simm8:
+	 case TOP_vblendpd_f256_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vblendps_f256_ofloat_float_float_simm8:
+	 case TOP_vblendps_f256_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vblendps_f256_ofloat_float_base64_simm32_simm8:
+	 case TOP_vblendps_f256_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vblendvpd_f256_ofloat_float_float_float:
+	 case TOP_vblendvpd_f256_ofloat_float_base64_index64_uimm8_simm32_float:
+	 case TOP_vblendvpd_f256_ofloat_float_base64_simm32_float:
+	 case TOP_vblendvpd_f256_ofloat_float_index64_uimm8_simm32_float:
+	 case TOP_vblendvps_f256_ofloat_float_float_float:
+	 case TOP_vblendvps_f256_ofloat_float_base64_index64_uimm8_simm32_float:
+	 case TOP_vblendvps_f256_ofloat_float_base64_simm32_float:
+	 case TOP_vblendvps_f256_ofloat_float_index64_uimm8_simm32_float:
+	 case TOP_vdpps_f128_ofloat_float_float_simm8:
+	 case TOP_vdpps_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vdpps_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vdpps_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vshufpd_f128_ofloat_float_float_simm8:
+	 case TOP_vshufpd_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vshufpd_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vshufpd_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vshufps_f128_ofloat_float_float_simm8:
+	 case TOP_vshufps_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vshufps_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vshufps_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vdpps_f256_ofloat_float_float_simm8:
+	 case TOP_vdpps_f256_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vdpps_f256_ofloat_float_base64_simm32_simm8:
+	 case TOP_vdpps_f256_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vshufpd_f256_ofloat_float_float_simm8:
+	 case TOP_vshufpd_f256_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vshufpd_f256_ofloat_float_base64_simm32_simm8:
+	 case TOP_vshufpd_f256_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vshufps_f256_ofloat_float_float_simm8:
+	 case TOP_vshufps_f256_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vshufps_f256_ofloat_float_base64_simm32_simm8:
+	 case TOP_vshufps_f256_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vpblendvb_f128_ofloat_float_float_float:
+	 case TOP_vpblendvb_f128_ofloat_float_base64_index64_uimm8_simm32_float:
+	 case TOP_vpblendvb_f128_ofloat_float_base64_simm32_float:
+	 case TOP_vpblendvb_f128_ofloat_float_index64_uimm8_simm32_float:
+	 case TOP_vperm2f128_f256_ofloat_float_float_simm8:
+	 case TOP_vperm2f128_f256_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vperm2f128_f256_ofloat_float_base64_simm32_simm8:
+	 case TOP_vperm2f128_f256_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vpinsrb_f128_ofloat_float_int32_simm8:
+	 case TOP_vpinsrb_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vpinsrb_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vpinsrb_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vpinsrw_f128_ofloat_float_int32_simm8:
+	 case TOP_vpinsrw_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vpinsrw_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vpinsrw_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vpinsrd_f128_ofloat_float_int32_simm8:
+	 case TOP_vpinsrd_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vpinsrd_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vpinsrd_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vpinsrq_f128_ofloat_float_int64_simm8:
+	 case TOP_vpinsrq_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vpinsrq_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vpinsrq_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vcmpsd_f128_ofloat_float_float_simm8:
+	 case TOP_vcmpsd_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vcmpsd_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vcmpsd_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vcmpss_f128_ofloat_float_float_simm8:
+	 case TOP_vcmpss_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vcmpss_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vcmpss_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vdppd_f128_ofloat_float_float_simm8:
+	 case TOP_vdppd_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vdppd_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vdppd_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vcmppd_f128_ofloat_float_float_simm8:
+	 case TOP_vcmppd_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vcmppd_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vcmppd_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vcmpps_f128_ofloat_float_float_simm8:
+	 case TOP_vcmpps_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vcmpps_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vcmpps_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vcmppd_f256_ofloat_float_float_simm8:
+	 case TOP_vcmppd_f256_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vcmppd_f256_ofloat_float_base64_simm32_simm8:
+	 case TOP_vcmppd_f256_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vcmpps_f256_ofloat_float_float_simm8:
+	 case TOP_vcmpps_f256_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vcmpps_f256_ofloat_float_base64_simm32_simm8:
+	 case TOP_vcmpps_f256_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vinsertf128_f256_ofloat_float_float_simm8:
+	 case TOP_vinsertf128_f256_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vinsertf128_f256_ofloat_float_base64_simm32_simm8:
+	 case TOP_vinsertf128_f256_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vinsertps_f128_ofloat_float_float_simm8:
+	 case TOP_vinsertps_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vinsertps_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vinsertps_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vmpsadbw_f128_ofloat_float_float_simm8:
+	 case TOP_vmpsadbw_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vmpsadbw_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vmpsadbw_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vpalignr_f128_ofloat_float_float_simm8:
+	 case TOP_vpalignr_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vpalignr_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vpalignr_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vpblendw_f128_ofloat_float_float_simm8:
+	 case TOP_vpblendw_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vpblendw_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vpblendw_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vpclmulqdq_f128_ofloat_float_float_simm8:
+	 case TOP_vpclmulqdq_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vpclmulqdq_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vpclmulqdq_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vroundsd_f128_ofloat_float_float_simm8:
+	 case TOP_vroundsd_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vroundsd_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vroundsd_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 case TOP_vroundss_f128_ofloat_float_float_simm8:
+	 case TOP_vroundss_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
+	 case TOP_vroundss_f128_ofloat_float_base64_simm32_simm8:
+	 case TOP_vroundss_f128_ofloat_float_index64_uimm8_simm32_simm8:
 	  return TRUE;
     default:
 	  return FALSE;
@@ -5370,6 +5511,43 @@ BOOL EBO_Is_3opr(OP *op){
 	 case TOP_vfnmsubsd_f128_oxmm_xmm_xmm_xmm:
 	 case TOP_vfnmsubss_f128_oxmm_xmm_xmm_xmm:
 	 case TOP_vpmacsdd_f128_oxmm_xmm_xmm_xmm:
+	 /*AVX*/
+	 case TOP_vblendpd_f128_ofloat_float_float_simm8:
+	 case TOP_vblendps_f128_ofloat_float_float_simm8:
+	 case TOP_vblendvpd_f128_ofloat_float_float_float:
+	 case TOP_vblendvps_f128_ofloat_float_float_float:
+	 case TOP_vblendpd_f256_ofloat_float_float_simm8:
+	 case TOP_vblendps_f256_ofloat_float_float_simm8:
+	 case TOP_vblendvpd_f256_ofloat_float_float_float:
+	 case TOP_vblendvps_f256_ofloat_float_float_float:
+	 case TOP_vdpps_f128_ofloat_float_float_simm8:
+	 case TOP_vshufpd_f128_ofloat_float_float_simm8:
+	 case TOP_vshufps_f128_ofloat_float_float_simm8:
+	 case TOP_vdpps_f256_ofloat_float_float_simm8:
+	 case TOP_vshufpd_f256_ofloat_float_float_simm8:
+	 case TOP_vshufps_f256_ofloat_float_float_simm8:
+	 case TOP_vpblendvb_f128_ofloat_float_float_float:
+	 case TOP_vperm2f128_f256_ofloat_float_float_simm8:
+	 case TOP_vpinsrb_f128_ofloat_float_int32_simm8:
+	 case TOP_vpinsrw_f128_ofloat_float_int32_simm8:
+	 case TOP_vpinsrd_f128_ofloat_float_int32_simm8:
+	 case TOP_vpinsrq_f128_ofloat_float_int64_simm8:
+	 case TOP_vcmpsd_f128_ofloat_float_float_simm8:
+	 case TOP_vcmpss_f128_ofloat_float_float_simm8:
+	 case TOP_vdppd_f128_ofloat_float_float_simm8:
+	 case TOP_vcmppd_f128_ofloat_float_float_simm8:
+	 case TOP_vcmpps_f128_ofloat_float_float_simm8:
+	 case TOP_vcmppd_f256_ofloat_float_float_simm8:
+	 case TOP_vcmpps_f256_ofloat_float_float_simm8:
+	 case TOP_vinsertf128_f256_ofloat_float_float_simm8:
+	 case TOP_vinsertps_f128_ofloat_float_float_simm8:
+	 case TOP_vmpsadbw_f128_ofloat_float_float_simm8:
+	 case TOP_vpalignr_f128_ofloat_float_float_simm8:
+	 case TOP_vpblendw_f128_ofloat_float_float_simm8:
+	 case TOP_vpclmulqdq_f128_ofloat_float_float_simm8:
+	 case TOP_vroundsd_f128_ofloat_float_float_simm8:
+	 case TOP_vroundss_f128_ofloat_float_float_simm8:
+	
 	  return TRUE;
 	 default:
 	  return FALSE;
@@ -5420,11 +5598,12 @@ BOOL EBO_Load_Execution( OP* alu_op,
     }
   }else if (EBO_Is_3opr(alu_op)){
     OP *in_op1 = actual_tninfo[1]->in_op;
-	OP *in_op2 = actual_tninfo[2]->in_op;
+	OP *in_op2 =actual_tninfo[2]? actual_tninfo[2]->in_op : NULL;
 
 	
 	// TODO: we might can swap op0 and op1 for madd/msub intruction
-	ld_i = (in_op2 && OP_load(in_op2) && !EBO_Is_XOP((TOP)alu_op->opr))? 2: -1;
+	ld_i = (in_op2 && OP_load(in_op2) && 
+	        !EBO_load_in_2OP(OP_code(alu_op)) && TN_is_register(OP_opnd(alu_op,2)))? 2: -1;
 	//vpmacsdd only has memory in the src2
 	if(ld_i == -1)
 	  ld_i = (in_op1 && OP_load(in_op1))? 1 : -1;
@@ -5574,14 +5753,16 @@ BOOL EBO_Load_Execution( OP* alu_op,
 
   TOP new_top = Load_Execute_Format( ld_op, alu_op, mode );
 
-  if(EBO_Is_3opr(alu_op) && ld_i == 1 && !EBO_Is_XOP(new_top)){
+  if( new_top == TOP_UNDEFINED )
+    return FALSE;
+
+  if(EBO_Is_3opr(alu_op) && ld_i == 1 && !EBO_load_in_2OP(new_top)){
   	//it means the load in opnd1
-  	FmtAssert(new_top != TOP_UNDEFINED, ("some fma/xop not yet implement"));
+  	
   	new_top = Reset_Execute_Format(new_top, mode);
   }
 
-  if( new_top == TOP_UNDEFINED )
-    return FALSE;
+  
 
  
 

@@ -477,7 +477,7 @@ Prepare_Target ( void )
 #endif
       targ = TARGET_barcelona;
     }
-	else if ( strcasecmp ( Processor_Name, "bdverl") == 0){
+	else if ( strcasecmp ( Processor_Name, "bdver1") == 0){
 	  targ = TARGET_orochi;
 	  // TODO: here to add Tareget sse?
 	}

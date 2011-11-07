@@ -2362,7 +2362,7 @@ get_x86_auto_cpu_name ()
       case 16:
         return "barcelona";     // FIXME??
       case 21:
-	  	return "bdverl";
+	  	return "bdver1";
     default:
       return "generic";
     }

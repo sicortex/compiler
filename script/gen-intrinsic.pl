@@ -150,13 +150,13 @@ my @ov32f4_flmem=["VBROADCASTSS256 __builtin_ia32_vbroadcastss256","VMOVAPS","VM
 my @ov16f4_flmem=["VROADCASTSS128 __builtin_ia32_vbroadcastss"];
 #my @ov32i4_v32i4mem=["VMOVDQA256 __builtin_ia32_loaddqu256"];
 my @ov32i4_charmem=["VMOVDQA256 __builtin_ia32_loaddqu256"];
-my @ov32f8_v32f8mem_v32f8=["VMASKMOVPD256 __builtin_ia32_maskloadpd256"];
-my @ov32f4_v32f4mem_v32f4=["VMASKMOVPS256 __builtin_ia32_maskloadps256"];
+my @ov32f8_v32f8mem_v32i8=["VMASKMOVPD256 __builtin_ia32_maskloadpd256"];
+my @ov32f4_v32f4mem_v32i4=["VMASKMOVPS256 __builtin_ia32_maskloadps256"];
 #my @ov16f8_dbmem_v16i4=["VMASKMOVPD128 __builtin_ia32_maskloadpd"];
-my @ov16f8_v16f8mem_v16f8=["VMASKMOVPD128 __builtin_ia32_maskloadpd"];
+my @ov16f8_v16f8mem_v16i8=["VMASKMOVPD128 __builtin_ia32_maskloadpd"];
+my @ov16f4_v16f4mem_v16i4=["VMASKMOVPS128 __builtin_ia32_maskloadps"];
 #my @ov32f4_flmem_v32i4=["VMASKMOVPS256 __builtin_ia32_maskloadps256"];
 #my @ov16f4_flmem_v16i4=["VMASKMOVPS128 __builtin_ia32_maskloadps"];
-my @ov16f4_v16f4mem_v16f4=["VMASKMOVPS128 __builtin_ia32_maskloadps"];
 #my @ov32f8_dbmem=["VMOVAPD"];
 my @ovoid_dbmem_v32f8=["VMOVAPD256 __builtin_ia32_storeupd256","VMOVNTPD256 __builtin_ia32_movntpd256"];
 my @ovoid_flmem_v32f4=["VMOVAPS256 __builtin_ia32_storeups256","VMOVNTPS256 __builtin_ia32_movntpd256"];
@@ -164,12 +164,12 @@ my @ovoid_v32i4mem_v32i4=["VMOVNTDQ256 __builtin_ia32_movntdq256"];
 my @ovoid_charmem_v32i4=["VMOVDQA256ST __builtin_ia32_storedqu256"];
 #my @ovoid_dbmem_v32f8=["VMOVNTPD256 __builtin_ia32_movntpd256"];
 #my @ovoid_dbmem_v32i4_v32f8=["VMASKMOVPD256ST __builtin_ia32_maskstorepd256"];
-my @ovoid_v32f8mem_v32f8_v32f8=["VMASKMOVPD256ST __builtin_ia32_maskstorepd256"];
+my @ovoid_v32f8mem_v32i8_v32f8=["VMASKMOVPD256ST __builtin_ia32_maskstorepd256"];
 #my @ovoid_dbmem_v32i4_v16f8=["VMASKMOVPD128ST __builtin_ia32_maskstorepd"];
-my @ovoid_v16f8mem_v16f8_v16f8=["VMASKMOVPD128ST __builtin_ia32_maskstorepd"];
+my @ovoid_v16f8mem_v16i8_v16f8=["VMASKMOVPD128ST __builtin_ia32_maskstorepd"];
 #my @ovoid_flmem_v32i4_v32f4=["VMASKMOVPS256ST __builtin_ia32_maskstoreps256"];
-my @ovoid_v32f4mem_v32f4_v32f4=["VMASKMOVPS256ST __builtin_ia32_maskstoreps256"];
-my @ovoid_v16f4mem_v16f4_v16f4=["VMASKMOVPS128ST __builtin_ia32_maskstoreps"];
+my @ovoid_v32f4mem_v32i4_v32f4=["VMASKMOVPS256ST __builtin_ia32_maskstoreps256"];
+my @ovoid_v16f4mem_v16i4_v16f4=["VMASKMOVPS128ST __builtin_ia32_maskstoreps"];
 my @ov16f8_v32f8_int32=["VEXTRACTF128D __builtin_ia32_vextractf128_pd256"];
 my @ov16f4_v32f4_int32=["VEXTRACTF128S __builtin_ia32_vextractf128_ps256"];
 my @ov16i4_v32i4_int32=["VEXTRACTF128I __builtin_ia32_vextractf128_si256"];
@@ -259,8 +259,8 @@ my @ops=(
 		[["NAME"],@ov32f4_flmem, ["OPS"],["V32F4ov32f4"],["memfl"]],
 		[["NAME"],@ov16f4_flmem, ["OPS"],["V16F4ov16f4"],["memfl"]],
 		[["NAME"],@ov32i4_charmem, ["OPS"],["V32I4ov32i4"],["memchar"]],
-		[["NAME"],@ov32f8_v32f8mem_v32f8, ["OPS"],["V32F8ov32f8"],["memv32f8"],["v32f8"]],
-		[["NAME"],@ov32f4_v32f4mem_v32f4, ["OPS"],["V32F4ov32f4"],["memv32f4"],["v32f4"]],
+		[["NAME"],@ov32f8_v32f8mem_v32i8, ["OPS"],["V32F8ov32f8"],["memv32f8"],["v32i8"]],
+		[["NAME"],@ov32f4_v32f4mem_v32i4, ["OPS"],["V32F4ov32f4"],["memv32f4"],["v32i4"]],
 		[["NAME"],@ov16f8_dbv16f8_v16f8, ["OPS"],["V16F8ov16f8"],["memv16f8"],["v16f8"]],
 		#[["NAME"],@ov32f4_flmem_v32i4, ["OPS"],["V32F4ov32f4"],["memfl"],["v32i4"]],
 		#[["NAME"],@ov16f4_v16f4_v16f4, ["OPS"],["V16F4ov16f4"],["memv16f4"],["v16f4"]],
@@ -268,11 +268,11 @@ my @ops=(
 		[["NAME"],@ovd_dfmem_v32f8,["OPS"],["Vovd"],["memdf"],["v32f8"]],
 		[["NAME"],@ovoid_v32i4mem_v32i4, ["OPS"],["Vovd"],["v32i4mem"],["v32i4"]],
 		[["NAME"],@ovoid_charmem_v32i4, ["OPS"],["Vovd"],["memchar"],["v32i4"]],
-		[["NAME"],@ovoid_v32f8mem_v32f8_v32f8, ["OPS"],["Vovd"],["memv32f8"],["v32f8"],["v32f8"]],
-		[["NAME"],@ovoid_v16f8mem_v16f8_v16f8, ["OPS"],["Vovd"],["memv16f8"],["v16f8"],["v16f8"]],
+		[["NAME"],@ovoid_v32f8mem_v32i8_v32f8, ["OPS"],["Vovd"],["memv32f8"],["v32i8"],["v32f8"]],
+		[["NAME"],@ovoid_v16f8mem_v16i8_v16f8, ["OPS"],["Vovd"],["memv16f8"],["v16i8"],["v16f8"]],
 		#[["NAME"],@ovoid_flmem_v32i4_v32f4, ["OPS"],["Vovd"],["memfl"],["v32i4"],["v32f4"]],
-		[["NAME"],@ovoid_v32f4mem_v32f4_v32f4, ["OPS"],["Vovd"],["memv32f4"],["v32f4"],["v32f4"]],
-		[["NAME"],@ovoid_v16f4mem_v16f4_v16f4, ["OPS"],["Vovd"],["memv16f4"],["v16f4"],["v16f4"]],
+		[["NAME"],@ovoid_v32f4mem_v32i4_v32f4, ["OPS"],["Vovd"],["memv32f4"],["v32i4"],["v32f4"]],
+		[["NAME"],@ovoid_v16f4mem_v16i4_v16f4, ["OPS"],["Vovd"],["memv16f4"],["v16i4"],["v16f4"]],
 #		[["NAME"],@ovoid_dbmem_v32i4, ["OPS"],["Vovd"],["dbmem"],["v32i4"]],
 		[["NAME"],@ov16f8_v32f8,["OPS"],["V16F8ov16f8"],["v32f8"]],
 		[["NAME"],@ov16f4_v32f4,["OPS"],["V16F4ov16f4"],["v32f4"]],
@@ -280,8 +280,8 @@ my @ops=(
 		[["NAME"],@ov32f8_v16f8,["OPS"],["V32F8ov32f8"],["v16f8"]],
 		[["NAME"],@ov32f4_v16f4,["OPS"],["V32F4ov32f4"],["v16f4"]],
 		[["NAME"],@ov32i4_v16i4,["OPS"],["V32I4ov32i4"],["v16i4"]],
-		[["NAME"],@ov16f8_v16f8mem_v16f8,["OPS"],["V16F8ov16f8"],["memv16f8"],["v16f8"]],
-		[["NAME"],@ov16f4_v16f4mem_v16f4,["OPS"],["V16F4ov16f4"],["memv16f4"],["v16f4"]],
+		[["NAME"],@ov16f8_v16f8mem_v16i8,["OPS"],["V16F8ov16f8"],["memv16f8"],["v16i8"]],
+		[["NAME"],@ov16f4_v16f4mem_v16i4,["OPS"],["V16F4ov16f4"],["memv16f4"],["v16i4"]],
 	);
 my @isa;
 my @tops; 		#for isa pack and subset
@@ -433,7 +433,7 @@ foreach (keys %isa_operands){
 }
 
 sub copy_all_file{
-  if(0){
+  if(1){
   copy_to('../GCC/gcc/config/i386/',"i386_avx.h");
   copy_to('../GCC/gcc/config/i386/',"i386_avx.c");
   copy_to('../GCC/gcc/',"tree_avx.c");

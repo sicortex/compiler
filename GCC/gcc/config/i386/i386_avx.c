@@ -31,7 +31,7 @@ def_builtin (MASK_AVX, "__builtin_ia32_mulps256",ftype,IX86_BUILTIN_VMULPS256);
 ftype = build_function_type_list(V4DF_type_node, V4DF_type_node, V4DF_type_node, NULL_TREE);
 def_builtin (MASK_AVX, "__builtin_ia32_unpckhpd256",ftype,IX86_BUILTIN_VUNPCKHPD256);
 
-ftype = build_function_type_list(void_type_node, pv4sf_type_node, V4SF_type_node, V4SF_type_node, NULL_TREE);
+ftype = build_function_type_list(void_type_node, pv4sf_type_node, V4SI_type_node, V4SF_type_node, NULL_TREE);
 def_builtin (MASK_AVX, "__builtin_ia32_maskstoreps",ftype,IX86_BUILTIN_VMASKMOVPS128ST);
 
 ftype = build_function_type_list(V4DF_type_node, pdouble_type_node, NULL_TREE);
@@ -85,7 +85,7 @@ def_builtin (MASK_AVX, "__builtin_ia32_haddps256",ftype,IX86_BUILTIN_VHADDPS);
 ftype = build_function_type_list(V4DF_type_node, V4DF_type_node, V4DF_type_node, NULL_TREE);
 def_builtin (MASK_AVX, "__builtin_ia32_maxpd256",ftype,IX86_BUILTIN_VMAXPD256);
 
-ftype = build_function_type_list(V4DF_type_node, pv4df_type_node, V4DF_type_node, NULL_TREE);
+ftype = build_function_type_list(V4DF_type_node, pv4df_type_node, V4DI_type_node, NULL_TREE);
 def_builtin (MASK_AVX, "__builtin_ia32_maskloadpd256",ftype,IX86_BUILTIN_VMASKMOVPD256);
 
 ftype = build_function_type_list(V8SF_type_node, V8SF_type_node, V8SF_type_node, integer_type_node, NULL_TREE);
@@ -106,7 +106,7 @@ def_builtin (MASK_AVX, "__builtin_ia32_vinsertf128_pd256",ftype,IX86_BUILTIN_VIN
 ftype = build_function_type_list(V4SF_type_node, V8SF_type_node, NULL_TREE);
 def_builtin (MASK_AVX, "__builtin_ia32_ps_ps256",ftype,IX86_BUILTIN_VCASTPS256TOPS128);
 
-ftype = build_function_type_list(void_type_node, pv2df_type_node, V2DF_type_node, V2DF_type_node, NULL_TREE);
+ftype = build_function_type_list(void_type_node, pv2df_type_node, V2DI_type_node, V2DF_type_node, NULL_TREE);
 def_builtin (MASK_AVX, "__builtin_ia32_maskstorepd",ftype,IX86_BUILTIN_VMASKMOVPD128ST);
 
 ftype = build_function_type_list(V8SF_type_node, V8SF_type_node, V8SF_type_node, NULL_TREE);
@@ -115,7 +115,7 @@ def_builtin (MASK_AVX, "__builtin_ia32_hsubps256",ftype,IX86_BUILTIN_VHSUBPS256)
 ftype = build_function_type_list(V4DF_type_node, V4DF_type_node, integer_type_node, NULL_TREE);
 def_builtin (MASK_AVX, "__builtin_ia32_vpermilpd256",ftype,IX86_BUILTIN_VPERMILPD256);
 
-ftype = build_function_type_list(V2DF_type_node, pv2df_type_node, V2DF_type_node, NULL_TREE);
+ftype = build_function_type_list(V2DF_type_node, pv2df_type_node, V2DI_type_node, NULL_TREE);
 def_builtin (MASK_AVX, "__builtin_ia32_maskloadpd",ftype,IX86_BUILTIN_VMASKMOVPD128);
 
 ftype = build_function_type_list(void_type_node, pchar_type_node, V8SI_type_node, NULL_TREE);
@@ -148,7 +148,7 @@ def_builtin (MASK_AVX, "__builtin_ia32_roundpd256",ftype,IX86_BUILTIN_VROUNDPD25
 ftype = build_function_type_list(V2DF_type_node, V2DF_type_node, V4SI_type_node, NULL_TREE);
 def_builtin (MASK_AVX, "__builtin_ia32_vpermilvarpd",ftype,IX86_BUILTIN_VPERMILPD128VAR);
 
-ftype = build_function_type_list(void_type_node, pv4df_type_node, V4DF_type_node, V4DF_type_node, NULL_TREE);
+ftype = build_function_type_list(void_type_node, pv4df_type_node, V4DI_type_node, V4DF_type_node, NULL_TREE);
 def_builtin (MASK_AVX, "__builtin_ia32_maskstorepd256",ftype,IX86_BUILTIN_VMASKMOVPD256ST);
 
 ftype = build_function_type_list(V8SF_type_node, V8SF_type_node, V8SF_type_node, integer_type_node, NULL_TREE);
@@ -184,7 +184,7 @@ def_builtin (MASK_AVX, "__builtin_ia32_vbroadcastf128_ps256",ftype,IX86_BUILTIN_
 ftype = build_function_type_list(integer_type_node, V4DF_type_node, V4DF_type_node, NULL_TREE);
 def_builtin (MASK_AVX, "__builtin_ia32_vtestcpd256",ftype,IX86_BUILTIN_VTESTPD256C);
 
-ftype = build_function_type_list(V4SF_type_node, pv4sf_type_node, V4SF_type_node, NULL_TREE);
+ftype = build_function_type_list(V4SF_type_node, pv4sf_type_node, V4SI_type_node, NULL_TREE);
 def_builtin (MASK_AVX, "__builtin_ia32_maskloadps",ftype,IX86_BUILTIN_VMASKMOVPS128);
 
 ftype = build_function_type_list(V8SF_type_node, pfloat_type_node, NULL_TREE);
@@ -247,7 +247,7 @@ def_builtin (MASK_AVX, "__builtin_ia32_vbroadcastf128_pd256",ftype,IX86_BUILTIN_
 ftype = build_function_type_list(integer_type_node, V4DF_type_node, NULL_TREE);
 def_builtin (MASK_AVX, "__builtin_ia32_movmskpd256",ftype,IX86_BUILTIN_VMOVMSKPD256);
 
-ftype = build_function_type_list(V8SF_type_node, pv8sf_type_node, V8SF_type_node, NULL_TREE);
+ftype = build_function_type_list(V8SF_type_node, pv8sf_type_node, V8SI_type_node, NULL_TREE);
 def_builtin (MASK_AVX, "__builtin_ia32_maskloadps256",ftype,IX86_BUILTIN_VMASKMOVPS256);
 
 ftype = build_function_type_list(integer_type_node, V8SF_type_node, NULL_TREE);
@@ -325,7 +325,7 @@ def_builtin (MASK_AVX, "__builtin_ia32_cvtdq2ps256",ftype,IX86_BUILTIN_VCVTDQ2PS
 ftype = build_function_type_list(V4SF_type_node, V4SF_type_node, V4SI_type_node, NULL_TREE);
 def_builtin (MASK_AVX, "__builtin_ia32_vpermilvarps",ftype,IX86_BUILTIN_VPERMILPS128VAR);
 
-ftype = build_function_type_list(void_type_node, pv8sf_type_node, V8SF_type_node, V8SF_type_node, NULL_TREE);
+ftype = build_function_type_list(void_type_node, pv8sf_type_node, V8SI_type_node, V8SF_type_node, NULL_TREE);
 def_builtin (MASK_AVX, "__builtin_ia32_maskstoreps256",ftype,IX86_BUILTIN_VMASKMOVPS256ST);
 
 ftype = build_function_type_list(integer_type_node, V4DF_type_node, V4DF_type_node, NULL_TREE);

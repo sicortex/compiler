@@ -21,6 +21,9 @@ set(HEADERS
 	unwind.h
 	varargs.h
 	xmmintrin.h
+	immintrin.h
+	avxintrin.h
+	wmmintrin.h
 )
 
 set(header_outputs)

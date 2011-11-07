@@ -384,7 +384,16 @@ static TYPE_ID Promoted_Mtype[MTYPE_LAST + 1] = {
   MTYPE_M8I1,     /* MTYPE_M8I1 */
   MTYPE_M8I2,     /* MTYPE_M8I2 */
   MTYPE_M8I4,     /* MTYPE_M8I4 */
-  MTYPE_M8F4      /* MTYPE_M8F4 */
+  MTYPE_M8F4,      /* MTYPE_M8F4 */
+  MTYPE_V32C4,		/* vector type for C4 not sure if useful */
+  MTYPE_V32C8,		/* vector type for C8 */
+  MTYPE_V32I1,    /* 256-bit vector of signed bytes            */
+  MTYPE_V32I2,           /* 256-bit vector of signed short ints       */
+  MTYPE_V32I4,           /* 256-bit vector of signed ints             */
+  MTYPE_V32I8,           /* 256-bit vector of signed long long ints   */
+  MTYPE_V32F4,           /* 256-bit vector of signed floats           */
+  MTYPE_V32F8,           /* 256-bit vector of signed doubles          */
+  MTYPE_F32 
 #endif // TARG_X8664
 };
 

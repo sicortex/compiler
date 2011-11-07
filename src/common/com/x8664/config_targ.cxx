@@ -332,7 +332,7 @@ Targ_Name ( TARGET_PROCESSOR b)
     case TARGET_xeon: return "Xeon";
     case TARGET_anyx86: return "Generic";
     case TARGET_barcelona: return "Barcelona";
-	case TARGET_orochi: return "Bdverl";
+	case TARGET_orochi: return "bdver1";
 	case TARGET_sandy: return "Sandy Bridge";
     default:
       r = bnb[bnb_used].name;

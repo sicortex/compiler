@@ -5473,7 +5473,7 @@ static void Expand_Recip( TN* result, TN* src2, TYPE_ID mtype, OPS* ops )
 
   TCON tcon;
   ST* sym;
-  FmtAssert(mtype== MTYPE_V32F4|| mtype== MTYPE_V32F8,("handle it later"));
+  FmtAssert(!(mtype== MTYPE_V32F4|| mtype== MTYPE_V32F8),("handle it later"));
 
   if (mtype == MTYPE_V16F4)
     tcon = Create_Simd_Const ( MTYPE_V16F4,  

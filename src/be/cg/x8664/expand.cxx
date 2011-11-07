@@ -6231,7 +6231,7 @@ Expand_Reduce_Mpy (OPCODE op, TN *result, TN *op1, OPS *ops)
 	TN* tmp_h = Build_TN_Like(result);
 	TN* tmp_l = Build_TN_Like(result);
 	Build_OP(TOP_vmovapd_f256_ofloat_float, tmp, op1, ops);
-	Build_OP(TOP_vunpckhpd_f256_ofloat_float_float, tmp, op1, ops);
+	Build_OP(TOP_vunpckhpd_f256_ofloat_float_float, tmp, op1,op1, ops);
 	Build_OP(TOP_vmulpd_f256_ofloat_float_float, tmp_a, tmp, op1, ops);
 	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_h, tmp_a, Gen_Literal_TN(1, 1), ops);
 	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_l, tmp_a, Gen_Literal_TN(0, 1), ops);

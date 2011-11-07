@@ -2048,10 +2048,10 @@ static struct
   { "barcelona",	"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
   { "shanghai",		"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
   { "istanbul",		"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "sandy",		"sandy",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE,  TRUE,  TRUE,  TRUE , FALSE, FALSE, FALSE},
-  { "bdverl", "bdverl", ABI_M64, TRUE, TRUE,  TRUE,  TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE},
+  { "sandy",		"sandy",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE,  TRUE,  TRUE,  TRUE, FALSE, FALSE, FALSE},
+  { "bdver1",		"bdver1", 	ABI_M64,  TRUE,  TRUE,  TRUE,  TRUE, FALSE,  TRUE,  TRUE,  TRUE,  TRUE,  TRUE, TRUE},
 //  -------------------+---------------+--------+------+------+------+------+------+------+------+-----
-//  CPU			Target		ABI      SSE2   SSE3   3DNow! SSSE3  SSE4a  SSE4.1 SSE4.2 AVX
+//  CPU			Target		ABI        SSE2   SSE3 3DNow!  SSSE3  SSE4a SSE4.1 SSE4.2    AVX   FMA4    XOP  AES
   { NULL, NULL, },
 };
   

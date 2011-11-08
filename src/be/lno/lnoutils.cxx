@@ -2117,6 +2117,12 @@ Lower_Re_IMadd(WN* parent, WN * wn){
   	}
   }else{
   //FmtAssert(WN_opcode(wn) == OPC_I4MADD, ("error, RE imadd is no i4madd"));
+    INT kid = 0;
+    for(kid = 0; kid < WN_kid_count(parent); kid++){
+	  if(WN_kid(parent, kid) == wn)
+	  	break;
+    }
+    //FmtAssert(kid < WN_kid_count(parent); ("parent is not really parent of wn in Lower_Re_IMadd"));
     TYPE_ID ty = WN_rtype(wn);
     WN *madd_kid0 = WN_COPY_Tree(WN_kid0(wn));
     LWN_Copy_Def_Use(WN_kid0(wn), madd_kid0, Du_Mgr);
@@ -2127,15 +2133,15 @@ Lower_Re_IMadd(WN* parent, WN * wn){
     WN *new_mul = WN_Mpy(ty, madd_kid1, madd_kid2);
     WN *new_add = WN_Add(ty , new_mul, madd_kid0);
     WN_DELETE_Tree(wn);
-    WN_kid0(parent) = new_add;
+    WN_kid(parent, kid) = new_add;
     LWN_Parentize(parent);
-	WN_kid0(new_add) = Lower_Re_IMadd(new_add, WN_kid0(new_add));
-	WN_kid0(WN_kid1(new_add)) = Lower_Re_IMadd(new_add, WN_kid0(WN_kid1(new_add)));
-	WN_kid1(WN_kid1(new_add)) = Lower_Re_IMadd(new_add, WN_kid1(WN_kid1(new_add)));
+    for(INT i =0; i < WN_kid_count(new_add); i++)
+	WN_kid(new_add, i) = Lower_Re_IMadd(new_add, WN_kid(new_add,i));
     return new_add;
   }
   return wn;
 }
+
 
 BOOL Solve_For(WN* wn_top, const SYMBOL& sym)
 {

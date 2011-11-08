@@ -740,12 +740,14 @@ string_list_t *get_runtime_libraries_ld_flags()
     }
 
 #ifdef PATH64_ENABLE_PSCRUNTIME
+#ifndef NO_AS_NEEDED
 #ifdef __sun
     add_string(flags, "-z");
     add_string(flags, "ignore");
 #else // !__sun
     add_string(flags, "--as-needed");
 #endif // !__sun
+#endif // !NO_AS_NEEDED
 
     if((source_lang == L_CC || instr_used) &&
        !option_was_seen(O_nodefaultlibs) &&
@@ -794,12 +796,14 @@ string_list_t *get_runtime_libraries_ld_flags()
     add_library(flags, "mpath");
     add_library(flags, "m");
 
+#ifndef NO_AS_NEEDED
 #ifdef __sun
     add_string(flags, "-z");
     add_string(flags, "record");
 #else // !__sun
     add_string(flags, "--no-as-needed");
 #endif // !__sun
+#endif // !NO_AS_NEEDED
 
 #else // !PATH64_ENABLE_PSCRUNTIME
 

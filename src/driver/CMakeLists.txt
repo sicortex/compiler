@@ -437,6 +437,12 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
     set(PSC_CRT_PATH_x86_64 "/usr/lib64")
     set(PSC_CRT_PATH_x86_32 "/usr/lib")
     add_driver("rpm_no_hash_style" "FALSE")
+
+    # rpm configuration without --hash-style ld option support
+    set(NO_AS_NEEDED TRUE)
+    set(PSC_CRT_PATH_x86_64 "/usr/lib64")
+    set(PSC_CRT_PATH_x86_32 "/usr/lib")
+    add_driver("rpm_no_hash_style_no_as_needed" "FALSE")
 endif()
 
 

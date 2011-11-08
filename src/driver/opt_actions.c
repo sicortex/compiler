@@ -2049,7 +2049,7 @@ static struct
   { "shanghai",		"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
   { "istanbul",		"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
   { "sandy",		"sandy",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE,  TRUE,  TRUE,  TRUE, FALSE, FALSE, FALSE },
-  { "bdver1",		"bdver1", 	ABI_M64,  TRUE,  TRUE,  TRUE,  TRUE, FALSE,  TRUE,  TRUE, FALSE, TRUE, TRUE, FALSE },
+  { "bdver1",		"bdver1", 	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE,  TRUE,  TRUE,  TRUE, FALSE, TRUE, TRUE, FALSE },
 //  -------------------+---------------+--------+------+------+------+------+------+------+------+-----
 //  CPU			Target		ABI        SSE2   SSE3 3DNow!  SSSE3  SSE4a SSE4.1 SSE4.2    AVX   FMA4    XOP   AES
   { NULL, NULL, },

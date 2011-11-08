@@ -996,6 +996,13 @@ CK_WHERE:
          goto EXIT;
       }
 
+      if (l_opnd.fld == AT_Tbl_Idx &&
+	  TYP_LINEAR(ATD_TYPE_IDX(l_opnd.idx)) == Proc_Ptr) {
+	  IR_OPR(ir_idx) = ProcPtr_Asg_Opr;
+	  procedure_pointer_semantics(ir_idx);
+	  goto EXIT;
+      }
+
       if (!exp_desc_l.pointer) {
          attr_idx = find_base_attr(&l_opnd, &line, &col);
          PRINTMSG(line, 417, Error, col);

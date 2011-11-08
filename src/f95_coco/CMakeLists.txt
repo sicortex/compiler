@@ -30,7 +30,7 @@ if(PATH64_ENABLE_FORTRAN)
 
             add_custom_command(OUTPUT "${coco_exe}"
                                COMMAND ${Path64_BINARY_DIR}/bin/pathf90 ${flags} -o ${coco_exe}
-                                       ${CMAKE_CURRENT_SOURCE_DIR}/coco.F90
+                                       ${CMAKE_CURRENT_SOURCE_DIR}/coco.F90 ${link_flags}
                                DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/coco.F90)
 
             list(APPEND coco_deps "${coco_exe}")

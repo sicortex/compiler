@@ -2109,51 +2109,46 @@ static void Flip_Le_And_Ge(WN* wn)
   WN_set_opcode(wn, OPCODE_make_op(opr, OPCODE_rtype(opc), OPCODE_desc(opc)));
 }
 
+static WN*
+Lower_Re_IMadd(WN* parent, WN * wn){
+  if( WN_opcode(wn) != OPC_I4MADD){
+  	for(INT i= 0; i < WN_kid_count(wn); i++){
+	  WN_kid(wn, i) = Lower_Re_IMadd(wn, WN_kid(wn, i));
+  	}
+  }else{
+  //FmtAssert(WN_opcode(wn) == OPC_I4MADD, ("error, RE imadd is no i4madd"));
+    TYPE_ID ty = WN_rtype(wn);
+    WN *madd_kid0 = WN_COPY_Tree(WN_kid0(wn));
+    LWN_Copy_Def_Use(WN_kid0(wn), madd_kid0, Du_Mgr);
+    WN *madd_kid1 = WN_COPY_Tree(WN_kid1(wn));
+    LWN_Copy_Def_Use(WN_kid1(wn), madd_kid1, Du_Mgr);
+    WN *madd_kid2 = WN_COPY_Tree(WN_kid2(wn));
+    LWN_Copy_Def_Use(WN_kid2(wn), madd_kid2, Du_Mgr);
+    WN *new_mul = WN_Mpy(ty, madd_kid1, madd_kid2);
+    WN *new_add = WN_Add(ty , new_mul, madd_kid0);
+    WN_DELETE_Tree(wn);
+    WN_kid0(parent) = new_add;
+    LWN_Parentize(parent);
+	WN_kid0(new_add) = Lower_Re_IMadd(new_add, WN_kid0(new_add));
+	WN_kid0(WN_kid1(new_add)) = Lower_Re_IMadd(new_add, WN_kid0(WN_kid1(new_add)));
+	WN_kid1(WN_kid1(new_add)) = Lower_Re_IMadd(new_add, WN_kid1(WN_kid1(new_add)));
+    return new_add;
+  }
+  return wn;
+}
+
 BOOL Solve_For(WN* wn_top, const SYMBOL& sym)
 {
   BOOL       ok = FALSE;
 
+  wn_top = Lower_Re_IMadd(LWN_Get_Parent(wn_top), wn_top);
   
 	
   WN*		 l = WN_kid0(wn_top);
   WN*		 r = WN_kid1(wn_top);
 
-#ifdef TARG_X8664
-  OPERATOR l_opr = WN_operator(l);
-  OPERATOR r_opr = WN_operator(r);
-  if(l_opr == OPR_MADD){
-	TYPE_ID ty = WN_rtype(l);
-	FmtAssert(ty == MTYPE_I4, ("unexpected MTYPE of MADD"));
-  WN *madd_kid0 = WN_COPY_Tree(WN_kid0(l));
-  LWN_Copy_Def_Use(WN_kid0(l), madd_kid0, Du_Mgr);
-  WN *madd_kid1 = WN_COPY_Tree(WN_kid1(l));
-  LWN_Copy_Def_Use(WN_kid1(l), madd_kid1, Du_Mgr);
-  WN *madd_kid2 = WN_COPY_Tree(WN_kid2(l));
-  LWN_Copy_Def_Use(WN_kid2(l), madd_kid2, Du_Mgr);
-	WN *new_mul = WN_Mpy(ty, madd_kid1, madd_kid2);
-	WN *new_add = WN_Add(ty , new_mul, madd_kid0);
-	WN_DELETE_Tree(l);
-	WN_kid0(wn_top) = new_add;
-	l = new_add;
-	LWN_Parentize(wn_top);
-  }
-  if(r_opr == OPR_MADD){
-	TYPE_ID ty = WN_rtype(r);
-	FmtAssert(ty == MTYPE_I4, ("unexpected MTYPE of MADD"));
-  WN *madd_kid0 = WN_COPY_Tree(WN_kid0(r));
-  LWN_Copy_Def_Use(WN_kid0(r), madd_kid0, Du_Mgr);
-  WN *madd_kid1 = WN_COPY_Tree(WN_kid1(r));
-  LWN_Copy_Def_Use(WN_kid1(r), madd_kid1, Du_Mgr);
-  WN *madd_kid2 = WN_COPY_Tree(WN_kid2(r));
-  LWN_Copy_Def_Use(WN_kid2(r), madd_kid2, Du_Mgr);
-	WN *new_mul = WN_Mpy(ty, madd_kid1, madd_kid2);
-	WN *new_add = WN_Add(ty , new_mul, madd_kid0);
-	WN_DELETE_Tree(r);
-	WN_kid1(wn_top) = new_add;
-	r = new_add;
-	LWN_Parentize(wn_top);
-  }
-#endif
+  FmtAssert(WN_operator(l)!= OPR_MADD,("MADD should be handled in Lower_Re_IMadd"));
+  FmtAssert(WN_operator(r)!= OPR_MADD,("MADD should be handled in Lower_Re_IMadd"));
 
 
   INT        lcount = Symbol_Count(WN_kid0(wn_top), sym);
@@ -2184,6 +2179,8 @@ BOOL Solve_For(WN* wn_top, const SYMBOL& sym)
 
     OPCODE     lopc = WN_opcode(l);
     OPERATOR   lopr = OPCODE_operator(lopc);
+
+	FmtAssert(WN_operator(l)!= OPR_MADD,("MADD should be handled in Lower_Re_IMadd"));
 
     // have we successfully solved for the index variable?
     if (OPCODE_is_load(lopc)) {

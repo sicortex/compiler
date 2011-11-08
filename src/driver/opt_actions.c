@@ -2014,20 +2014,20 @@ static struct
   boolean supports_xop;
   boolean supports_aes;
 } supported_cpu_types[] = {
-//  CPU			Target		ABI      SSE2   SSE3   3DNow! SSSE3  SSE4a  SSE4.1 SSE4.2 AVX FMA XOP AES
+//  CPU			Target		ABI        SSE2  SSE3  3DNow! SSSE3  SSE4a  SSE4.1 SSE4.2    AVX    FMA    XOP   AES
 //  -------------------+---------------+--------+------+------+------+------+------+------+------+-----
-  { "any_64bit_x86",	"generic",	ABI_M64,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE},
+  { "any_64bit_x86",	"generic",	ABI_M64,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
   { "any_32bit_x86",	"generic",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
   { "i386",		"generic",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
   { "i486",		"generic",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
   { "i586",		"generic",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
   { "athlon",		"athlon",	ABI_M32, FALSE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
   { "athlon-mp",	"athlon",	ABI_M32, FALSE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "athlon-xp",	"athlon",	ABI_M32, FALSE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "athlon-xp",	"athlon",	ABI_M32, FALSE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
   { "athlon64",		"athlon64",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "athlon64-sse3",	"athlon64",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE , FALSE, FALSE, FALSE},
-  { "athlon64fx",	"opteron",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE , FALSE, FALSE, FALSE},
-  { "turion",		"athlon64",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE , FALSE, FALSE, FALSE},
+  { "athlon64-sse3",	"athlon64",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "athlon64fx",	"opteron",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "turion",		"athlon64",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
   { "i686",		"pentium4",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
   { "ia32",		"pentium4",	ABI_M32,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
   { "k7",		"athlon",	ABI_M32, FALSE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
@@ -2048,10 +2048,10 @@ static struct
   { "barcelona",	"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
   { "shanghai",		"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
   { "istanbul",		"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
-  { "sandy",		"sandy",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE,  TRUE,  TRUE,  TRUE, FALSE, FALSE, FALSE},
-  { "bdver1",		"bdver1", 	ABI_M64,  TRUE,  TRUE,  TRUE,  TRUE, FALSE,  TRUE,  TRUE,  TRUE,  TRUE,  TRUE, TRUE},
+  { "sandy",		"sandy",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE,  TRUE,  TRUE,  TRUE, FALSE, FALSE, FALSE },
+  { "bdver1",		"bdver1", 	ABI_M64,  TRUE,  TRUE,  TRUE,  TRUE, FALSE,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE },
 //  -------------------+---------------+--------+------+------+------+------+------+------+------+-----
-//  CPU			Target		ABI        SSE2   SSE3 3DNow!  SSSE3  SSE4a SSE4.1 SSE4.2    AVX   FMA4    XOP  AES
+//  CPU			Target		ABI        SSE2   SSE3 3DNow!  SSSE3  SSE4a SSE4.1 SSE4.2    AVX   FMA4    XOP   AES
   { NULL, NULL, },
 };
   

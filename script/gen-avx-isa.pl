@@ -972,7 +972,8 @@ copy_to('../src/common/targ_info/isa/x8664/',"isa_avx_pack.cxx");
 copy_to('../src/common/targ_info/isa/x8664/',"isa_avx_subset.cxx");
 copy_to('../src/common/targ_info/isa/x8664/',"isa_avx_properties.cxx");
 copy_to('../src/common/targ_info/proc/x8664/',"avx_si2.cxx");
-copy_to('../src/be/cg/x8664/cgemit_targ_avx.cxx',"cgemit_targ_avx.cxx");
+##already changed cgmemt_targ_avx.cxx by handle
+copy_to('../src/be/cg/x8664/cgemit_targ_avx.cxx',"cgemit_targ_avx.cxx") if(0);
 copy_to('../src/be/cg/x8664/',"ebo_special_avx.cxx") if(0);
   
 fprint("isa_avx_properties_load_only.cxx", $print_load_only);

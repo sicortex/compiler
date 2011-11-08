@@ -2072,6 +2072,11 @@ int main()
 		     TOP_movss,
 		     TOP_movdq, 
 		     TOP_aesmov,
+		     TOP_sivmovdqa,
+  	         TOP_sivmovdqu,
+  	         TOP_sivmovups,
+  	         TOP_sivmovupd,
+  	         TOP_sivmovapd,
 		     TOP_movapd,
 		     TOP_movaps,
 		     TOP_movg2x64,
@@ -3404,6 +3409,11 @@ int main()
 		     TOP_movhlps,
 		     TOP_movlhps,
 		     TOP_aesmov,
+		     TOP_sivmovdqa,
+  	         TOP_sivmovdqu,
+  	         TOP_sivmovups,
+  	         TOP_sivmovupd,
+  	         TOP_sivmovapd,
 		     TOP_psrldq,
 		     TOP_psrlq128v64,
 		     TOP_pslldq,
@@ -4544,6 +4554,11 @@ int main()
   	         TOP_vmovups_f256_ofloat_float,
   	         TOP_vmovupd_f256_ofloat_float,
   	         TOP_vmovapd_f256_ofloat_float,
+  	         TOP_sivmovdqa,
+  	         TOP_sivmovdqu,
+  	         TOP_sivmovups,
+  	         TOP_sivmovupd,
+  	         TOP_sivmovapd,
   			 TOP_UNDEFINED);
 
   vector_avx = ISA_Property_Create ("vector_avx"); 
@@ -4555,6 +4570,11 @@ int main()
   aesmov = ISA_Property_Create("aesmov");
   Instruction_Group(aesmov,
   	TOP_aesmov,
+  	TOP_sivmovdqa,
+  	TOP_sivmovdqu,
+  	TOP_sivmovups,
+  	TOP_sivmovupd,
+  	TOP_sivmovapd,
   	TOP_UNDEFINED);
 
   cfi = ISA_Property_Create ("cfi");

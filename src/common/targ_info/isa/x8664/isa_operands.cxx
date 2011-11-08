@@ -1811,6 +1811,12 @@ int main()
 		    TOP_fmovsldup,
 		    TOP_fmovshdup,
 		    TOP_fmovddup,
+		    /*AVX*/
+            TOP_sivmovdqa,
+  	        TOP_sivmovdqu,
+  	        TOP_sivmovups,
+  	        TOP_sivmovupd,
+  	        TOP_sivmovapd,
 		    TOP_UNDEFINED);
   Result(0, fp128);
   Operand(0, fp128, opnd1);

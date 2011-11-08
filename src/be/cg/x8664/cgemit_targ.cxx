@@ -1347,6 +1347,12 @@ static void Init_OP_Name()
   OP_Name[TOP_movss] = "movaps";
   OP_Name[TOP_movdq] = "movdqa";
   OP_Name[TOP_aesmov] = "movdqa";
+  /*AVX can't not be deleted by EBO*/
+  OP_Name[TOP_sivmovdqa] = "vmovdqa";
+  OP_Name[TOP_sivmovdqu] = "vmovdqu",
+  OP_Name[TOP_sivmovups] = "vmovups",
+  OP_Name[TOP_sivmovupd] = "vmovupd",
+  OP_Name[TOP_sivmovapd] = "vmovapd",
   OP_Name[TOP_movg2x] = "movd";
   OP_Name[TOP_movg2x64] = "movd";
   OP_Name[TOP_movx2g] = "movd";

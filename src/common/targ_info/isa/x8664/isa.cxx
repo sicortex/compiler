@@ -1372,6 +1372,11 @@ int main ()
 	      "noop",
               "swp_start",
               "swp_stop",
+           "sivmovdqa",
+  	       "sivmovdqu",
+  	       "sivmovups",
+  	       "sivmovupd",
+  	       "sivmovapd",
 #include "isa_avx.cxx"
 #include "isa_xop_fma.cxx"
 

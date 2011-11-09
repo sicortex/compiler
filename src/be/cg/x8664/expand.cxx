@@ -4577,7 +4577,7 @@ Exp_Stid_And_VComp(
     BOOL rev_condition = FALSE;
     switch( OPCODE_operator(compare) ){
     case OPR_EQ: 
-      Build_OP(Target_AVX? TOP_vpcmpeqw_f128_ofloat_float_base64_simm32 : TOP_cmpeq128v32, result, cmp_kid1, cmp_kid2, ops);
+      Build_OP(Target_AVX? TOP_vpcmpeqw_f128_ofloat_float_float: TOP_cmpeq128v32, result, cmp_kid1, cmp_kid2, ops);
       break;
     case OPR_NE:
       Build_OP(Target_AVX? TOP_vpcmpeqw_f128_ofloat_float_float : TOP_cmpeq128v32, result, cmp_kid1, cmp_kid2, ops);
@@ -5617,7 +5617,7 @@ static void Expand_Complex_Divide( OPCODE opcode, TN *result,
     Build_OP(Target_AVX ? TOP_vshufpd_f128_ofloat_float_float_simm8 : TOP_shufpd, tmp26, tmp25, tmp25, Gen_Literal_TN(1, 1), ops);
     Build_OP(Target_AVX ? TOP_vdivpd_f128_ofloat_float_float : TOP_fdiv128v64, tmp27, tmp26, tmp24, ops);
     Build_OP(Target_AVX ? TOP_vcvtpd2ps_f128_f256_ofloat_float : TOP_cvtpd2ps, tmp28, tmp27, ops);
-    Build_OP(Target_AVX ? TOP_vmovlhps_f128_ofloat_float_float: TOP_movlhps, result, tmp28, ops);
+	Build_OP(TOP_movlhps, result, tmp28, ops);
     Set_OP_cond_def_kind( OPS_last(ops), OP_ALWAYS_COND_DEF );
   }
 
@@ -6468,8 +6468,11 @@ Expand_Shuffle (OPCODE opc, TN* result, TN* op1, VARIANT variant, OPS *ops)
     break;
   case OPC_V16I8V16I8SHUFFLE:
   case OPC_V16F8V16F8SHUFFLE:
-    Build_OP(TOP_movhlps, result, op1, ops);
-    Build_OP(Target_AVX? TOP_vmovlhps_f128_ofloat_float_float : TOP_movlhps, result, op1, ops);
+  	if(Target_AVX)
+	  Build_OP(TOP_vmovhlps_f128_ofloat_float_float, result, op1, op1, ops);
+	else
+      Build_OP(TOP_movhlps, result, op1, ops);
+    Build_OP(TOP_movlhps, result, op1, ops);
     Set_OP_cond_def_kind( OPS_last(ops), OP_ALWAYS_COND_DEF );
     break;    
   case OPC_V16I2V16I2SHUFFLE:

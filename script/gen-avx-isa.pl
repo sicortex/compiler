@@ -516,7 +516,7 @@ foreach (keys %isa_operands){
 			$opnd_post++;
 		}
 		if($_=~/^simm8$/){
-			$isa_operands_print.="\tOperand(".$opnd++.", "."simm8".",opnd".$opnd_post++.");\n";
+			$isa_operands_print.="\tOperand(".$opnd++.", "."uimm8".",opnd".$opnd_post++.");\n";
 		}
 		if($_=~/^n32$/){
 			$isa_operands_print.="\tOperand(".$opnd++.", "."simm32".",offset".");\n";
@@ -975,8 +975,8 @@ copy_to('../src/common/targ_info/proc/x8664/',"avx_si2.cxx");
 ##already changed cgmemt_targ_avx.cxx by handle
 copy_to('../src/be/cg/x8664/cgemit_targ_avx.cxx',"cgemit_targ_avx.cxx") if(0);
 copy_to('../src/be/cg/x8664/',"ebo_special_avx.cxx") if(0);
-  
-fprint("isa_avx_properties_load_only.cxx", $print_load_only);
+  if(0){ 
+  fprint("isa_avx_properties_load_only.cxx", $print_load_only);
   fprint("isa_avx_properties_load_exe.cxx", $print_load_exe);
   fprint("isa_avx_properties_store_only.cxx", $print_store_only);
   fprint("isa_avx_properties_move_prop.cxx", $print_move_prop);
@@ -996,6 +996,7 @@ fprint("isa_avx_properties_load_only.cxx", $print_load_only);
   copy_to('../src/common/targ_info/isa/x8664/',"isa_avx_properties_flop_prop.cxx");
   copy_to('../src/common/targ_info/isa/x8664/',"isa_avx_properties_change_rflags.cxx");
   copy_to('../src/common/targ_info/isa/x8664/',"isa_avx_properties_avx_vector.cxx");
+		}
 }
 #sub copy_to_property{
 	#fprint("isa_avx_properties_load_only.cxx", $print_load_only);

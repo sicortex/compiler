@@ -5616,7 +5616,7 @@ static void Expand_Complex_Divide( OPCODE opcode, TN *result,
     Build_OP(Target_AVX ? TOP_vaddsubpd_f128_ofloat_float_float : TOP_faddsub128v64, tmp25, tmp23, tmp21, ops);
     Build_OP(Target_AVX ? TOP_vshufpd_f128_ofloat_float_float_simm8 : TOP_shufpd, tmp26, tmp25, tmp25, Gen_Literal_TN(1, 1), ops);
     Build_OP(Target_AVX ? TOP_vdivpd_f128_ofloat_float_float : TOP_fdiv128v64, tmp27, tmp26, tmp24, ops);
-    Build_OP(Target_AVX ? TOP_vcvtpd2ps_f128_f256_ofloat_float : TOP_cvtpd2ps, tmp28, tmp27, ops);
+    Build_OP(Target_AVX ? TOP_vcvtpd2ps_f128_ofloat_float : TOP_cvtpd2ps, tmp28, tmp27, ops);
 	Build_OP(TOP_movlhps, result, tmp28, ops);
     Set_OP_cond_def_kind( OPS_last(ops), OP_ALWAYS_COND_DEF );
   }

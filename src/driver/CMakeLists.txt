@@ -396,12 +396,50 @@ foreach(targ ${PATH64_ENABLE_TARGETS})
     endif()
 endforeach()
 
+
+# checking for --as-needed
+message(STATUS "Checking for --as-needed")
+set(as_needed_supported FALSE)
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+    set(test_dir "${CMAKE_CURRENT_BINARY_DIR}/as_needed")
+    make_directory(test_dir)
+    write_file("${test_dir}/bar.c" "void bar() {}")
+    write_file("${test_dir}/foo.c" "void foo() { bar(); }")
+    write_file("${test_dir}/test.c" "int main() { foo(); }")
+    execute_process(COMMAND ${CMAKE_C_COMPILER} -shared -o libfoo.so foo.c -fPIC
+                    WORKING_DIRECTORY "${test_dir}"
+                    RESULT_VARIABLE res)
+    if(res EQUAL 0)
+        execute_process(COMMAND ${CMAKE_C_COMPILER} -shared -o libbar.so bar.c -fPIC
+                        WORKING_DIRECTORY "${test_dir}"
+                        RESULT_VARIABLE res)
+        if(res EQUAL 0)
+            execute_process(COMMAND ${CMAKE_C_COMPILER} -fPIC -o test test.c
+                                    -L. -Wl,--as-needed -lfoo -lbar -Wl,--no-as-needed
+                            WORKING_DIRECTORY "${test_dir}"
+                            RESULT_VARIABLE res)
+            if(res EQUAL 0)
+                set(as_needed_supported TRUE)
+            endif()
+        endif()
+    endif()
+endif()
+
+if(as_needed_supported)
+    message(STATUS "--as-needed supported")
+else()
+    message(STATUS "--as-needed not supported")
+    set(NO_AS_NEEDED TRUE)
+endif()
+
 add_driver("" ${hash_style_supported})
 
 
 # Drivers for various linux distros
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+
+    set(NO_AS_NEEDED FALSE)
 
     # deb configuration - for debian multiarch distros with multiarch includes
     set(PSC_INCLUDE_PATH_x86_64 "/usr/include/x86_64-linux-gnu")

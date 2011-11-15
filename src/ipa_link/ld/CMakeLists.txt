@@ -68,7 +68,14 @@ IF("${arch}" STREQUAL "x8664")
 ELSEIF("${arch}" STREQUAL "x8632")
     set(arch "i386")
 ENDIF()
-set_property(SOURCE ldmain.c PROPERTY COMPILE_DEFINITIONS DEFAULT_EMULATION="elf_${arch}";SCRIPTDIR="${INSTALL_DIR}/${PSC_TARGET}/lib";BINDIR="${INSTALL_DIR}/bin";TOOLBINDIR="${INSTALL_DIR}/${PSC_TARGET}/bin";TARGET="${PSC_TARGET}";TARGET_SYSTEM_ROOT="")
+
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "SunOS")
+    set(targ "i386-pc-solaris2.11")
+else()
+    set(targ "${PSC_TARGET}")
+endif()
+
+set_property(SOURCE ldmain.c PROPERTY COMPILE_DEFINITIONS DEFAULT_EMULATION="elf_${arch}";SCRIPTDIR="${INSTALL_DIR}/${PSC_TARGET}/lib";BINDIR="${INSTALL_DIR}/bin";TOOLBINDIR="${INSTALL_DIR}/${PSC_TARGET}/bin";TARGET="${targ}";TARGET_SYSTEM_ROOT="")
 
 # I don't know if this is needed to pull in libiberty
 FOREACH(f

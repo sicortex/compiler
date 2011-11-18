@@ -275,9 +275,12 @@ CGEMIT_Prn_Scn_In_Asm (FILE       *asm_file,
         *p++ = 'w';
 
 #ifdef __sun
-      // .eh_frame section should be writable on solaris
+      // .eh_frame, .ctors, .dtors sections should be writable on solaris
       // FIXME: check target os, not host
-      if (!(scn_flags & SHF_WRITE) && strcmp(scn_name, ".eh_frame") == 0) {
+      if (!(scn_flags & SHF_WRITE) && 
+              (strcmp(scn_name, ".eh_frame") == 0 || 
+               strcmp(scn_name, ".ctors") == 0 ||
+               strcmp(scn_name, ".dtors") == 0)) {
         *p++ = 'w';
       }
 #endif // __sun

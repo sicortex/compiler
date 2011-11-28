@@ -3216,9 +3216,18 @@ Expand_Int_To_Float_Tas (TN *dest, TN *src, TYPE_ID fmtype, OPS *ops)
 void
 Expand_Int_To_Vect_Tas (TN *dest, TN *src, TYPE_ID vectype, OPS *ops)
 {
-  FmtAssert(MTYPE_byte_size(vectype) == 8,
-  	    ("Expand_Int_To_Vect_Tas: 16-byte vector type not handled"));
-  FmtAssert(TN_register_class(src) == ISA_REGISTER_CLASS_integer,
+  UINT vectsize = MTYPE_byte_size(vectype);
+  TYPE_ID mtype;
+  switch (vectsize) {
+    case 8: mtype = MTYPE_U8; break;
+    case 16: mtype = MTYPE_V16I4; break;
+    case 32: mtype = MTYPE_V32I4; break;
+    default:
+            FmtAssert(0, 
+  	      ("Expand_Int_To_Vect_Tas: vector type not handled"));
+  }
+  FmtAssert(TN_register_class(src) == ISA_REGISTER_CLASS_integer
+            || TN_register_class(src) == ISA_REGISTER_CLASS_float,
   	    ("Expand_Int_To_Vect_Tas: source operand not integer"));
 
   // Allocate space to store the integer value
@@ -3237,7 +3246,7 @@ Expand_Int_To_Vect_Tas (TN *dest, TN *src, TYPE_ID vectype, OPS *ops)
   TN* ofst_tn = Gen_Literal_TN( base_ofst, 4 );
 
   // store the int value to memory
-  Expand_Store(MTYPE_U8, src, base_tn, ofst_tn, ops);
+  Expand_Store(mtype, src, base_tn, ofst_tn, ops);
 
   // load the value into the vector register
   Expand_Load(OPCODE_make_op(OPR_LDID,vectype,vectype), dest, base_tn, ofst_tn,

@@ -2455,6 +2455,16 @@ vho_lower_rcomma ( WN * wn, WN *block, BOOL_INFO * bool_info )
     WN_INSERT_BlockLast ( block, rcomma_block );
   rcomma_block = vho_lower_block ( WN_kid1(wn));
 
+  if (preg_mtype == MTYPE_M) {
+    TY_IDX ty_idx = WN_ty(wn);
+    ST* st = Gen_Temp_Symbol (ty_idx, ".rcomma_m_expansion");
+    wn = WN_CreateStid (OPC_MSTID, 0, st, ty_idx, test);
+    WN_Set_Linenum ( wn, VHO_Srcpos );
+    WN_INSERT_BlockLast (rcomma_block, wn);
+    WN_INSERT_BlockLast ( block, rcomma_block );
+    return WN_CreateLdid (OPC_MMLDID, 0, st, ty_idx);
+  }
+
   preg = Create_Preg (preg_mtype, vho_lower_rcomma_name);
 
   preg_st      = MTYPE_To_PREG ( preg_mtype );

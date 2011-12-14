@@ -1151,7 +1151,6 @@ Create_INITO_For_Range_Table(ST * st, ST * pu)
 // This gives the offset into the action table, which is output as the
 // 4th field in a call-site record.
   int running_ofst=1;
-  int bytes_for_filter;
 
   PU::type_info_table type_table;
   Get_Current_PU().Get_type_info_table(type_table);
@@ -1211,7 +1210,7 @@ Create_INITO_For_Range_Table(ST * st, ST * pu)
       // offset - single action
       // -filter - excetion filter
 
-      bool zero_action = false;
+      int action_value = 0;
 
       switch (INITV_kind(next_initv)) {
       case INITVKIND_SYMOFF:
@@ -1222,30 +1221,22 @@ Create_INITO_For_Range_Table(ST * st, ST * pu)
           PU::type_info_table::const_iterator filter_it = type_table.find(&St_Table[sym]);
           FmtAssert(filter_it != type_table.end(), ("Action filter not found in TI table"));
 
-          INITV_Set_VAL(Initv_Table[action],
-                        Enter_tcon(Host_To_Targ(MTYPE_I4, filter_it->second)), 1);
-          bytes_for_filter = sizeof_signed_leb128(filter_it->second);
+          action_value = filter_it->second;
         }
         break;
 
       case INITVKIND_ZERO:
         // cleanup or catch-all
 
-        INITV_Set_ZERO(Initv_Table[action], MTYPE_I4, 1);
-        zero_action = true;
-        bytes_for_filter = 1;
+        action_value = 0;
         break;
 
       case INITVKIND_VAL:
         // offset in EH spec filter
 
       {
-        int offset = TCON_ival(INITV_tc_val(next_initv));
-        FmtAssert(offset < 0, ("Invalid value in ereg_supp"));
-
-        INITV_Set_VAL(Initv_Table[action],
-        Enter_tcon (Host_To_Targ(MTYPE_I4, offset)), 1);
-        bytes_for_filter = sizeof_signed_leb128(offset);
+        action_value = TCON_ival(INITV_tc_val(next_initv));
+        FmtAssert(action_value < 0, ("Invalid value in ereg_supp"));
         break;
       }
 
@@ -1254,20 +1245,16 @@ Create_INITO_For_Range_Table(ST * st, ST * pu)
         break;
       }
 
+      INITV_Set_VAL(Initv_Table[action],
+                    Enter_tcon(Host_To_Targ(MTYPE_I4, action_value)), 1);
+
       if (!action_ofst)
       {
         // store the head of each action chain
         action_chains.push_back (action);
         
         // action start marker for call-site record
-        if (zero_action && !INITV_next (next_initv))
-        {
-          // There is no action-record for this eh-region, so mark the
-          // action-record ofst as zero.
-          INITV_Set_ZERO (Initv_Table[first_action], MTYPE_I4, 1);
-        }
-        else
-          INITV_Set_VAL (Initv_Table[first_action],
+        INITV_Set_VAL (Initv_Table[first_action],
         Enter_tcon (Host_To_Targ (MTYPE_I4, running_ofst)), 1);
         // store offset into first action **Note: not the filter, but offset to it
         Set_INITV_next (pad, first_action);
@@ -1284,7 +1271,7 @@ Create_INITO_For_Range_Table(ST * st, ST * pu)
       else
         INITV_Set_ZERO (Initv_Table[action_ofst], MTYPE_I4, 1);
         Set_INITV_next (action, action_ofst);
-        running_ofst += (1 + bytes_for_filter);
+        running_ofst += (1 + sizeof_signed_leb128(action_value));
     }
 
     if (i == 0)

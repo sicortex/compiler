@@ -954,7 +954,8 @@ SUMMARIZE<program>::Process_eh_globals (void)
     for (PU::type_info_table::const_iterator it = type_table.begin();
          it != type_table.end(); ++it)
     {
-        Get_symbol_index(it->first);
+        if(it->first != NULL)
+            Get_symbol_index(it->first);
     }
 
     PU::eh_spec_vector eh_spec;

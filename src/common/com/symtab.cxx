@@ -2811,18 +2811,33 @@ void PU::Get_type_info_table(type_info_table & type_info) const
         INITV_IDX filter_initv = INITV_next(st_initv);
         FmtAssert(filter_initv != 0, ("Invalid TI table"));
 
-        FmtAssert(INITV_kind(st_initv) == INITVKIND_SYMOFF,
-                  ("Invalid TI table"));
+        ST * st = NULL;
+
+        switch(INITV_kind(st_initv)) {
+        case INITVKIND_SYMOFF:
+            {
+            ST_IDX st_idx = INITV_st(st_initv);
+            st = &St_Table[st_idx];
+            break;
+            }
+
+        case INITVKIND_ZERO:
+            // catch-all type
+            st = NULL;
+            break;
+
+        default:
+            FmtAssert(FALSE, ("Invalid entry in type table"));
+            break;
+        }
+
         FmtAssert(INITV_kind(filter_initv) == INITVKIND_VAL,
                   ("Invalid TI table"));
 
-        ST_IDX st_idx = INITV_st(st_initv);
         int filter = TCON_ival(INITV_tc_val(filter_initv));
 
-        FmtAssert(st_idx != 0, ("null ST in TI table"));
-
         std::pair<type_info_table::iterator, bool> res =
-                type_info.insert(std::make_pair(&St_Table[st_idx], filter));
+                type_info.insert(std::make_pair(st, filter));
         FmtAssert(res.second, ("Duplicated ST in TI table"));
 
         block = INITV_next(block);

@@ -301,7 +301,11 @@ void WN_Verifier::Check_eh_region(WN *wn)
 
     switch (INITV_kind(filter)) {
     case INITVKIND_ZERO:
-      // catch-all filter
+      // cleanup
+      break;
+
+    case INITVKIND_ONE:
+      // catch-all
       break;
 
     case INITVKIND_VAL:

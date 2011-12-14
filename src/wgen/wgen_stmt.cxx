@@ -627,15 +627,12 @@ Do_EH_Tables (void)
         for (int i=0; i<type_filter_vector.size(); ++i)
         {
                 INITV_IDX st = New_INITV();
-// Do not use INITV_Init_Integer(), since INITV_Init_Integer()
-// silently calls INITV_Set_ONE() if the value is 1. Then you
-// try to retrieve later using INITV_tc_val(), and you get an
-// assertion failure!
-                FmtAssert(type_filter_vector[i].st != 0,
-                          ("Bad TI in TI table"));
 
-                INITV_Set_SYMOFF(Initv_Table[st], 1,
-                                 type_filter_vector[i].st, 0);
+                if(type_filter_vector[i].st != 0) {
+                  INITV_Set_SYMOFF(Initv_Table[st], 1, type_filter_vector[i].st, 0);
+                } else {
+                  INITV_Set_ZERO(Initv_Table[st], MTYPE_I4, 1);
+                }
 
                 INITV_IDX filter = New_INITV();
                 INITV_Set_VAL (Initv_Table[filter],
@@ -3091,7 +3088,7 @@ Create_handler_list (int scope_index, bool &cleanups_seen)
         if (st != 0)
             INITV_Set_SYMOFF(Initv_Table[type_st], 1, st, 0);
         else
-            INITV_Set_ZERO(Initv_Table[type_st], MTYPE_U4, 1);
+            INITV_Set_ONE(Initv_Table[type_st], MTYPE_U4, 1);
 
 	if (prev_type_st) Set_INITV_next (prev_type_st, type_st);
 	else start = type_st;
@@ -4032,18 +4029,16 @@ WGEN_Expand_Handlers_Or_Cleanup (const HANDLER_INFO &handler_info)
 
         int filter = 0;
 
-        if (sym != 0) {
-          // adding type to type_filter_vector if not added
+        // adding type to type_filter_vector if not added
 
-          vector<TYPE_FILTER_ENTRY>::iterator it = find(type_filter_vector.begin(),
-                                                        type_filter_vector.end(),
-                                                        TYPE_FILTER_ENTRY(sym, 0));
-          if (it == type_filter_vector.end()) {
-            filter = type_filter_vector.size() + 1;
-            type_filter_vector.push_back(TYPE_FILTER_ENTRY(sym, filter));
-          } else {
-            filter = it->filter;
-          }
+        vector<TYPE_FILTER_ENTRY>::iterator it = find(type_filter_vector.begin(),
+                                                      type_filter_vector.end(),
+                                                      TYPE_FILTER_ENTRY(sym, 0));
+        if (it == type_filter_vector.end()) {
+          filter = type_filter_vector.size() + 1;
+          type_filter_vector.push_back(TYPE_FILTER_ENTRY(sym, filter));
+        } else {
+          filter = it->filter;
         }
 
         if (sym)

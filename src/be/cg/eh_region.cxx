@@ -1077,7 +1077,12 @@ INITV_IDX Create_Type_Info_Table_Block(PU * pu)
          i != sorted_table.rend(); ++i) {
 
         INITV_IDX type = New_INITV();
-        INITV_Init_Symoff(type, i->second, 0);
+
+        if(i->second != NULL) {
+          INITV_Init_Symoff(type, i->second, 0);
+        } else {
+          INITV_Set_ZERO(Initv_Table[type], Pointer_Mtype, 1);
+        }
 
         if (prev)
             Set_INITV_next(prev, type);
@@ -1213,20 +1218,23 @@ Create_INITO_For_Range_Table(ST * st, ST * pu)
       int action_value = 0;
 
       switch (INITV_kind(next_initv)) {
+      case INITVKIND_ONE:
+        // catch-all
       case INITVKIND_SYMOFF:
         // type filter
 
         {
-          ST_IDX sym = INITV_st(next_initv);
-          PU::type_info_table::const_iterator filter_it = type_table.find(&St_Table[sym]);
-          FmtAssert(filter_it != type_table.end(), ("Action filter not found in TI table"));
+          ST * st = INITV_kind(next_initv) == INITVKIND_SYMOFF ?
+                    &St_Table[INITV_st(next_initv)] : NULL;
 
+          PU::type_info_table::const_iterator filter_it = type_table.find(st);
+          FmtAssert(filter_it != type_table.end(), ("Action filter not found in TI table"));
           action_value = filter_it->second;
         }
         break;
 
       case INITVKIND_ZERO:
-        // cleanup or catch-all
+        // cleanup
 
         action_value = 0;
         break;

@@ -2290,6 +2290,7 @@ get_x86_auto_cpu_name ()
         return "any_64bit_x86";
 	  case 30: // Intel i7
 	  case 42: // Intel i5
+	  case 45: // Intel Xeon E5
 	    return "sandy";
 
       default: return "i686";

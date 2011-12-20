@@ -674,6 +674,25 @@ int main()
 			   TOP_mulxsd,
 			   TOP_divxss,
 			   TOP_divxsd,
+			   TOP_phaddwx,
+			   TOP_phadddx,
+			   TOP_phaddswx,
+			   TOP_phsubwx,
+			   TOP_phsubdx,
+			   TOP_phsubswx,
+			   TOP_pmaddubswx,
+			   TOP_pmulhrswx,
+			   TOP_pshufbx,
+			   TOP_phaddwx128,
+			   TOP_phadddx128,
+			   TOP_phaddswx128,
+			   TOP_phsubwx128,
+			   TOP_phsubdx128,
+			   TOP_phsubswx128,
+			   TOP_pmaddubswx128,
+			   TOP_pmulhrswx128,
+			   TOP_pshufbx128,
+			   
 			   TOP_UNDEFINED );
 
   /* One result / two operands in x86 style w/ mem operand w/ scaled-index */
@@ -771,6 +790,24 @@ int main()
 			   TOP_mulxxsd,
 			   TOP_divxxss,
 			   TOP_divxxsd,
+			   TOP_phaddwxx,
+			   TOP_phadddxx,
+			   TOP_phaddswxx,
+			   TOP_phsubwxx,
+			   TOP_phsubdxx,
+			   TOP_phsubswxx,
+			   TOP_pmaddubswxx,
+			   TOP_pmulhrswxx,
+			   TOP_pshufbxx,
+			   TOP_phaddwxx128,
+			   TOP_phadddxx128,
+			   TOP_phaddswxx128,
+			   TOP_phsubwxx128,
+			   TOP_phsubdxx128,
+			   TOP_phsubswxx128,
+			   TOP_pmaddubswxx128,
+			   TOP_pmulhrswxx128,
+			   TOP_pshufbxx128,
 			   TOP_UNDEFINED );
 
   /* One result / two operands in x86 style w/ mem operand w/o base */
@@ -867,6 +904,24 @@ int main()
 			   TOP_mulxxxsd,
 			   TOP_divxxxss,
 			   TOP_divxxxsd,
+			   TOP_phaddwxxx,
+			   TOP_phadddxxx,
+			   TOP_phaddswxxx,
+			   TOP_phsubwxxx,
+			   TOP_phsubdxxx,
+			   TOP_phsubswxxx,
+			   TOP_pmaddubswxxx,
+			   TOP_pmulhrswxxx,
+			   TOP_pshufbxxx,
+			   TOP_phaddwxxx128,
+			   TOP_phadddxxx128,
+			   TOP_phaddswxxx128,
+			   TOP_phsubwxxx128,
+			   TOP_phsubdxxx128,
+			   TOP_phsubswxxx128,
+			   TOP_pmaddubswxxx128,
+			   TOP_pmulhrswxxx128,
+			   TOP_pshufbxxx128,
 			   TOP_UNDEFINED );
 
   /* One result / three operands in x86 style */
@@ -1196,7 +1251,60 @@ int main()
 				 TOP_pabsb,
 				 TOP_pabsw,
 				 TOP_pabsd,
+				 TOP_psignb128,
+				 TOP_psignw128,
+				 TOP_psignd128,
+				 TOP_psignb,
+				 TOP_psignw,
+				 TOP_psignd,
 			   TOP_UNDEFINED );
+
+   /* One result / x86-style opr, mem, opr */
+  ISA_PRINT_TYPE ropmemop =  ISA_Print_Type_Create("ropmemop", "%s %s%s(%s),%s,%s");
+  Name();
+  Segment();
+  Operand(2);
+  Operand(1);
+  Operand(3);
+  Result(0);
+  Operand(0);
+  Instruction_Print_Group( ropmemop,
+                           /* SSSE3 instructions */
+                           TOP_palignrx128,
+                           TOP_palignrx,
+                           TOP_UNDEFINED);
+
+   /* One result / x86 style opr, mem with scaled-index with base, opr*/
+  ISA_PRINT_TYPE ropmemindexop =  ISA_Print_Type_Create("ropmemindexop", "%s %s%s(%s,%s,%s),%s,%s");
+  Name();
+  Segment();
+  Operand(4);
+  Operand(1);
+  Operand(2);
+  Operand(3);
+  Operand(5);
+  Result(0);
+  Operand(0);
+  Instruction_Print_Group( ropmemindexop,
+                           /* SSSE3 instructions */
+                           TOP_palignrxx128,
+                           TOP_palignrxx,
+                           TOP_UNDEFINED);
+
+  /* One result / x86 style opr, mem with scaled-index w/o base, opr*/
+  ISA_PRINT_TYPE ropmemindexxop =  ISA_Print_Type_Create("ropmemindexxop", "%s %s%s(,%s,%s),%s,%s");
+  Name();
+  Segment();
+  Operand(3);
+  Operand(1);
+  Operand(2);
+  Operand(4);
+  Result(0);
+  Operand(0);
+  Instruction_Print_Group( ropmemindexxop,
+                           TOP_palignrxxx128,
+                           TOP_palignrxxx,
+                           TOP_UNDEFINED);
 
   /* Two operands / no result */
   ISA_PRINT_TYPE opop1 =  ISA_Print_Type_Create("opop1", "%s %s,%s");
@@ -1343,6 +1451,18 @@ int main()
 			   TOP_fmovddupx,			   
 			   TOP_ld64_2m,
 			   TOP_ld64_2sse,
+			   TOP_pabsbx,
+			   TOP_pabswx,
+			   TOP_pabsdx,
+			   TOP_psignbx,
+			   TOP_psignwx,
+			   TOP_psigndx,
+			   TOP_pabsbx128,
+			   TOP_pabswx128,
+			   TOP_pabsdx128,
+			   TOP_psignbx128,
+			   TOP_psignwx128,
+			   TOP_psigndx128,
 			   TOP_UNDEFINED );
 
   /* lea instruction with indx */
@@ -1428,6 +1548,18 @@ int main()
 			   TOP_fmovsldupxx,
 			   TOP_fmovshdupxx,
 			   TOP_fmovddupxx,
+			   TOP_pabsbxx,
+			   TOP_pabswxx,
+			   TOP_pabsdxx,
+			   TOP_psignbxx,
+			   TOP_psignwxx,
+			   TOP_psigndxx,
+			   TOP_pabsbxx128,
+			   TOP_pabswxx128,
+			   TOP_pabsdxx128,
+			   TOP_psignbxx128,
+			   TOP_psignwxx128,
+			   TOP_psigndxx128,
 			   TOP_UNDEFINED );
 
   /* load instruction with indx w/o base*/
@@ -1462,7 +1594,19 @@ int main()
 			   TOP_ldapsxx,
 			   TOP_fmovsldupxxx,
 			   TOP_fmovshdupxxx,
-			   TOP_fmovddupxxx,			   
+			   TOP_fmovddupxxx,
+			   TOP_pabsbxxx,
+			   TOP_pabswxxx,
+			   TOP_pabsdxxx,
+			   TOP_psignbxxx,
+			   TOP_psignwxxx,
+			   TOP_psigndxxx,
+			   TOP_pabsbxxx128,
+			   TOP_pabswxxx128,
+			   TOP_pabsdxxx128,
+			   TOP_psignbxxx128,
+			   TOP_psignwxxx128,
+			   TOP_psigndxxx128,
 			   TOP_UNDEFINED );
 
   /* store instruction with indx */

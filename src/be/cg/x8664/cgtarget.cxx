@@ -610,6 +610,65 @@ UINT32 CGTARG_Mem_Ref_Bytes(const OP *memop)
   case TOP_fmovshdupxxx:
   case TOP_fmovddupxxx:
   case TOP_xchgx64:
+  //SSSE3
+  case TOP_phaddwx:
+  case TOP_phaddwxx:
+  case TOP_phaddwxxx:
+  case TOP_phadddx:
+  case TOP_phadddxx:
+  case TOP_phadddxxx:
+  case TOP_phaddswx:
+  case TOP_phaddswxx:
+  case TOP_phaddswxxx:
+  case TOP_phsubwx:
+  case TOP_phsubwxx:
+  case TOP_phsubwxxx:
+  case TOP_phsubdx:
+  case TOP_phsubdxx:
+  case TOP_phsubdxxx:
+  case TOP_phsubswx:
+  case TOP_phsubswxx:
+  case TOP_phsubswxxx:
+  case TOP_pabsb:
+  case TOP_pabsw:
+  case TOP_pabsd:
+  case TOP_pmaddubsw:
+  case TOP_pmulhrsw:
+  case TOP_palignr:
+  case TOP_pshufb:
+  case TOP_psignb:
+  case TOP_psignw:
+  case TOP_psignd:
+  case TOP_pabsbx:
+  case TOP_pabswx:
+  case TOP_pabsdx:
+  case TOP_pmaddubswx:
+  case TOP_pmulhrswx:
+  case TOP_palignrx:
+  case TOP_pshufbx:
+  case TOP_psignbx:
+  case TOP_psignwx:
+  case TOP_psigndx:
+  case TOP_pabsbxx:
+  case TOP_pabswxx:
+  case TOP_pabsdxx:
+  case TOP_pmaddubswxx:
+  case TOP_pmulhrswxx:
+  case TOP_palignrxx:
+  case TOP_pshufbxx:
+  case TOP_psignbxx:
+  case TOP_psignwxx:
+  case TOP_psigndxx:
+  case TOP_pabsbxxx:
+  case TOP_pabswxxx:
+  case TOP_pabsdxxx:
+  case TOP_pmaddubswxxx:
+  case TOP_pmulhrswxxx:
+  case TOP_palignrxxx:
+  case TOP_pshufbxxx:
+  case TOP_psignbxxx:
+  case TOP_psignwxxx:
+  case TOP_psigndxxx:
     return 8;
 
   case TOP_fldt:

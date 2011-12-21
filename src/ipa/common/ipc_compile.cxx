@@ -283,7 +283,6 @@ ipa_compile_init ()
   if (command_map == 0)
     ErrMsg (EC_No_Mem, "ipa_compile_init");
 
-  const char* toolroot = getenv("TOOLROOT");
 
 #ifdef TARG_IA64
 
@@ -374,15 +373,9 @@ ipa_compile_init ()
 
   (*command_map)["cord"] = cord_name_base;
 
-  if (toolroot) {
-      static char* new_cc_name_base = concat_names((const string)toolroot, (const string)tmp_cc_name_base);
-      if (file_exists(new_cc_name_base))
-	  (*command_map)["cc"] = new_cc_name_base;
-      else 
-	  (*command_map)["cc"] = cc_name_base;
-  }
+ 
 #ifdef KEY
-  else if (IPA_cc_name != NULL) {		// Bug 14371.
+  if (IPA_cc_name != NULL) {		// Bug 14371.
       (*command_map)["cc"]    = IPA_cc_name;
   }
 #endif
@@ -395,11 +388,6 @@ ipa_compile_init ()
   // contains something sensible.
   static const char* smake_name = 0;
   {
-    if (toolroot != 0) {
-      const char* tmp = concat_names((const string)toolroot, (const string)smake_base);
-      if (file_exists(tmp))
-        smake_name = tmp;
-    }
 
     if (smake_name == 0) {
       if (file_exists(smake_base))

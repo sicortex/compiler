@@ -132,17 +132,10 @@ void init_msg_processing (char *argv[])
 #endif /* KEY Bug 5089 */
   {
     /* NLSPATH is not set. */
-    const char * const toolroot = getenv("TOOLROOT");
     const char * const env_name = "NLSPATH=";
     const char * const env_val = "/usr/lib/locale/C/LC_MESSAGES/%N.cat";
     int len = strlen(env_name) + strlen(env_val) + 1;
     char * new_env;
-    if (toolroot != NULL) len += strlen(toolroot);
-    new_env = malloc(len);
-    if (toolroot == NULL)
-      sprintf(new_env, "%s%s", env_name, env_val);
-    else
-      sprintf(new_env, "%s%s%s", env_name, toolroot, env_val);
     putenv(new_env);
 #ifdef KEY /* Bug 5089 */
     result = new_env;

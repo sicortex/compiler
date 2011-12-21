@@ -131,8 +131,7 @@ static const char* get_ipa_linker (int argc, char** argv)
 
 static const char* get_linker_name(int argc, char** argv)
 {
-    const char * toolroot = getenv("TOOLROOT");
-    if (!toolroot) { toolroot = "" ; }
+
 
     char* linker_name;
     char *where_am_i = getenv("COMPILER_BIN");
@@ -170,45 +169,8 @@ static const char* get_linker_name(int argc, char** argv)
 	free (linker_name);
     }
 
-#ifdef KEY
-    if (use_cc_linker)
-      linker_name = concat_names (toolroot, PHASEPATH CC_LINKER_NAME_WITH_SLASH);
-    else
-#endif
-      linker_name = concat_names (toolroot, PHASEPATH LINKER_NAME_WITH_SLASH);
-    if (file_exists (linker_name)) {
-        return linker_name;
-    }
-    free (linker_name);
-
-#ifdef KEY
-    if (use_cc_linker)
-      linker_name = concat_names (toolroot, GNUPHASEPATH CC_LINKER_NAME_WITH_SLASH);
-    else
-#endif
-      linker_name = concat_names (toolroot, GNUPHASEPATH LINKER_NAME_WITH_SLASH);
-    if (file_exists (linker_name)) {
-        return linker_name;
-    }
-    free (linker_name);
-
-#ifdef KEY
-    if (use_cc_linker)
-      linker_name = concat_names (toolroot, BINPATH CC_LINKER_NAME_WITH_SLASH);
-    else
-#endif
-      linker_name = concat_names (toolroot, BINPATH LINKER_NAME_WITH_SLASH);
-    if (file_exists (linker_name)) {
-        return linker_name;
-    }
-    free (linker_name);
         
-#ifdef KEY
-    if (use_cc_linker)
-      linker_name = concat_names (toolroot, ALTBINPATH CC_LINKER_NAME_WITH_SLASH);
-    else
-#endif
-      linker_name = concat_names (toolroot, ALTBINPATH LINKER_NAME_WITH_SLASH);
+
     if (file_exists (linker_name)) {
         return linker_name;
     }

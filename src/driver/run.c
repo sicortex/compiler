@@ -468,19 +468,12 @@ run_phase (phases_t phase, char *name, string_list_t *args)
         my_putenv("ORIG_CMD_NAME", "%s", program_name);
     
     if (phase == P_f90_fe) {
-        char *root;
         char *modulepath;
         int len;
         char *new_env;
         char *env_name = "FORTRAN_SYSTEM_MODULES=";
         char *env_val = "/usr/lib/f90modules";
-        root = getenv("TOOLROOT");
-        if (root != NULL) {
-            len = strlen(env_val) + strlen(root) +3 + strlen(env_val);
-            new_env = alloca(len);
-            sprintf(new_env,"%s/%s:%s",root,env_val,env_val);
-            env_val = new_env;
-        }
+        
         modulepath = string_copy(getenv("FORTRAN_SYSTEM_MODULES"));
         if (modulepath != NULL) {
             /* Append env_val to FORTRAN_SYSTEM_MODULES */

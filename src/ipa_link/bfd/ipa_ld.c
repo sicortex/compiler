@@ -219,9 +219,6 @@ do_compile (string *argv)
     int pid;
     
     if (toolroot) {
-	if ((toolroot = getenv ("TOOLROOT")) == 0)
-	    toolroot = ipa_copy_of(DEFAULT_TOOLROOT);
-	else
 	    toolroot = concat_names (toolroot, DEFAULT_TOOLROOT);
     }
 

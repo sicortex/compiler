@@ -2958,7 +2958,6 @@ extern char *get_binutils_lib_path(void);
 void
 init_phase_info (void)
 {
-	char *toolroot;
 	char *comp_target_root;
 
 	init_gnu_phase_info();
@@ -2981,11 +2980,7 @@ init_phase_info (void)
 	  old_ld_library_path = get_binutils_lib_path();
 	}
 
-	toolroot = getenv("TOOLROOT");
-	if (toolroot != NULL) {
-		/* add toolroot as prefix to phase dirs */
-                prefix_all_phase_dirs(PHASE_MASK, toolroot);
-	}
+
 	comp_target_root = getenv("COMP_TARGET_ROOT");
 	if (comp_target_root != NULL) {
 		/* add comp_target_root as prefix to phase dirs */

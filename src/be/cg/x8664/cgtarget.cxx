@@ -2931,6 +2931,8 @@ void CGTARG_LOOP_Optimize( LOOP_DESCR* loop )
         continue;
     }
 #endif
+ //temporarily disable bug12036
+   if(0){
     TOP new_top = TOP_UNDEFINED;
     switch( OP_code(op) ){
     //SSE support
@@ -2974,6 +2976,7 @@ void CGTARG_LOOP_Optimize( LOOP_DESCR* loop )
    if( new_top != TOP_UNDEFINED )
       OP_Change_Opcode( op, new_top );
   }
+ }
 #if 0 //temporarily disable the changeset of bug 11853 for bug 12036
   if (dep_graph_computed == TRUE)
     CG_DEP_Delete_Graph(body);

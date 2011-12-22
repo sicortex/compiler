@@ -601,10 +601,8 @@ _mm_set_epi8 (char __q15, char __q14, char __q13, char __q12,
 	      char __q07, char __q06, char __q05, char __q04,
 	      char __q03, char __q02, char __q01, char __q00)
 {
-  return __extension__ (__m128i)(__v16qi){
-    __q00, __q01, __q02, __q03, __q04, __q05, __q06, __q07,
-    __q08, __q09, __q10, __q11, __q12, __q13, __q14, __q15
-  };
+  return __builtin_ia32_setr_epi8(__q00, __q01, __q02, __q03, __q04, __q05, __q06, __q07,
+		    __q08, __q09, __q10, __q11, __q12, __q13, __q14, __q15);
 }
 
 /* Set all of the elements of the vector to A.  */
@@ -668,8 +666,10 @@ _mm_setr_epi8 (char __q00, char __q01, char __q02, char __q03,
 	       char __q08, char __q09, char __q10, char __q11,
 	       char __q12, char __q13, char __q14, char __q15)
 {
-  return _mm_set_epi8 (__q15, __q14, __q13, __q12, __q11, __q10, __q09, __q08,
-		       __q07, __q06, __q05, __q04, __q03, __q02, __q01, __q00);
+    return (__m128i)__builtin_ia32_setr_epi8(__q00, __q01, __q02, __q03, __q04, __q05, __q06, __q07,
+				__q08, __q09, __q10, __q11, __q12, __q13, __q14, __q15);
+  //return _mm_set_epi8 (__q15, __q14, __q13, __q12, __q11, __q10, __q09, __q08,
+		  //     __q07, __q06, __q05, __q04, __q03, __q02, __q01, __q00);
 }
 
 /* Create a vector with element 0 as *P and the rest zero.  */

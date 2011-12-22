@@ -162,7 +162,11 @@ extern void Exp_Intrinsic_Op (
         INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, TN *op4, 
         TYPE_ID mtype, OPS *ops
         );
-
+extern void Exp_Intrinsic_Op_SETE(
+	    INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, TN *op4,
+	    TN *op5, TN *op6, TN *op7, TN *op8, TN *op9,
+	    TN *op10, TN *op11, TN *op12, TN *op13, TN *op14, TN *op15,
+	    TYPE_ID mtype, OPS *ops);
 #else 
 
 /* expand intrinsic op */

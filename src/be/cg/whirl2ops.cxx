@@ -3168,6 +3168,71 @@ Get_Intrinsic_Op_Parameters( WN *expr, TN **result, TN ***opnds, INT *numopnds, 
 #undef CHECK_OPNDS
 }
 
+static TN*
+Handle_INTRINSIC_SETOP(WN *expr, TN *result){
+  INTRINSIC id = (INTRINSIC) WN_intrinsic(expr);
+  switch(id){
+  	case INTRN_SETREPI8:{
+	  TN *kid0, *kid1,*kid2,*kid3,*kid4,*kid5,*kid6,*kid7,*kid8,*kid9,*kid10,*kid11,*kid12,*kid13,*kid14,*kid15;
+	  kid0 = (WN_operator(WN_kid0(WN_kid0(expr)))== OPR_INTCONST) ? 
+	  	Gen_Literal_TN(WN_const_val(WN_kid0(WN_kid0(expr))),1) :
+	  	Expand_Expr(WN_kid0(expr), expr, NULL);
+	  kid1 = (WN_operator(WN_kid0(WN_kid(expr, 1)))== OPR_INTCONST) ? 
+	  	Gen_Literal_TN(WN_const_val(WN_kid0(WN_kid(expr, 1))),1) :
+	  	Expand_Expr(WN_kid(expr, 1), expr, NULL);
+	  kid2 = (WN_operator(WN_kid0(WN_kid(expr, 2)))== OPR_INTCONST) ? 
+	  	Gen_Literal_TN(WN_const_val(WN_kid0(WN_kid(expr, 2))),1) : 
+	  	Expand_Expr(WN_kid(expr, 2), expr, NULL);
+	  kid3 = (WN_operator(WN_kid0(WN_kid(expr, 3)))== OPR_INTCONST) ? 
+	  	Gen_Literal_TN(WN_const_val(WN_kid0(WN_kid(expr, 3))),1) :
+	  	Expand_Expr(WN_kid(expr, 3), expr, NULL);
+	  kid4 = (WN_operator(WN_kid0(WN_kid(expr, 4)))== OPR_INTCONST) ? 
+	  	Gen_Literal_TN(WN_const_val(WN_kid0(WN_kid(expr, 4))),1) : 
+	  	Expand_Expr(WN_kid(expr, 4), expr, NULL);
+	  kid5 = (WN_operator(WN_kid0(WN_kid(expr, 5)))== OPR_INTCONST) ? 
+	  	Gen_Literal_TN(WN_const_val(WN_kid0(WN_kid(expr, 5))),1) :
+	  	Expand_Expr(WN_kid(expr, 5), expr, NULL);
+	  kid6 = (WN_operator(WN_kid0(WN_kid(expr, 6)))== OPR_INTCONST) ? 
+	  	Gen_Literal_TN(WN_const_val(WN_kid0(WN_kid(expr, 6))),1) :
+	  	Expand_Expr(WN_kid(expr, 6), expr, NULL);
+	  kid7 = (WN_operator(WN_kid0(WN_kid(expr, 7)))== OPR_INTCONST) ? 
+	  	Gen_Literal_TN(WN_const_val(WN_kid0(WN_kid(expr, 7))),1) :
+	  	Expand_Expr(WN_kid(expr, 7), expr, NULL);
+	  kid8 = (WN_operator(WN_kid0(WN_kid(expr, 8)))== OPR_INTCONST) ? 
+	  	Gen_Literal_TN(WN_const_val(WN_kid0(WN_kid(expr, 8))),1) : 
+	  	Expand_Expr(WN_kid(expr, 8), expr, NULL);
+	  kid9 = (WN_operator(WN_kid0(WN_kid(expr, 9)))== OPR_INTCONST) ? 
+	  	Gen_Literal_TN(WN_const_val(WN_kid0(WN_kid(expr, 9))),1) :
+	  	Expand_Expr(WN_kid(expr, 9), expr, NULL);
+	  kid10 = (WN_operator(WN_kid0(WN_kid(expr, 10)))== OPR_INTCONST) ? 
+	  	Gen_Literal_TN(WN_const_val(WN_kid0(WN_kid(expr, 10))),1) :
+	  	Expand_Expr(WN_kid(expr, 10), expr, NULL);
+	  kid11 = (WN_operator(WN_kid0(WN_kid(expr, 11)))== OPR_INTCONST) ? 
+	  	Gen_Literal_TN(WN_const_val(WN_kid0(WN_kid(expr, 11))),1) :
+	  	Expand_Expr(WN_kid(expr, 11), expr, NULL);
+	  kid12 = (WN_operator(WN_kid0(WN_kid(expr, 12)))== OPR_INTCONST) ? 
+	  	Gen_Literal_TN(WN_const_val(WN_kid0(WN_kid(expr, 12))),1) :
+	  	Expand_Expr(WN_kid(expr, 12), expr, NULL);
+	  kid13 = (WN_operator(WN_kid0(WN_kid(expr, 13)))== OPR_INTCONST) ? 
+	  	Gen_Literal_TN(WN_const_val(WN_kid0(WN_kid(expr, 13))),1) : 
+	  	Expand_Expr(WN_kid(expr, 13), expr, NULL);
+	  kid14 = (WN_operator(WN_kid0(WN_kid(expr, 14)))== OPR_INTCONST) ? 
+	  	Gen_Literal_TN(WN_const_val(WN_kid0(WN_kid(expr, 14))),1) :
+	  	Expand_Expr(WN_kid(expr, 14), expr, NULL);
+	  kid15 = (WN_operator(WN_kid0(WN_kid(expr, 15)))== OPR_INTCONST) ? 
+	  	Gen_Literal_TN(WN_const_val(WN_kid0(WN_kid(expr, 15))),1) :
+	  	Expand_Expr(WN_kid(expr, 15), expr, NULL);
+	  Exp_Intrinsic_Op_SETE(id, result, kid0, kid1, kid2, kid3,
+	  	kid4, kid5, kid6, kid7, kid8, kid9, kid10,
+	  	kid11,kid12, kid13, kid14, kid15, WN_rtype( WN_kid0(expr) ), &New_OPs);	
+  	}
+	break;
+	default:
+	  FmtAssert(FALSE, ("unexpected number of kids in intrinsic_op not INTRN_SETEPI8"));
+	  
+  }
+  return result; 
+}
 
 static TN*
 Handle_INTRINSIC_OP (WN *expr, TN *result)
@@ -3178,6 +3243,13 @@ Handle_INTRINSIC_OP (WN *expr, TN *result)
   TN *kid0 = Expand_Expr(WN_kid0(expr), expr, NULL);
 
 #ifdef TARG_X8664
+  if(numkids > 5){
+  	/*For some intrinsic like _mm_set_epi8 of SSE2*/
+	if(result == NULL)
+	  result = Allocate_Result_TN(expr, NULL);
+  	Handle_INTRINSIC_SETOP(expr, result);
+	return result;
+  }
   INT imm_kidno = 0;
   // Get any immediate operand in intrinsic.
   TN * imm_kid = Handle_Imm_Op (expr, &imm_kidno);

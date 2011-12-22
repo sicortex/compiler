@@ -7036,6 +7036,281 @@ void Expand_Intrinsic_Imm_Param(TOP opc, struct tn* result, struct tn *op0,
 	   }
 }
 
+static void
+Expand_Mov_Int_To_vector(TN *result, TN* src, OPS *ops){
+  if(TN_is_constant(src)){
+  	TN *tni = Build_TN_Of_Mtype(MTYPE_I4);
+  	Build_OP(TOP_ldc32, tni , src, ops);
+	Build_OP(TOP_movg2x, result, tni, ops );
+  }else
+    Build_OP(TOP_movg2x, result, src, ops);
+}
+
+static UINT32
+Gen_Uint_By_Char(UINT v1, UINT v2, UINT v3, UINT v4){
+  return (v1 & 0x000000ff) +((v2 & 0x000000ff)<<8) + 
+  	((v3 & 0x000000ff) << 16) + ((v4 & 0x000000ff)<<24);
+}
+
+void Exp_Intrinsic_Op_SETE(
+	    INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, TN *op4,
+	    TN *op5, TN *op6, TN *op7, TN *op8, TN *op9,
+	    TN *op10, TN *op11, TN *op12, TN *op13, TN *op14, TN *op15,
+	    TYPE_ID mtype, OPS *ops)
+{
+  switch(id){
+  	case INTRN_SETREPI8:{
+	  // TODO: when all op is contant, we can optimize it out
+	 if(TN_is_constant(op0) && TN_is_constant(op1) && TN_is_constant(op2) && TN_is_constant(op3)
+	 	&& TN_is_constant(op4) && TN_is_constant(op5) && TN_is_constant(op6)
+	 	&& TN_is_constant(op7) && TN_is_constant(op8) && TN_is_constant(op9)
+	 	&& TN_is_constant(op10) && TN_is_constant(op11) && TN_is_constant(op12)
+	 	&& TN_is_constant(op13) && TN_is_constant(op14) && TN_is_constant(op15)){
+	 	UINT32 tval1, tval2, tval3, tval4;
+		tval1 = Gen_Uint_By_Char( TN_value(op0),TN_value(op1), TN_value(op2) ,TN_value(op3));
+		tval2 = Gen_Uint_By_Char( TN_value(op4),TN_value(op5), TN_value(op6) ,TN_value(op7));
+		tval3 = Gen_Uint_By_Char( TN_value(op8),TN_value(op9), TN_value(op10) ,TN_value(op11));
+		tval4 = Gen_Uint_By_Char( TN_value(op12),TN_value(op13), TN_value(op14) ,TN_value(op15));
+		TCON tcon = Host_To_Targ(MTYPE_V16I4, 0);
+		TCON_v0(tcon) = tval1;
+		TCON_v1(tcon) = tval2;
+		TCON_v2(tcon) = tval3;
+		TCON_v3(tcon) = tval4;
+		ST *sym = New_Const_Sym(Enter_tcon(tcon),Be_Type_Tbl(TCON_ty(tcon)));
+		Allocate_Object(sym);
+		Exp_Load(MTYPE_V16I4, MTYPE_V16I4, result , sym, 0, ops, 0);
+		
+	 }else if( TN_is_constant(op8) && TN_is_constant(op9)
+	 	&& TN_is_constant(op10) && TN_is_constant(op11) && TN_is_constant(op12)
+	 	&& TN_is_constant(op13) && TN_is_constant(op14) && TN_is_constant(op15)){
+	 	UINT32 tval891011 = Gen_Uint_By_Char( TN_value(op8),TN_value(op9), TN_value(op10) ,TN_value(op11));
+		UINT32 tval12131415 = Gen_Uint_By_Char( TN_value(op12),TN_value(op13), TN_value(op14) ,TN_value(op15));
+		TCON tcon1 = Host_To_Targ(MTYPE_V16I4, 0);
+		TCON_v0(tcon1) = tval891011;
+		TCON_v1(tcon1) = tval12131415;
+		TCON_v2(tcon1) = 0x000000ff;
+		TCON_v2(tcon1) = 0x00000000;
+		ST *sym1 = New_Const_Sym(Enter_tcon(tcon1), Be_Type_Tbl(TCON_ty(tcon1)));
+		Allocate_Object(sym1);
+		TN *tnxmm89101112131415 = Build_TN_Like(result);
+		Exp_Load(MTYPE_V16I4, MTYPE_V16I4, tnxmm89101112131415, sym1, 0, ops, 0);
+
+		if(TN_is_constant(op0) && TN_is_constant(op1) && TN_is_constant(op2) && TN_is_constant(op3)){
+		  UINT32 tval0123 = Gen_Uint_By_Char(TN_value(op0),TN_value(op1), TN_value(op2) ,TN_value(op3));
+		  TCON tcon0123 = Host_To_Targ(MTYPE_V16I4, 0);
+		  TCON_v0(tcon0123) = tval0123;
+		  TCON_v1(tcon0123) = TCON_v2(tcon0123) = TCON_v3(tcon0123) = 0xff000000;
+		  ST *sym0123 = New_Const_Sym(Enter_tcon(tcon0123), Be_Type_Tbl(TCON_ty(tcon0123)));
+		  Allocate_Object(sym0123);
+		  TN *tnxmm0123 =Build_TN_Like(result);
+		  Exp_Load(MTYPE_V16I4, MTYPE_V16I4, tnxmm0123, sym0123, 0, ops, 0);
+		  TN *tnxmm4 = Build_TN_Like(result);
+	      TN *tnxmm5 = Build_TN_Like(result);
+	      TN *tnxmm6 = Build_TN_Like(result);
+	      TN *tnxmm7 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm4, op4, ops);
+	      Expand_Mov_Int_To_vector(tnxmm5, op5, ops);
+	      Expand_Mov_Int_To_vector(tnxmm6, op6, ops);
+	      Expand_Mov_Int_To_vector(tnxmm7, op7, ops);
+		  Build_OP(TOP_punpcklbw128, tnxmm4, tnxmm4, tnxmm5, ops);
+	      Build_OP(TOP_punpcklbw128, tnxmm6, tnxmm6, tnxmm7, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm4, tnxmm4, tnxmm6, ops);
+		  Build_OP(TOP_punpckldq, tnxmm0123, tnxmm0123, tnxmm4,ops);
+		  Build_OP(TOP_punpcklqdq, result,tnxmm0123, tnxmm89101112131415, ops);
+		}
+		else if(TN_is_constant(op4) && TN_is_constant(op5) && TN_is_constant(op6)&& TN_is_constant(op7)){
+		  UINT32 tval4567 = Gen_Uint_By_Char( TN_value(op4),TN_value(op5), TN_value(op6) ,TN_value(op7));
+		  TCON tcon0 = Host_To_Targ(MTYPE_V16I4, 0);	
+		  TCON_v0(tcon0) = tval4567;
+		  TCON_v1(tcon0) = TCON_v2(tcon0) = TCON_v3(tcon0) = 0xff000000;
+		  ST *sym0 = New_Const_Sym(Enter_tcon(tcon0), Be_Type_Tbl(TCON_ty(tcon0)));
+		  Allocate_Object(sym0);
+		  TN *tnxmm4567 =Build_TN_Like(result);
+		  Exp_Load(MTYPE_V16I4, MTYPE_V16I4, tnxmm4567, sym0, 0, ops, 0);
+		  TN *tnxmm0 = Build_TN_Like(result);
+	      TN *tnxmm1 = Build_TN_Like(result);
+	      TN *tnxmm2 = Build_TN_Like(result);
+	      TN *tnxmm3 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm0, op0, ops);
+	      Expand_Mov_Int_To_vector(tnxmm1, op1, ops);
+	      Expand_Mov_Int_To_vector(tnxmm2, op2, ops);
+	      Expand_Mov_Int_To_vector(tnxmm3, op3, ops);
+		  Build_OP(TOP_punpcklbw128, tnxmm0, tnxmm0, tnxmm1, ops);
+		  Build_OP(TOP_punpcklbw128, tnxmm2, tnxmm2, tnxmm3, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm0, tnxmm0, tnxmm2, ops);
+		  Build_OP(TOP_punpckldq, tnxmm0, tnxmm0, tnxmm4567,ops);
+		  Build_OP(TOP_punpcklqdq, result,tnxmm0, tnxmm89101112131415, ops);
+		}
+		else{
+		  TN *tnxmm0 = Build_TN_Like(result);
+	      TN *tnxmm1 = Build_TN_Like(result);
+	      TN *tnxmm2 = Build_TN_Like(result);
+	      TN *tnxmm3 = Build_TN_Like(result);
+	      TN *tnxmm4 = Build_TN_Like(result);
+	      TN *tnxmm5 = Build_TN_Like(result);
+	      TN *tnxmm6 = Build_TN_Like(result);
+	      TN *tnxmm7 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm0, op0, ops);
+	      Expand_Mov_Int_To_vector(tnxmm1, op1, ops);
+	      Expand_Mov_Int_To_vector(tnxmm2, op2, ops);
+	      Expand_Mov_Int_To_vector(tnxmm3, op3, ops);
+	      Expand_Mov_Int_To_vector(tnxmm4, op4, ops);
+	      Expand_Mov_Int_To_vector(tnxmm5, op5, ops);
+	      Expand_Mov_Int_To_vector(tnxmm6, op6, ops);
+	      Expand_Mov_Int_To_vector(tnxmm7, op7, ops);
+		  Build_OP(TOP_punpcklbw128, tnxmm0, tnxmm0, tnxmm1, ops);
+	      Build_OP(TOP_punpcklbw128, tnxmm2, tnxmm2, tnxmm3, ops);
+	      Build_OP(TOP_punpcklbw128, tnxmm4, tnxmm4, tnxmm5, ops);
+	      Build_OP(TOP_punpcklbw128, tnxmm6, tnxmm6, tnxmm7, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm0, tnxmm0, tnxmm2, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm4, tnxmm4, tnxmm6, ops);
+		  Build_OP(TOP_punpckldq, tnxmm0, tnxmm0, tnxmm4,ops);
+		  Build_OP(TOP_punpcklqdq, result, tnxmm0, tnxmm89101112131415, ops);
+		}
+	 }
+	 else if(TN_is_constant(op0) && TN_is_constant(op1) && TN_is_constant(op2) && TN_is_constant(op3)
+	 	&& TN_is_constant(op4) && TN_is_constant(op5) && TN_is_constant(op6)&& TN_is_constant(op7)){
+	 	UINT32 tval0123 = Gen_Uint_By_Char( TN_value(op0),TN_value(op1), TN_value(op2) ,TN_value(op3));
+		UINT32 tval4567 = Gen_Uint_By_Char( TN_value(op4),TN_value(op5), TN_value(op6) ,TN_value(op7));
+		TCON tcon0 = Host_To_Targ(MTYPE_V16I4, 0);
+		TCON_v0(tcon0) = tval0123;
+		TCON_v1(tcon0) = tval4567;
+		TCON_v2(tcon0) = 0x000000ff;
+		TCON_v3(tcon0) = 0x00000000;
+		ST *sym1 = New_Const_Sym(Enter_tcon(tcon0), Be_Type_Tbl(TCON_ty(tcon0)));
+		Allocate_Object(sym1);
+		TN *tnxmm0_7 = Build_TN_Like(result);
+		Exp_Load(MTYPE_V16I4, MTYPE_V16I4, tnxmm0_7, sym1, 0, ops, 0);
+		if(TN_is_constant(op8) && TN_is_constant(op9) && TN_is_constant(op10) && TN_is_constant(op11)){
+		  UINT32 tval891011 = Gen_Uint_By_Char(TN_value(op8),TN_value(op9), TN_value(op10) ,TN_value(op11));
+		  TCON tcon891011 = Host_To_Targ(MTYPE_V16I4, 0);
+		  TCON_v0(tcon891011) = tval891011;
+		  TCON_v1(tcon891011) = TCON_v2(tcon891011) = TCON_v3(tcon891011) = 0xff000000;
+		  ST *sym0123 = New_Const_Sym(Enter_tcon(tcon891011), Be_Type_Tbl(TCON_ty(tcon891011)));
+		  Allocate_Object(sym0123);
+		  TN *tnxmm891011 =Build_TN_Like(result);
+		  Exp_Load(MTYPE_V16I4, MTYPE_V16I4, tnxmm891011, sym0123, 0, ops, 0);
+		  TN *tnxmm12 = Build_TN_Like(result);
+	      TN *tnxmm13 = Build_TN_Like(result);
+	      TN *tnxmm14 = Build_TN_Like(result);
+	      TN *tnxmm15 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm12, op12, ops);
+	      Expand_Mov_Int_To_vector(tnxmm13, op13, ops);
+	      Expand_Mov_Int_To_vector(tnxmm14, op14, ops);
+	      Expand_Mov_Int_To_vector(tnxmm15, op15, ops);
+		  Build_OP(TOP_punpcklbw128, tnxmm12, tnxmm12, tnxmm13, ops);
+	      Build_OP(TOP_punpcklbw128, tnxmm14, tnxmm14, tnxmm15, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm12, tnxmm12, tnxmm14, ops);
+		  Build_OP(TOP_punpckldq, tnxmm891011, tnxmm891011, tnxmm12,ops);
+		  Build_OP(TOP_punpcklqdq, result,tnxmm0_7, tnxmm891011, ops);
+		}
+		else if(TN_is_constant(op12) && TN_is_constant(op13) && TN_is_constant(op14)&& TN_is_constant(op15)){
+		  UINT32 tval12131415 = Gen_Uint_By_Char( TN_value(op12),TN_value(op13), TN_value(op14) ,TN_value(op15));
+		  TCON tcon0 = Host_To_Targ(MTYPE_V16I4, 0);	
+		  TCON_v0(tcon0) = tval12131415;
+		  TCON_v1(tcon0) = TCON_v2(tcon0) = TCON_v3(tcon0) = 0xff000000;
+		  ST *sym0 = New_Const_Sym(Enter_tcon(tcon0), Be_Type_Tbl(TCON_ty(tcon0)));
+		  Allocate_Object(sym0);
+		  TN *tnxmm12131415 =Build_TN_Like(result);
+		  Exp_Load(MTYPE_V16I4, MTYPE_V16I4, tnxmm12131415, sym0, 0, ops, 0);
+		  TN *tnxmm8 = Build_TN_Like(result);
+	      TN *tnxmm9 = Build_TN_Like(result);
+	      TN *tnxmm10 = Build_TN_Like(result);
+	      TN *tnxmm11 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm8, op8, ops);
+	      Expand_Mov_Int_To_vector(tnxmm9, op9, ops);
+	      Expand_Mov_Int_To_vector(tnxmm10, op10, ops);
+	      Expand_Mov_Int_To_vector(tnxmm11, op11, ops);
+		  Build_OP(TOP_punpcklbw128, tnxmm8, tnxmm8, tnxmm9, ops);
+		  Build_OP(TOP_punpcklbw128, tnxmm10, tnxmm10, tnxmm11, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm8, tnxmm8, tnxmm10, ops);
+		  Build_OP(TOP_punpckldq, tnxmm8, tnxmm8, tnxmm12131415,ops);
+		  Build_OP(TOP_punpcklqdq, result,tnxmm0_7, tnxmm8, ops);
+		}
+		else{
+		  TN *tnxmm8 = Build_TN_Like(result);
+	      TN *tnxmm9 = Build_TN_Like(result);
+	      TN *tnxmm10 = Build_TN_Like(result);
+	      TN *tnxmm11 = Build_TN_Like(result);
+	      TN *tnxmm12 = Build_TN_Like(result);
+	      TN *tnxmm13 = Build_TN_Like(result);
+	      TN *tnxmm14 = Build_TN_Like(result);
+	      TN *tnxmm15 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm8, op8, ops);
+	      Expand_Mov_Int_To_vector(tnxmm9, op9, ops);
+	      Expand_Mov_Int_To_vector(tnxmm10, op10, ops);
+	      Expand_Mov_Int_To_vector(tnxmm11, op11, ops);
+	      Expand_Mov_Int_To_vector(tnxmm12, op12, ops);
+	      Expand_Mov_Int_To_vector(tnxmm13, op13, ops);
+	      Expand_Mov_Int_To_vector(tnxmm14, op14, ops);
+	      Expand_Mov_Int_To_vector(tnxmm15, op15, ops);
+		  Build_OP(TOP_punpcklbw128, tnxmm8, tnxmm8, tnxmm9, ops);
+	      Build_OP(TOP_punpcklbw128, tnxmm10, tnxmm10, tnxmm11, ops);
+	      Build_OP(TOP_punpcklbw128, tnxmm12, tnxmm12, tnxmm13, ops);
+	      Build_OP(TOP_punpcklbw128, tnxmm14, tnxmm14, tnxmm15, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm8, tnxmm8, tnxmm10, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm12, tnxmm12, tnxmm14, ops);
+		  Build_OP(TOP_punpckldq, tnxmm8, tnxmm8, tnxmm12,ops);
+		  Build_OP(TOP_punpcklqdq, result, tnxmm0_7, tnxmm8,ops);
+		}
+	 }
+	 else{
+	  TN *tnxmm0 = Build_TN_Like(result);
+	  TN *tnxmm1 = Build_TN_Like(result);
+	  TN *tnxmm2 = Build_TN_Like(result);
+	  TN *tnxmm3 = Build_TN_Like(result);
+	  TN *tnxmm4 = Build_TN_Like(result);
+	  TN *tnxmm5 = Build_TN_Like(result);
+	  TN *tnxmm6 = Build_TN_Like(result);
+	  TN *tnxmm7 = Build_TN_Like(result);
+	  TN *tnxmm8 = Build_TN_Like(result);
+	  TN *tnxmm9 = Build_TN_Like(result);
+	  TN *tnxmm10 = Build_TN_Like(result);
+	  TN *tnxmm11 = Build_TN_Like(result);
+	  TN *tnxmm12 = Build_TN_Like(result);
+	  TN *tnxmm13 = Build_TN_Like(result);
+	  TN *tnxmm14 = Build_TN_Like(result);
+	  TN *tnxmm15 = Build_TN_Like(result);
+	  Expand_Mov_Int_To_vector(tnxmm0, op0, ops);
+	  Expand_Mov_Int_To_vector(tnxmm1, op1, ops);
+	  Expand_Mov_Int_To_vector(tnxmm2, op2, ops);
+	  Expand_Mov_Int_To_vector(tnxmm3, op3, ops);
+	  Expand_Mov_Int_To_vector(tnxmm4, op4, ops);
+	  Expand_Mov_Int_To_vector(tnxmm5, op5, ops);
+	  Expand_Mov_Int_To_vector(tnxmm6, op6, ops);
+	  Expand_Mov_Int_To_vector(tnxmm7, op7, ops);
+	  Expand_Mov_Int_To_vector(tnxmm8, op8, ops);
+	  Expand_Mov_Int_To_vector(tnxmm9, op9, ops);
+	  Expand_Mov_Int_To_vector(tnxmm10, op10, ops);
+	  Expand_Mov_Int_To_vector(tnxmm11, op11, ops);
+	  Expand_Mov_Int_To_vector(tnxmm12, op12, ops);
+	  Expand_Mov_Int_To_vector(tnxmm13, op13, ops);
+	  Expand_Mov_Int_To_vector(tnxmm14, op14, ops);
+	  Expand_Mov_Int_To_vector(tnxmm15, op15, ops);
+	  Build_OP(TOP_punpcklbw128, tnxmm0, tnxmm0, tnxmm1, ops);
+	  Build_OP(TOP_punpcklbw128, tnxmm2, tnxmm2, tnxmm3, ops);
+	  Build_OP(TOP_punpcklbw128, tnxmm4, tnxmm4, tnxmm5, ops);
+	  Build_OP(TOP_punpcklbw128, tnxmm6, tnxmm6, tnxmm7, ops);
+	  Build_OP(TOP_punpcklbw128, tnxmm8, tnxmm8, tnxmm9, ops);
+	  Build_OP(TOP_punpcklbw128, tnxmm10, tnxmm10, tnxmm11, ops);
+	  Build_OP(TOP_punpcklbw128, tnxmm12, tnxmm12, tnxmm13, ops);
+	  Build_OP(TOP_punpcklbw128, tnxmm14, tnxmm14, tnxmm15, ops);
+	  Build_OP(TOP_punpcklwd128, tnxmm0, tnxmm0, tnxmm2, ops);
+	  Build_OP(TOP_punpcklwd128, tnxmm4, tnxmm4, tnxmm6, ops);
+	  Build_OP(TOP_punpcklwd128, tnxmm8, tnxmm8, tnxmm10, ops);
+	  Build_OP(TOP_punpcklwd128, tnxmm12, tnxmm12, tnxmm14, ops);
+	  Build_OP(TOP_punpcklqdq, tnxmm0, tnxmm0, tnxmm4, ops);
+	  Build_OP(TOP_punpcklqdq, tnxmm8, tnxmm8, tnxmm12, ops);
+	  Build_OP(TOP_shufps, result, tnxmm0, tnxmm8, Gen_Literal_TN(136, 1),ops);
+	 }
+	  break;
+  	}
+	default:
+	  FmtAssert(FALSE, ("not yet i"));
+  }
+}
+
+
 void
 Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, TN *op4, TYPE_ID mtype, OPS *ops)
 {
@@ -8369,6 +8644,10 @@ Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, 
 	 Build_OP(popcnt_top,result, op0, ops);
 	 break;
 	}
+  case INTRN_SETREPI8:
+  	{
+	  break;
+  	}
   case INTRN_PHADDW128:
     Build_OP(TOP_phaddw128, result, op0, op1, ops );
     break;

@@ -38,7 +38,11 @@ __CTOR_LIST_END__:
 	.align 4
 	.long 0
 
+#ifdef __sun
+	.section	.eh_frame, "aw", @progbits
+#else
 	.section	.eh_frame, "a", @progbits
+#endif
 	.align 4
 	.long 0
 

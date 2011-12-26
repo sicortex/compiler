@@ -2490,7 +2490,7 @@ IPA_NODE::Write_PU ()
 #ifdef Is_True
     WN* w = Whirl_Tree(FALSE);
     if (w && !Is_Nested_PU()) {
-      WN_verifier(w);
+      WN_verifier(&Get_PU(), w);
     }
 #endif
     if ((IP_PROC_INFO_state (proc_info) != IPA_WRITTEN) || !Has_Recursive_In_Edge())

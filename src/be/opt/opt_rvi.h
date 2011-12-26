@@ -371,7 +371,7 @@ public:
 		}
 
   // Perform the RVI algorithm (main entry point)
-  WN *Perform_RVI( WN *wn, ALIAS_MANAGER *alias );
+  WN *Perform_RVI(PU *pu,  WN *wn, ALIAS_MANAGER *alias );
 };
 
 class PRE_RVI_HOOKS {

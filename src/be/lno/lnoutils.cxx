@@ -2897,11 +2897,11 @@ static BOOL LNO_Check_Du_Check(HASH_TABLE<WN*,WN*>* ht)
   return rval;
 }
 
-void LNO_Check_Du(WN* orig)
+void LNO_Check_Du(PU *pu, WN* orig)
 {
   WN* copy = LWN_Copy_Tree(orig);
   Set_Error_Phase ( "Pre-Optimizer DU" );
-  copy = Pre_Optimizer(PREOPT_DUONLY_PHASE, copy, Du_Mgr, Alias_Mgr);
+  copy = Pre_Optimizer(PREOPT_DUONLY_PHASE, pu, copy, Du_Mgr, Alias_Mgr);
   Set_Error_Phase ( "Loop nest optimizer Post-DU" );
   LWN_Parentize(copy);
   Mark_Code(copy, FALSE, TRUE);

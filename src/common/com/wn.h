@@ -1271,7 +1271,7 @@ extern WN * WN_Type_Conversion( WN *wn, TYPE_ID to_type );
 
 extern INT32 WN_Size_and_StartAddress (WN *wn, void **StartAddress);
 
-extern BOOL WN_verifier(WN *);
+extern BOOL WN_verifier(PU *pu, WN *wn);
 
 
 /*

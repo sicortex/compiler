@@ -1168,7 +1168,7 @@ W2C_Outfile_Init(BOOL emit_global_decls)
 
 
 void
-W2C_Outfile_Translate_Pu(WN *pu, BOOL emit_global_decls)
+W2C_Outfile_Translate_Pu(PU *pu, WN *pu_wn, BOOL emit_global_decls)
 {
    TOKEN_BUFFER       tokens;
    LOWER_ACTIONS      lower_actions = LOWER_NULL;
@@ -1178,7 +1178,7 @@ W2C_Outfile_Translate_Pu(WN *pu, BOOL emit_global_decls)
    if (!Check_Outfile_Initialized("W2C_Outfile_Translate_Pu"))
       return;
 
-   Is_True(WN_opcode(pu) == OPC_FUNC_ENTRY, 
+   Is_True(WN_opcode(pu_wn) == OPC_FUNC_ENTRY, 
 	   ("Invalid opcode for W2C_Outfile_Translate_Pu()"));
 
    /* Make sure all necessary output files are open.
@@ -1196,16 +1196,16 @@ W2C_Outfile_Translate_Pu(WN *pu, BOOL emit_global_decls)
       lower_actions = LOWER_MP | LOWER_IO_STATEMENT | LOWER_INTRINSIC;
 
    if (lower_actions != LOWER_NULL)
-      pu = WN_Lower(pu, lower_actions, NULL, "W2C Lowering");
+      pu_wn = WN_Lower(pu, pu_wn, lower_actions, NULL, "W2C Lowering");
 
    Start_Timer (T_W2C_CU);
    Set_Error_Phase ("WHIRL To C");
 
    if (!pu_is_pushed)
-      W2C_Push_PU(pu, WN_func_body(pu));
+      W2C_Push_PU(pu_wn, WN_func_body(pu_wn));
 
    tokens = New_Token_Buffer();
-   (void)WN2C_translate(tokens, pu, Global_Context);
+   (void)WN2C_translate(tokens, pu_wn, Global_Context);
    Write_And_Reclaim_Tokens(W2C_File[W2C_DOTC_FILE], 
 			    W2C_File[W2C_LOC_FILE], 
 			    &tokens);

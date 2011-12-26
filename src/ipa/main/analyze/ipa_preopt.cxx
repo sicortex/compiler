@@ -690,7 +690,7 @@ IPA_Preoptimize (IPA_NODE* node)
   ALIAS_MANAGER* alias_mgr = Create_Alias_Manager (MEM_pu_nz_pool_ptr);
 
   // call the preopt, which then calls Perform_Procedure_Summary_Phase
-  WN* opt_wn = Pre_Optimizer (PREOPT_IPA1_PHASE, wn, du_mgr, alias_mgr);
+  WN* opt_wn = Pre_Optimizer (PREOPT_IPA1_PHASE, &node->Get_PU(), wn, du_mgr, alias_mgr);
 
   Delete_Du_Manager (du_mgr, MEM_pu_nz_pool_ptr);
   Delete_Alias_Manager (alias_mgr, MEM_pu_nz_pool_ptr);
@@ -717,7 +717,7 @@ IPA_Preoptimize (IPA_NODE* node)
   }
 
 #if Is_True_On
-  WN_verifier(opt_wn);
+  WN_verifier(&node->Get_PU(), opt_wn);
 #endif
 
   if (Summary->Has_symbol_entry()) {

@@ -54,7 +54,7 @@ extern void Lno_Init (void);
 
 extern void Lno_Fini (void);
 
-extern WN *Perform_Loop_Nest_Optimization (PU_Info*, WN *, WN *, BOOL);
+extern WN *Perform_Loop_Nest_Optimization (PU_Info*, PU *, WN *, WN *, BOOL);
 
 #ifdef __cplusplus
 }

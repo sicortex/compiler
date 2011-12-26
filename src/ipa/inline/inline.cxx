@@ -395,7 +395,7 @@ Write_inline_pu(IPA_NODE* node)
 	Scope_tab = node->Scope();
 #ifdef Is_True
 	CURRENT_SYMTAB = node->Lexical_Level();
-        WN_verifier(node->Whirl_Tree());
+        WN_verifier(&node->Get_PU(), node->Whirl_Tree());
 #endif
 
         write_pu_info (node->PU_Info());

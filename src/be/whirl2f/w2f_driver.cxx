@@ -1172,17 +1172,17 @@ W2F_Outfile_Init(void)
 
 
 void
-W2F_Outfile_Translate_Pu(WN *pu)
+W2F_Outfile_Translate_Pu(PU *pu, WN *pu_wn)
 {
    TOKEN_BUFFER       tokens;
    LOWER_ACTIONS      lower_actions = LOWER_NULL;
-   const BOOL         pu_is_pushed = (PUinfo_current_func == pu);
+   const BOOL         pu_is_pushed = (PUinfo_current_func == pu_wn);
    const char * const caller_err_phase = Get_Error_Phase ();
 
    if (!Check_Outfile_Initialized("W2F_Outfile_Translate_Pu"))
       return;
 
-   Is_True(WN_opcode(pu) == OPC_FUNC_ENTRY, 
+   Is_True(WN_opcode(pu_wn) == OPC_FUNC_ENTRY, 
 	   ("Invalid opcode for W2F_Outfile_Translate_Pu()"));
 
    /* Make sure all necessary output files are open.
@@ -1194,7 +1194,7 @@ W2F_Outfile_Translate_Pu(WN *pu)
       lower_actions = LOWER_MP;
 
    if (lower_actions != LOWER_NULL)
-      pu = WN_Lower(pu, lower_actions, NULL, "W2F Lowering");
+      pu_wn = WN_Lower(pu, pu_wn, lower_actions, NULL, "W2F Lowering");
 
    Start_Timer(T_W2F_CU);
    if (W2F_Progname != NULL)
@@ -1203,7 +1203,7 @@ W2F_Outfile_Translate_Pu(WN *pu)
       Diag_Set_Phase("FLIST");
 
    if (!pu_is_pushed)
-      W2F_Push_PU(pu, WN_func_body(pu));
+      W2F_Push_PU(pu_wn, WN_func_body(pu_wn));
 
    /* Set the flag for an F90 program unit */
 
@@ -1225,7 +1225,7 @@ W2F_Outfile_Translate_Pu(WN *pu)
 
    
 
-   (void)WN2F_translate(tokens, pu, Global_Context);
+   (void)WN2F_translate(tokens, pu_wn, Global_Context);
    Write_And_Reclaim_Tokens(W2F_File[W2F_FTN_FILE], 
 			    W2F_File[W2F_LOC_FILE], 
 			    &tokens);

@@ -80,7 +80,7 @@ extern "C" {
  */
 struct DU_MANAGER;
 
-extern WN *Pre_Optimizer( INT32 /* PREOPT_PHASES */,  WN *, struct DU_MANAGER * , struct ALIAS_MANAGER *);
+extern WN *Pre_Optimizer( INT32 /* PREOPT_PHASES */,  PU *, WN *, struct DU_MANAGER * , struct ALIAS_MANAGER *);
 
 extern void choose_from_complete_struct_for_relayout_candidates();
 

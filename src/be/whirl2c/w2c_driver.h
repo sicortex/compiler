@@ -303,7 +303,7 @@ extern void
 W2C_Translate_Purple_Main(FILE *outfile, const WN *pu, const char *region_name);
 
 extern void W2C_Outfile_Init(BOOL emit_global_decls);
-extern void W2C_Outfile_Translate_Pu(WN *pu, BOOL emit_global_decls);
+extern void W2C_Outfile_Translate_Pu(PU *pu, WN *pu_wn, BOOL emit_global_decls);
 extern void W2C_Outfile_Fini(BOOL emit_global_decls);
 
 extern void W2C_Cleanup(void);

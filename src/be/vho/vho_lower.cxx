@@ -8269,8 +8269,9 @@ VHO_Lower ( WN * wn )
  * ============================================================================
  */
 
-WN * VHO_Lower_Driver (PU_Info* pu_info, 
-		       WN *wn) {
+WN * VHO_Lower_Driver (PU_Info* pu_info,
+                       PU *pu,
+                       WN *wn) {
 
    if (Get_Trace ( TKIND_IR, TP_VHO_LOWER )) {
 
@@ -8311,11 +8312,11 @@ WN * VHO_Lower_Driver (PU_Info* pu_info,
    if (Inline_Intrinsics_Early) {
       /* Lower intrinsics and reduce tree height if running at high
        * optimization levels */
-      wn = WN_Lower(wn, LOWER_TREEHEIGHT | LOWER_INLINE_INTRINSIC, NULL,
+      wn = WN_Lower(pu, wn, LOWER_TREEHEIGHT | LOWER_INLINE_INTRINSIC, NULL,
 		    "Intrinsic lowering");
    }
 #if defined( KEY) // bug 6938
-   else wn = WN_Lower(wn, LOWER_FAST_EXP, NULL,
+   else wn = WN_Lower(pu, wn, LOWER_FAST_EXP, NULL,
 		    "Fast exponents lowering");
 #endif
 

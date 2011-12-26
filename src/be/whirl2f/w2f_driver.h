@@ -278,7 +278,7 @@ extern void
 W2F_Translate_Purple_Main(FILE *outfile, WN *pu, const char *region_name);
 
 extern void W2F_Outfile_Init(void);
-extern void W2F_Outfile_Translate_Pu(WN *pu);
+extern void W2F_Outfile_Translate_Pu(PU *pu, WN *pu_wn);
 extern void W2F_Outfile_Fini(void);
 
 extern void W2F_Cleanup(void);

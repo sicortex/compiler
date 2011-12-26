@@ -1508,7 +1508,7 @@ Rename_INITV_Labels(INITO_IDX inito_idx, LABEL_RENAMING_MAP *lab_map,
 
 
 BOOL
-WN_verifier(WN *wn)
+WN_verifier(PU *pu, WN *wn)
 {
   Temporary_Error_Phase ("WN_verifier");
 #ifdef Is_True_On

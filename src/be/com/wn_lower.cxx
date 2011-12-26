@@ -14089,8 +14089,11 @@ static void vcast_complex_types(WN* tree)
  *
  * ==================================================================== */
 
-WN *WN_Lower(WN *tree, LOWER_ACTIONS actions, struct ALIAS_MANAGER *alias,
-	     const char *msg)
+WN *WN_Lower(PU *pu,
+             WN *tree,
+             LOWER_ACTIONS actions,
+             struct ALIAS_MANAGER *alias,
+	         const char *msg)
 {
 #ifdef BACK_END
   Start_Timer(T_Lower_CU);
@@ -14158,7 +14161,7 @@ WN *WN_Lower(WN *tree, LOWER_ACTIONS actions, struct ALIAS_MANAGER *alias,
   FmtAssert( current_loop_nest_depth == 0, ("loop nest depth is not 0") );
 #endif
  
-  WN_verifier(tree);
+  WN_verifier(pu, tree);
 
   return tree;
 }

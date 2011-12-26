@@ -758,7 +758,7 @@ WN_UNROLL_suitable(WN *tree)
  * bodies have multiple BBs because they are not unrolled by CG
  * ==================================================================== */
 void
-WN_unroll(WN *tree)
+WN_unroll(PU *pu, WN *tree)
 {
   if (WOPT_Enable_WN_Unroll == 0)
     return;
@@ -778,7 +778,7 @@ WN_unroll(WN *tree)
 
   WN_Lower_Checkdump("After wn_unroll", tree, 0);   
 
-  WN_verifier(tree);
+  WN_verifier(pu, tree);
 
   return;
 }

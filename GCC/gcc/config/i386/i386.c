@@ -15959,6 +15959,11 @@ ix86_init_mmx_sse_builtins (void)
   def_builtin (MASK_SSE4_2, "__builtin_ia32_crc32di", ftype, IX86_BUILTIN_CRC32Q);
 
 	/*ssse3*/
+    ftype = build_function_type_list(V8HI_type_node, short_integer_type_node,short_integer_type_node,short_integer_type_node,
+                                    short_integer_type_node,short_integer_type_node,short_integer_type_node,
+                                    short_integer_type_node,short_integer_type_node, NULL_TREE);
+	def_builtin(MASK_SSSE3, "__builtin_ia32_setr_epi16", ftype, IX86_BUILTIN_SETREPI16);
+	
     ftype = build_function_type_list(V16QI_type_node, signed_char_type_node, signed_char_type_node, signed_char_type_node, signed_char_type_node,
                                     signed_char_type_node,signed_char_type_node,signed_char_type_node,signed_char_type_node,signed_char_type_node,
                                     signed_char_type_node,signed_char_type_node,signed_char_type_node,signed_char_type_node,signed_char_type_node,

@@ -3718,105 +3718,91 @@ IPO_INLINE::Merge_EH_Spec_Tables (void)
 void
 IPO_INLINE::Merge_EH_Typeinfo_Tables (void)
 {
-    vector<ST*> callee_typeinfos, caller_typeinfos;
-    INITV_IDX start, blk, last_blk=0;
+    PU::type_info_table callee_typeinfos, caller_typeinfos;
     if (!PU_cxx_lang (Callee_node()->Get_PU()))
-      return;
-    // callee side
-    INITO_IDX tmp = PU_misc_info (Callee_node()->Get_PU());
-    if (tmp)
-    	start = INITO_val (tmp);
-    else
-    	return;
-    const INITO_IDX callee_ttable = TCON_uval (INITV_tc_val (INITV_next (INITV_next (start))));
-    if (!callee_ttable) // nothing to merge
-	return;
-    blk = INITO_val (callee_ttable);
-    while (blk)
-    {
-        INITV_IDX ti = INITV_blk (blk);
-        FmtAssert (INITV_kind(ti) == INITVKIND_SYMOFF, ("Bad TI table"));
-        callee_typeinfos.push_back (&St_Table[INITV_st(ti)]);
-        blk = INITV_next (blk);
+       return;
+
+    Callee_node()->Get_PU().Get_type_info_table(callee_typeinfos);
+    
+    if (callee_typeinfos.empty()) {
+        // nothing to merge
+        return;
     }
+
+    INITO_IDX misc = PU_misc_info (Callee_node()->Get_PU());
+    const INITO_IDX callee_ttable = TCON_uval (INITV_tc_val (INITV_next (INITV_next (INITO_val(misc)))));
 
     // caller side
     // change tables temporarily
     Set_Tables (Caller_node());
-    start = INITO_val (PU_misc_info (Pu_Table [ST_pu (Caller_node()->Func_ST())]));
+
+    INITV_IDX start = INITO_val (PU_misc_info (Pu_Table [ST_pu (Caller_node()->Func_ST())]));
     INITO_IDX caller_ttable = TCON_uval (INITV_tc_val (INITV_next (INITV_next (start))));
-    if (caller_ttable) blk = INITO_val (caller_ttable);
-    else blk = 0;
-    while (blk)
+
+    Caller_node()->Get_PU().Get_type_info_table(caller_typeinfos);
+
+    if (caller_typeinfos.empty())
     {
-	INITV_IDX ti = INITV_blk (blk);
-        FmtAssert (INITV_kind(ti) == INITVKIND_SYMOFF, ("Invalid TI table"));
-        caller_typeinfos.push_back (&St_Table[INITV_st(ti)]);
-        last_blk = blk;
-        blk = INITV_next (blk);
-    }
-    std::sort (caller_typeinfos.begin(), caller_typeinfos.end());
-    int last_caller_filter = caller_typeinfos.size();
-    if (!last_caller_filter)
-    { // special case, there is no typeinfo table in caller
-        FmtAssert (!last_blk && !caller_ttable, ("EH Tables processing error in inliner"));
-	IPO_SYMTAB* cloned = Callee_node()->Cloned_Symtab();
-	// return the already cloned inito and get its st
-	INITO_IDX cloned_ttable = cloned->Get_INITO_IDX (callee_ttable);
-	ST * new_st = Copy_ST (INITO_st (cloned_ttable), CURRENT_SYMTAB);
-	INITV_IDX to_iter = New_INITV();
-	INITO_IDX new_ttable = New_INITO (ST_st_idx (new_st), to_iter);
+        // special case, there is no typeinfo table in caller
+        FmtAssert (!caller_ttable, ("EH Tables processing error in inliner"));
+        IPO_SYMTAB* cloned = Callee_node()->Cloned_Symtab();
+
+        // return the already cloned inito and get its st
+        INITO_IDX cloned_ttable = cloned->Get_INITO_IDX (callee_ttable);
+        ST * new_st = Copy_ST (INITO_st (cloned_ttable), CURRENT_SYMTAB);
+        INITV_IDX to_iter = New_INITV();
+        INITO_IDX new_ttable = New_INITO (ST_st_idx (new_st), to_iter);
     	INITV_IDX from_iter = INITO_val (cloned_ttable);
     	while (from_iter)
     	{
-	    memcpy (&Initv_Table[to_iter], &Initv_Table[from_iter], sizeof(INITV));
+            memcpy (&Initv_Table[to_iter], &Initv_Table[from_iter], sizeof(INITV));
 
-	    INITV_IDX from = INITV_blk (from_iter);
-	    INITV_IDX to_ti = New_INITV();
-	    INITV_Init_Block (to_iter, to_ti);
+            INITV_IDX from = INITV_blk (from_iter);
+            INITV_IDX to_ti = New_INITV();
+            INITV_Init_Block (to_iter, to_ti);
 
-	    memcpy (&Initv_Table[to_ti], &Initv_Table[from], sizeof(INITV));
-	    from = INITV_next (from);
-	    INITV_IDX to_filter = New_INITV();
-	    memcpy (&Initv_Table[to_filter], &Initv_Table[from], sizeof(INITV));
-	    Set_INITV_next (to_ti, to_filter);
-	    from_iter = INITV_next (from_iter);
-	    if (from_iter)
-	    {
-	        INITV_IDX tmp = New_INITV();
-	        Set_INITV_next (to_iter, tmp);
-	        to_iter = tmp;
-	    }
+            memcpy (&Initv_Table[to_ti], &Initv_Table[from], sizeof(INITV));
+            from = INITV_next (from);
+            INITV_IDX to_filter = New_INITV();
+            memcpy (&Initv_Table[to_filter], &Initv_Table[from], sizeof(INITV));
+            Set_INITV_next (to_ti, to_filter);
+            from_iter = INITV_next (from_iter);
+            if (from_iter)
+            {
+                INITV_IDX tmp = New_INITV();
+                Set_INITV_next (to_iter, tmp);
+                to_iter = tmp;
+            }
         }
 
-	INITV_IDX insert = INITV_next (INITV_next (start));
-	INITV_IDX bkup = INITV_next (insert);
-	INITV_Set_VAL (Initv_Table[insert],
-	               Enter_tcon (Host_To_Targ (MTYPE_U4, new_ttable)), 1);
-    	Set_INITV_next (insert, bkup);
+        INITV_IDX insert = INITV_next (INITV_next (start));
+        INITV_IDX bkup = INITV_next (insert);
+        INITV_Set_VAL (Initv_Table[insert],
+                       Enter_tcon (Host_To_Targ (MTYPE_U4, new_ttable)), 1);
+                       Set_INITV_next (insert, bkup);
     }
     else
     {
-        FmtAssert (last_blk, ("EH Tables processing error in inliner"));
-        int filter = last_caller_filter+1;
-        vector<ST*>::iterator i = callee_typeinfos.begin();
-        for (; i!=callee_typeinfos.end(); ++i)
-        {
-            if (!std::binary_search (caller_typeinfos.begin(),
-                                     caller_typeinfos.end(), (*i)))
-            { // insert the entry
-                INITV_IDX st = New_INITV();
-                INITV_Set_SYMOFF (Initv_Table[st], 1, ST_st_idx(*i), 0);
-                INITV_IDX f = New_INITV();
-                INITV_Set_VAL (Initv_Table[f],
-                        Enter_tcon (Host_To_Targ (MTYPE_U4, filter)), 1);
-                Set_INITV_next (st, f);
+        initv_block_builder caller_tt_builder(caller_ttable);
 
-		INITV_IDX next_blk = New_INITV();
-                INITV_Init_Block (next_blk, st);
-                Set_INITV_next (last_blk, next_blk);
-                last_blk = next_blk;
-		filter++;
+        int filter = caller_typeinfos.size() + 1;
+        for (PU::type_info_table::const_iterator i = callee_typeinfos.begin(); i != callee_typeinfos.end(); ++i)
+        {
+            if (caller_typeinfos.find(i->first) == caller_typeinfos.end())
+            {
+                // insert the entry
+                initv_block_builder entry_builder;
+
+                if (i->first != NULL)
+                    entry_builder.add_symoff(*i->first);
+                else
+                    entry_builder.add_zero(MTYPE_I4);
+                
+                entry_builder.add_val(Enter_tcon (Host_To_Targ (MTYPE_U4, filter)));
+
+                caller_tt_builder.add_initv(entry_builder.result());
+
+                filter++;
             }
         }
     }

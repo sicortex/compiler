@@ -584,7 +584,7 @@ _mm_set_epi64 (__m64 __q1,  __m64 __q0)
 static __inline __m128i __attribute__((__always_inline__))
 _mm_set_epi32 (int __q3, int __q2, int __q1, int __q0)
 {
-  return __extension__ (__m128i)(__v4si){ __q0, __q1, __q2, __q3 };
+  return __extension__ (__m128i)(__v4si) __builtin_ia32_setr_epi32( __q0, __q1, __q2, __q3 );
 }
 
 static __inline __m128i __attribute__((__always_inline__))
@@ -622,7 +622,7 @@ _mm_set1_epi64 (__m64 __A)
 static __inline __m128i __attribute__((__always_inline__))
 _mm_set1_epi32 (int __A)
 {
-  return _mm_set_epi32 (__A, __A, __A, __A);
+  return __builtin_ia32_setr_epi32 (__A, __A, __A, __A);
 }
 
 static __inline __m128i __attribute__((__always_inline__))
@@ -650,7 +650,7 @@ _mm_setr_epi64 (__m64 __q0, __m64 __q1)
 static __inline __m128i __attribute__((__always_inline__))
 _mm_setr_epi32 (int __q0, int __q1, int __q2, int __q3)
 {
-  return _mm_set_epi32 (__q3, __q2, __q1, __q0);
+  return __builtin_ia32_setr_epi32 (__q0, __q1, __q2, __q3);
 }
 
 static __inline __m128i __attribute__((__always_inline__))

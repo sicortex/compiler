@@ -4299,6 +4299,9 @@ WGEN_target_builtins (gs_t exp, INTRINSIC * iopc, BOOL * intrinsic_op)
     case GSBI_IX86_BUILTIN_CRC32Q:
       *iopc = INTRN_CRC32Q;
       break;
+	case GSBI_IX86_BUILTIN_SETREPI32:
+	  *iopc = INTRN_SETREPI32;
+	  break;
 	case GSBI_IX86_BUILTIN_SETREPI16:
 	  *iopc = INTRN_SETREPI16;
 	  break;

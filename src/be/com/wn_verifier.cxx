@@ -187,6 +187,7 @@ class WN_Verifier{
     MEM_POOL _mem_pool;
     wn_set   _visited_wns;
     BOOL     _is_tree_OK;
+    PU      *_pu;
     WN      *_func;
     std::stack< pragma_stack_type > _pragma_stack; 
    
@@ -222,7 +223,7 @@ class WN_Verifier{
     void     Check_func_entry_pu(WN *wn);
 
   public:
-             WN_Verifier(WN *wn);
+             WN_Verifier(PU *pu, WN *wn);
             ~WN_Verifier();
     BOOL     WN_traverse_tree(WN *wn, WN *parent_wn);
 };
@@ -233,7 +234,8 @@ class WN_Verifier{
  *-----------------------------------------------------------*/
 
 
-WN_Verifier::WN_Verifier(WN *wn)
+WN_Verifier::WN_Verifier(PU *pu, WN *wn):
+_pu(pu)
 {
   // Create and initialize memory pool
 
@@ -294,7 +296,7 @@ void WN_Verifier::Check_eh_region(WN *wn)
 
   // getting type info table for current PU
   std::map<ST*, int> type_info_table;
-  Get_Current_PU().Get_type_info_table(type_info_table);
+  _pu->Get_type_info_table(type_info_table);
 
   for (INITV_IDX filter = INITV_next(label_initv_idx);
        filter != 0; filter = INITV_next(filter)) {
@@ -1517,7 +1519,7 @@ WN_verifier(PU *pu, WN *wn)
       return TRUE;
   if (Verifier_DEBUG)
       DevWarn("I am running newest verifier");
-  WN_Verifier wnv(wn);
+  WN_Verifier wnv(pu, wn);
   return wnv.WN_traverse_tree(wn, NULL);
 #else
   return TRUE;

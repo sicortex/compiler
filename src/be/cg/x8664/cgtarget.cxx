@@ -158,7 +158,46 @@ UINT32 CGTARG_Mem_Ref_Bytes(const OP *memop)
       case TOP_ldhpdx:
       case TOP_ldhpdxx:
       case TOP_ldhpd_n32:
+	  case TOP_pmovsxbwx:
+	  case TOP_pmovsxbwxx:
+	  case TOP_pmovsxbwxxx:
+	  case TOP_pmovsxwdx:
+	  case TOP_pmovsxwdxx:
+	  case TOP_pmovsxwdxxx:
+	  case TOP_pmovsxdqx:
+	  case TOP_pmovsxdqxx:
+	  case TOP_pmovsxdqxxx:
+	  case TOP_pmovzxbwx:
+	  case TOP_pmovzxbwxx:
+	  case TOP_pmovzxbwxxx:
+	  case TOP_pmovzxwdx:
+	  case TOP_pmovzxwdxx:
+	  case TOP_pmovzxwdxxx:
+	  case TOP_pmovzxdqx:
+	  case TOP_pmovzxdqxx:
+	  case TOP_pmovzxdqxxx:
         return 8;
+	  case TOP_pmovsxbdx:
+	  case TOP_pmovsxbdxx:
+	  case TOP_pmovsxbdxxx:
+	  case TOP_pmovsxwqx:
+	  case TOP_pmovsxwqxx:
+	  case TOP_pmovsxwqxxx:
+	  case TOP_pmovzxbdx:
+	  case TOP_pmovzxbdxx:
+	  case TOP_pmovzxbdxxx:
+	  case TOP_pmovzxwqx:
+	  case TOP_pmovzxwqxx:
+	  case TOP_pmovzxwqxxx:
+	  	return 4;
+	  case TOP_pmovsxbqx:
+	  case TOP_pmovsxbqxx:
+	  case TOP_pmovsxbqxxx:
+	  case TOP_pmovzxbqx:
+	  case TOP_pmovzxbqxx:
+	  case TOP_pmovzxbqxxx:
+	  	return 2;
+	  
       default:
         return 16;
     }
@@ -448,6 +487,11 @@ UINT32 CGTARG_Mem_Ref_Bytes(const OP *memop)
   case TOP_ld16_abs:
   case TOP_lock_xadd16:
   case TOP_xchgx16:
+  /*sse4*/
+  case TOP_popcnt16x:
+  case TOP_popcnt16xx:
+  case TOP_popcnt16xxx:
+  
     return 2;
 
   case TOP_xorx32:
@@ -521,6 +565,37 @@ UINT32 CGTARG_Mem_Ref_Bytes(const OP *memop)
   case TOP_lock_sub32:
   case TOP_lock_xadd32:
   case TOP_xchgx32:
+  /*ssse4*/
+  case TOP_extractpsx:
+  case TOP_extractpsxx:
+  case TOP_extractpsxxx:
+  case TOP_insertpsx:
+  case TOP_insertpsxx:
+  case TOP_insertpsxxx:
+  case TOP_pextrbx:
+  case TOP_pextrbxx:
+  case TOP_pextrbxxx:
+  case TOP_pextrdx:
+  case TOP_pextrdxx:
+  case TOP_pextrdxxx:
+  case TOP_pextrqx:
+  case TOP_pextrqxx:
+  case TOP_pextrqxxx:
+  case TOP_pextrwx:
+  case TOP_pextrwxx:
+  case TOP_pextrwxxx:
+  case TOP_pinsrbx:
+  case TOP_pinsrbxx:
+  case TOP_pinsrbxxx:
+  case TOP_pinsrdx:
+  case TOP_pinsrdxx:
+  case TOP_pinsrdxxx:
+  case TOP_pinsrqx:
+  case TOP_pinsrqxx:
+  case TOP_pinsrqxxx:
+  case TOP_popcnt32x:
+  case TOP_popcnt32xx:
+  case TOP_popcnt32xxx:
     return 4;
 
   case TOP_xorx64:
@@ -669,6 +744,10 @@ UINT32 CGTARG_Mem_Ref_Bytes(const OP *memop)
   case TOP_psignbxxx:
   case TOP_psignwxxx:
   case TOP_psigndxxx:
+  /*sse4*/
+  case TOP_popcnt64x:
+  case TOP_popcnt64xx:
+  case TOP_popcnt64xxx:
     return 8;
 
   case TOP_fldt:

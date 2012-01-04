@@ -8807,7 +8807,7 @@ Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, 
 	 }
    case INTRN_PCMPISTRI128:{
    	    TN *rflags = Rflags_TN();
-		Expand_Intrinsic_Imm_Param_2result(TOP_pcmpistrmintr, result, rflags, op0, op1, op2, ops, 5);
+		Expand_Intrinsic_Imm_Param_2result(TOP_pcmpistriintr, result, rflags, op0, op1, op2, ops, 5);
 	 	break;
    	}
    case INTRN_PCMPISTRM128:

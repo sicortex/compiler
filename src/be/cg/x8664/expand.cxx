@@ -7037,6 +7037,7 @@ void Expand_Intrinsic_Imm_Param(TOP opc, struct tn* result, struct tn *op0,
 }
 
 
+
 static void
 Expand_Mov_Int_To_vector(TN *result, TN* src, OPS *ops){
   if(TN_is_constant(src)){
@@ -7503,6 +7504,7 @@ void Exp_Intrinsic_Op_SETE(
 	  FmtAssert(FALSE, ("not yet i"));
   }
 }
+
 
 void Expand_Intrinsic_Imm_Param_2result(TOP opc, struct tn* result, struct tn* result2, struct tn *op0,
 										struct tn *op1, struct tn *op2, OPS *ops, int op_count)

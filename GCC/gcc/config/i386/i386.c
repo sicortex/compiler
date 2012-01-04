@@ -15741,6 +15741,12 @@ ix86_init_mmx_sse_builtins (void)
 	       v16qi_ftype_pcchar, IX86_BUILTIN_LDDQU);
 	
 	/* sse4_1*/
+#if 0
+  ftype = build_function_type_list(integer_type_node, unsigned_type_node, NULL_TREE );
+  def_builtin (MASK_SSE4_1, "__builtin_popcount", ftype, IX86_BUILTIN_POPCNTL);
+  ftype = build_function_type_list(long_long_integer_type_node, long_long_unsigned_type_node, NULL_TREE );
+  def_builtin (MASK_SSE4_1, "__builtin_popcountll", ftype, IX86_BUILTIN_POPCNTQ);
+#endif
 	/* blend family*/
   ftype = build_function_type_list (V8HI_type_node, V8HI_type_node, V8HI_type_node, integer_type_node, NULL_TREE);
   def_builtin (MASK_SSE4_1, "__builtin_ia32_pblendw128",ftype, IX86_BUILTIN_PBLENDW128);

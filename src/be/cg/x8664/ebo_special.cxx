@@ -3999,6 +3999,60 @@ static Addr_Mode_Group Addr_Mode_Group_Table[] = {
   {TOP_or128v64,	TOP_orx128v64,	TOP_orxx128v64,	TOP_orxxx128v64,	TOP_UNDEFINED},
   {TOP_for128v32,	TOP_forx128v32,	TOP_forxx128v32,	TOP_forxxx128v32,	TOP_UNDEFINED},
   {TOP_for128v64,	TOP_forx128v64,	TOP_forxx128v64,	TOP_forxxx128v64,	TOP_UNDEFINED},
+  /*sse4*/
+  {TOP_blendpd, TOP_blendpdx, TOP_blendpdxx, TOP_blendpdxxx, TOP_UNDEFINED},
+  {TOP_blendps, TOP_blendpsx, TOP_blendpsxx, TOP_blendpsxxx, TOP_UNDEFINED},
+  {TOP_blendvpd, TOP_blendvpdxx, TOP_blendvpdxx, TOP_blendvpdxxx, TOP_UNDEFINED},
+  {TOP_blendvps, TOP_blendvpsxx, TOP_blendvpsxx, TOP_blendvpsxxx, TOP_UNDEFINED},
+  // TODO: insertps and extractps support in ebo
+  {TOP_crc32, TOP_crc32x, TOP_crc32xx,TOP_crc32xxx, TOP_UNDEFINED},
+  {TOP_crc32_64, TOP_crc32_64x, TOP_crc32_64xx, TOP_crc32_64xxx, TOP_UNDEFINED},
+  {TOP_dppd, TOP_dppdx, TOP_dppdxx, TOP_dppdxxx, TOP_UNDEFINED},
+  {TOP_dpps, TOP_dppsx, TOP_dppsxx, TOP_dppsxxx, TOP_UNDEFINED},
+  {TOP_mpsadbw, TOP_mpsadbwx, TOP_mpsadbwxx, TOP_mpsadbwxxx, TOP_UNDEFINED},
+  {TOP_packusdw, TOP_packusdwx, TOP_packusdwxx, TOP_packusdwxxx, TOP_UNDEFINED},
+  {TOP_pblendvb, TOP_pblendvbx, TOP_pblendvbxx, TOP_pblendvbxxx, TOP_UNDEFINED},
+  {TOP_pblendw, TOP_pblendwx, TOP_pblendwxx, TOP_pblendwxxx,  TOP_UNDEFINED},
+  {TOP_pcmpeqq, TOP_pcmpeqqx, TOP_pcmpeqqxx, TOP_pcmpeqqxxx, TOP_UNDEFINED},
+  {TOP_pcmpestri, TOP_pcmpestrix, TOP_pcmpestrixx, TOP_pcmpestrixxx, TOP_UNDEFINED},
+  {TOP_pcmpestrm, TOP_pcmpestrmx, TOP_pcmpestrmxx, TOP_pcmpestrmxxx,  TOP_UNDEFINED},
+  {TOP_pcmpistri, TOP_pcmpistrix, TOP_pcmpistrixx, TOP_pcmpistrixxx, TOP_UNDEFINED},
+  {TOP_pcmpistrm, TOP_pcmpistrmx, TOP_pcmpistrmxx, TOP_pcmpistrmxxx, TOP_UNDEFINED},
+  {TOP_pcmpgtq, TOP_pcmpgtqx, TOP_pcmpgtqxx, TOP_pcmpgtqxxx, TOP_UNDEFINED},
+  {TOP_pextrb, TOP_pextrbx, TOP_pextrbxx, TOP_pextrbxxx, TOP_UNDEFINED},
+  {TOP_pextrd, TOP_pextrdx, TOP_pextrdxx, TOP_pextrdxxx, TOP_UNDEFINED},
+  {TOP_pextrq, TOP_pextrqx, TOP_pextrqxx, TOP_pextrqxxx, TOP_UNDEFINED},
+  {TOP_phminposuw, TOP_phminposuwx, TOP_phminposuwxx, TOP_phminposuwxxx, TOP_UNDEFINED},
+  {TOP_pinsrb, TOP_pinsrbx, TOP_pinsrbxx, TOP_pinsrbxxx, TOP_UNDEFINED},
+  {TOP_pinsrd, TOP_pinsrdx, TOP_pinsrdxx, TOP_pinsrdxxx, TOP_UNDEFINED},
+  {TOP_pinsrq, TOP_pinsrqx, TOP_pinsrqxx, TOP_pinsrqxxx, TOP_UNDEFINED},
+  {TOP_pmaxsb, TOP_pmaxsbx, TOP_pmaxsbxx, TOP_pmaxsbxxx, TOP_UNDEFINED},
+  {TOP_pmaxsd, TOP_pmaxsdx, TOP_pmaxsdxx, TOP_pmaxsdxxx, TOP_UNDEFINED},
+  {TOP_pmaxud, TOP_pmaxudx, TOP_pmaxudxx, TOP_pmaxudxxx, TOP_UNDEFINED},
+  {TOP_pmaxuw, TOP_pmaxuwx, TOP_pmaxuwxx, TOP_pmaxuwxxx, TOP_UNDEFINED},
+  {TOP_pminsb, TOP_pminsbx, TOP_pminsbxx, TOP_pminsbxxx, TOP_UNDEFINED},
+  {TOP_pminsd, TOP_pminsdx, TOP_pminsdxx, TOP_pminsdxxx, TOP_UNDEFINED},
+  {TOP_pminud, TOP_pminudx, TOP_pminudxx, TOP_pminudxxx, TOP_UNDEFINED},
+  {TOP_pminuw, TOP_pminuwx, TOP_pminuwxx, TOP_pminuwxxx,  TOP_UNDEFINED},
+  {TOP_pmovsxbw, TOP_pmovsxbwx, TOP_pmovsxbwxx, TOP_pmovsxbwxxx,  TOP_UNDEFINED},
+  {TOP_pmovsxbd, TOP_pmovsxbdx, TOP_pmovsxbdxx, TOP_pmovsxbdxxx, TOP_UNDEFINED},
+  {TOP_pmovsxbq, TOP_pmovsxbqx, TOP_pmovsxbqxx, TOP_pmovsxbqxxx, TOP_UNDEFINED},
+  {TOP_pmovsxwd, TOP_pmovsxwdx, TOP_pmovsxwdxx, TOP_pmovsxwdxxx, TOP_UNDEFINED},
+  {TOP_pmovsxwq, TOP_pmovsxwqx, TOP_pmovsxwqxx, TOP_pmovsxwqxxx, TOP_UNDEFINED},
+  {TOP_pmovsxdq, TOP_pmovsxdqx, TOP_pmovsxdqxx, TOP_pmovsxdqxxx, TOP_UNDEFINED},
+  {TOP_pmovzxbw, TOP_pmovzxbwx, TOP_pmovzxbwxx, TOP_pmovzxbwxxx, TOP_UNDEFINED},
+  {TOP_pmovzxbd, TOP_pmovzxbdx, TOP_pmovzxbdxx, TOP_pmovzxbdxxx, TOP_UNDEFINED},
+  {TOP_pmovzxbq, TOP_pmovzxbqx, TOP_pmovzxbqxx, TOP_pmovzxbqxxx, TOP_UNDEFINED},
+  {TOP_pmovzxwd, TOP_pmovzxwdx, TOP_pmovzxwdxx, TOP_pmovzxwdxxx, TOP_UNDEFINED},
+  {TOP_pmovzxwq, TOP_pmovzxwqx, TOP_pmovzxwqxx, TOP_pmovzxwqxxx, TOP_UNDEFINED},
+  {TOP_pmovzxdq, TOP_pmovzxdqx, TOP_pmovzxdqxx, TOP_pmovzxdqxxx, TOP_UNDEFINED},
+  {TOP_pmuldq, TOP_pmuldqx, TOP_pmuldqxx, TOP_pmuldqxxx, TOP_UNDEFINED},
+  {TOP_pmulld, TOP_pmulldx, TOP_pmulldxx, TOP_pmulldxxx, TOP_UNDEFINED},
+  {TOP_ptest, TOP_ptestx, TOP_ptestxx, TOP_ptestxxx, TOP_UNDEFINED},
+  {TOP_roundpd, TOP_roundpdx, TOP_roundpdxx, TOP_roundpdxxx,  TOP_UNDEFINED},
+  {TOP_roundps, TOP_roundpsx, TOP_roundpsxx, TOP_roundpsxxx, TOP_UNDEFINED},
+  {TOP_roundsd, TOP_roundsdx, TOP_roundsdxx, TOP_roundsdxxx, TOP_UNDEFINED},
+  {TOP_roundss, TOP_roundssx, TOP_roundssxx, TOP_roundssxxx, TOP_UNDEFINED},
   /*ssse3*/
   {TOP_phaddw128, TOP_phaddwx128, TOP_phaddwxx128, TOP_phaddwxxx128, TOP_UNDEFINED},
   {TOP_phaddd128, TOP_phadddx128, TOP_phadddxx128, TOP_phadddxxx128, TOP_UNDEFINED},
@@ -5500,6 +5554,88 @@ BOOL EBO_load_in_2OP(TOP top){
 	 case TOP_vroundss_f128_ofloat_float_base64_index64_uimm8_simm32_simm8:
 	 case TOP_vroundss_f128_ofloat_float_base64_simm32_simm8:
 	 case TOP_vroundss_f128_ofloat_float_index64_uimm8_simm32_simm8:
+	 /*SSE4*/
+	 case TOP_blendpdx:
+	 case TOP_blendpdxx:
+	 case TOP_blendpdxxx:
+     case TOP_blendpsx:
+     case TOP_blendvpdx:
+     case TOP_blendvpsx:
+     case TOP_dppdx:
+     case TOP_dppsx:
+     case TOP_extractpsx:
+     case TOP_insertpsx:
+     case TOP_mpsadbwx:
+     case TOP_packusdwx:
+     case TOP_pblendvbx:
+     case TOP_pblendwx:
+     case TOP_pcmpestrix:
+     case TOP_pcmpestrmx:
+     case TOP_pcmpistrix:
+     case TOP_pcmpistrmx:
+     case TOP_pextrbx:
+     case TOP_pextrdx:
+     case TOP_pextrqx:
+     case TOP_pextrwx:
+     case TOP_pinsrbx:
+     case TOP_pinsrdx:
+     case TOP_pinsrqx:
+     case TOP_roundpdx:
+     case TOP_roundpsx:
+     case TOP_roundsdx:
+     case TOP_roundssx:
+	 case TOP_blendpsxx:
+     case TOP_blendvpdxx:
+     case TOP_blendvpsxx:
+     case TOP_dppdxx:
+     case TOP_dppsxx:
+     case TOP_extractpsxx:
+     case TOP_insertpsxx:
+     case TOP_mpsadbwxx:
+     case TOP_packusdwxx:
+     case TOP_pblendvbxx:
+     case TOP_pblendwxx:
+     case TOP_pcmpestrixx:
+     case TOP_pcmpestrmxx:
+     case TOP_pcmpistrixx:
+     case TOP_pcmpistrmxx:
+     case TOP_pextrbxx:
+     case TOP_pextrdxx:
+     case TOP_pextrqxx:
+     case TOP_pextrwxx:
+     case TOP_pinsrbxx:
+     case TOP_pinsrdxx:
+     case TOP_pinsrqxx:
+     case TOP_roundpdxx:
+     case TOP_roundpsxx:
+     case TOP_roundsdxx:
+     case TOP_roundssxx:
+	 case TOP_blendpsxxx:
+     case TOP_blendvpdxxx:
+     case TOP_blendvpsxxx:
+     case TOP_dppdxxx:
+     case TOP_dppsxxx:
+     case TOP_extractpsxxx:
+     case TOP_insertpsxxx:
+     case TOP_mpsadbwxxx:
+     case TOP_packusdwxxx:
+     case TOP_pblendvbxxx:
+     case TOP_pblendwxxx:
+     case TOP_pcmpestrixxx:
+     case TOP_pcmpestrmxxx:
+     case TOP_pcmpistrixxx:
+     case TOP_pcmpistrmxxx:
+     case TOP_pextrbxxx:
+     case TOP_pextrdxxx:
+     case TOP_pextrqxxx:
+     case TOP_pextrwxxx:
+     case TOP_pinsrbxxx:
+     case TOP_pinsrdxxx:
+     case TOP_pinsrqxxx:
+     case TOP_roundpdxxx:
+     case TOP_roundpsxxx:
+     case TOP_roundsdxxx:
+     case TOP_roundssxxx:
 	  return TRUE;
     default:
 	  return FALSE;
@@ -5580,6 +5716,33 @@ BOOL EBO_Is_3opr(OP *op){
 	 case TOP_vpclmulqdq_f128_ofloat_float_float_simm8:
 	 case TOP_vroundsd_f128_ofloat_float_float_simm8:
 	 case TOP_vroundss_f128_ofloat_float_float_simm8:
+	 /*SSE4*/
+	 case TOP_blendpd:
+	 case TOP_blendps:
+     case TOP_blendvpd:
+     case TOP_blendvps:
+     case TOP_dppd:
+     case TOP_dpps:
+     case TOP_extractps:
+     case TOP_insertps:
+     case TOP_mpsadbw:
+     case TOP_packusdw:
+     case TOP_pblendvb:
+     case TOP_pblendw:
+     case TOP_pcmpestri:
+     case TOP_pcmpestrm:
+     case TOP_pcmpistri:
+     case TOP_pcmpistrm:
+     case TOP_pextrb:
+     case TOP_pextrd:
+     case TOP_pextrq:
+     case TOP_pinsrb:
+     case TOP_pinsrd:
+     case TOP_pinsrq:
+     case TOP_roundpd:
+     case TOP_roundps:
+     case TOP_roundsd:
+     case TOP_roundss:
 	
 	  return TRUE;
 	 default:

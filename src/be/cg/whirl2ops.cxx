@@ -3186,7 +3186,7 @@ Handle_INTRINSIC_OP (WN *expr, TN *result)
 
   if (imm_kid)
   {
-    Is_True (imm_kidno == 1 || imm_kidno == 2,
+    Is_True (imm_kidno >= 1 && imm_kidno <= 5,
              ("Immediate kid0 of intrinsic not supported"));
     switch ( imm_kidno ) {
         case 1:

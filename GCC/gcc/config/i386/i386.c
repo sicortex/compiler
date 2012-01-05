@@ -15724,6 +15724,23 @@ ix86_init_mmx_sse_builtins (void)
 
   def_builtin (MASK_SSE2, "__builtin_ia32_pmaddwd128", v4si_ftype_v8hi_v8hi, IX86_BUILTIN_PMADDWD128);
 
+  ftype = build_function_type_list(V4SI_type_node, integer_type_node,integer_type_node,integer_type_node,
+                                    integer_type_node, NULL_TREE);
+  def_builtin(MASK_SSE2, "__builtin_ia32_setr_epi32", ftype, IX86_BUILTIN_SETREPI32);
+	
+  ftype = build_function_type_list(V8HI_type_node, short_integer_type_node,short_integer_type_node,short_integer_type_node,
+                                    short_integer_type_node,short_integer_type_node,short_integer_type_node,
+                                    short_integer_type_node,short_integer_type_node, NULL_TREE);
+  def_builtin(MASK_SSE2, "__builtin_ia32_setr_epi16", ftype, IX86_BUILTIN_SETREPI16);
+	
+  ftype = build_function_type_list(V16QI_type_node, signed_char_type_node, signed_char_type_node, signed_char_type_node, signed_char_type_node,
+                                    signed_char_type_node,signed_char_type_node,signed_char_type_node,signed_char_type_node,signed_char_type_node,
+                                    signed_char_type_node,signed_char_type_node,signed_char_type_node,signed_char_type_node,signed_char_type_node,
+                                    signed_char_type_node,signed_char_type_node,NULL_TREE);
+  def_builtin(MASK_SSE2, "__builtin_ia32_setr_epi8", ftype, IX86_BUILTIN_SETREPI8);
+	
+  ftype = build_function_type_list(V8HI_type_node, V8HI_type_node, V8HI_type_node, NULL_TREE);
+
   /* Prescott New Instructions.  */
   def_builtin (MASK_SSE3, "__builtin_ia32_monitor",
 	       void_ftype_pcvoid_unsigned_unsigned,
@@ -15965,22 +15982,6 @@ ix86_init_mmx_sse_builtins (void)
   def_builtin (MASK_SSE4_2, "__builtin_ia32_crc32di", ftype, IX86_BUILTIN_CRC32Q);
 
 	/*ssse3*/
-	ftype = build_function_type_list(V4SI_type_node, integer_type_node,integer_type_node,integer_type_node,
-                                    integer_type_node, NULL_TREE);
-	def_builtin(MASK_SSSE3, "__builtin_ia32_setr_epi32", ftype, IX86_BUILTIN_SETREPI32);
-	
-    ftype = build_function_type_list(V8HI_type_node, short_integer_type_node,short_integer_type_node,short_integer_type_node,
-                                    short_integer_type_node,short_integer_type_node,short_integer_type_node,
-                                    short_integer_type_node,short_integer_type_node, NULL_TREE);
-	def_builtin(MASK_SSSE3, "__builtin_ia32_setr_epi16", ftype, IX86_BUILTIN_SETREPI16);
-	
-    ftype = build_function_type_list(V16QI_type_node, signed_char_type_node, signed_char_type_node, signed_char_type_node, signed_char_type_node,
-                                    signed_char_type_node,signed_char_type_node,signed_char_type_node,signed_char_type_node,signed_char_type_node,
-                                    signed_char_type_node,signed_char_type_node,signed_char_type_node,signed_char_type_node,signed_char_type_node,
-                                    signed_char_type_node,signed_char_type_node,NULL_TREE);
-	def_builtin(MASK_SSSE3, "__builtin_ia32_setr_epi8", ftype, IX86_BUILTIN_SETREPI8);
-	
-	ftype = build_function_type_list(V8HI_type_node, V8HI_type_node, V8HI_type_node, NULL_TREE);
 
 	def_builtin (MASK_SSSE3, "__builtin_ia32_phaddw128", ftype, IX86_BUILTIN_PHADDW128);
 

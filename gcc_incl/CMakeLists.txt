@@ -24,7 +24,6 @@ set(HEADERS
 	immintrin.h
 	avxintrin.h
 	wmmintrin.h
-	popcntintrin.h
 )
 
 set(header_outputs)

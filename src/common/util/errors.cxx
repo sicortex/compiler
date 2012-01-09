@@ -1214,7 +1214,7 @@ Fail_FmtAssertion ( const char *fmt, ... )
 
   /* Abort: */
   Signal_Cleanup( 0 );
-  exit(RC_INTERNAL_ERROR);
+  abort();
 }
 
 /* ====================================================================

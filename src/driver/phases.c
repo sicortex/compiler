@@ -441,7 +441,7 @@ add_targ_options ( string_list_t *args )
 	else
 	  add_string(args, "-TARG:avx=off");
 			
-	if (fma == TRUE)
+	if (fma_enable == TRUE)
 	  add_string(args, "-TARG:fma=on");
 	else
 	  add_string(args, "-TARG:fma=off");

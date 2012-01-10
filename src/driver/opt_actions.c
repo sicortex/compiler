@@ -2530,8 +2530,8 @@ Get_x86_ISA_extensions ()
   if(sse4_2 == UNDEFINED && target_supports_sse42)
   	sse4_2 = TRUE;
 
-  if(fma == UNDEFINED && target_supports_fma)
-  	fma = TRUE;
+  if(fma_enable == UNDEFINED && target_supports_fma)
+  	fma_enable = TRUE;
 
   if(xop == UNDEFINED && target_supports_xop)
   	xop = TRUE;

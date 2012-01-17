@@ -1591,4 +1591,5 @@ int main()
 		    TOP_UNDEFINED);
 
   ISA_Pack_End();
+  return 0;
 }

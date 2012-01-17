@@ -1676,4 +1676,5 @@ int main ()
 
 	      /* END */
 	      NULL);
+  return 0;
 }

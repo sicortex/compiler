@@ -29,9 +29,11 @@
 #include "topcode.h"
 #include "isa_pseudo_gen.h"
  
+int
 main()
 {
   ISA_Pseudo_Begin("MIPS");
 
   ISA_Pseudo_End();
+  return 0;
 }

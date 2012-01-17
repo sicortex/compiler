@@ -46,4 +46,5 @@ int main ()
   ISA_Create_Lit_Class( "pcrel32",SIGNED,   SignedBitRange(32),   LIT_RANGE_END);
 
   ISA_Lits_End();
+  return 0;
 }

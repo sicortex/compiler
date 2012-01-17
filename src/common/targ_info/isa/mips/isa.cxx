@@ -52,6 +52,7 @@
 #include <stddef.h>
 #include "isa_gen.h"
 
+int
 main ()
 {
   ISA_Create ("MIPS", 
@@ -465,4 +466,5 @@ main ()
         "swp_start",
         "swp_stop",
 	NULL);
+  return 0;
 }

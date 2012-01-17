@@ -54,6 +54,7 @@
 #include "topcode.h"
 #include "isa_operands_gen.h"
 
+int
 main()
 {
   ISA_Operands_Begin("MIPS");

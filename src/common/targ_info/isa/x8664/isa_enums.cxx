@@ -43,5 +43,6 @@ int main ()
       NULL,	UNDEFINED);	// default value
 
   ISA_Enums_End();
+  return 0;
 }
 

@@ -57,6 +57,7 @@
 #include "topcode.h"
 #include "isa_properties_gen.h"
 
+int
 main()
 {
   ISA_PROPERTY

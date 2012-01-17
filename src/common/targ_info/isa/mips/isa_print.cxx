@@ -61,6 +61,7 @@
 // suffix starts with an underscore. To get the assembly name we strip off
 // the suffix.
 
+int
 main()
 {
   ISA_Print_Begin("MIPS");
@@ -553,4 +554,5 @@ main()
 			  TOP_UNDEFINED);
 
   ISA_Print_End();
+  return 0;
 }

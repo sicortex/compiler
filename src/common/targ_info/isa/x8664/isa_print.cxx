@@ -2266,4 +2266,5 @@ int main()
                           TOP_UNDEFINED);
 
   ISA_Print_End();
+  return 0;
 }

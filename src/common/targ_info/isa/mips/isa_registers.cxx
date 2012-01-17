@@ -72,6 +72,7 @@ static int Range_ISA_Mask(ISA_SUBSET min_isa, ISA_SUBSET max_isa)
 }
 
 
+int
 main (int argc, char** argv)
 {
   ISA_Registers_Begin("MIPS");
@@ -89,4 +90,5 @@ main (int argc, char** argv)
   ISA_Register_Set(rc_hilo, 0, 0, "$hilo", NULL, All_ISA_Mask());
 
   ISA_Registers_End();
+  return 0;
 }

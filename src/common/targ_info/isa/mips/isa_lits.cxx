@@ -32,6 +32,7 @@
 
 #include "isa_lits_gen.h"
 
+int
 main ()
 {
   LIT_RANGE r1to32;
@@ -48,4 +49,5 @@ main ()
   ISA_Create_Lit_Class("len5", UNSIGNED, r1to32, LIT_RANGE_END);
 
   ISA_Lits_End();
+  return 0;
 }

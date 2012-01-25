@@ -48,5 +48,6 @@ int main ()
 	       "wolfdale",
 	       "sandy",
 	       NULL );
+  return 0;
 }
 

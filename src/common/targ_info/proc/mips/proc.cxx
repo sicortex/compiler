@@ -33,6 +33,7 @@
 #include <stddef.h>
 #include "proc_gen.h"
 
+int
 main ()
 {
   PROC_Create ( "MIPS",
@@ -41,5 +42,7 @@ main ()
 	"twc9a",
 	NULL
   );
+
+  return 0;
 }
 

@@ -345,4 +345,5 @@ int main()
   x86_64_abi();
 
   ABI_Properties_End();
+  return 0;
 }

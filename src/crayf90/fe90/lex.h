@@ -172,6 +172,7 @@ static	kwd_type		kwd[] = {
 				"ENUMERATOR",	     Tok_Kwd_Enumerator,
 #endif /* KEY Bug 10572 */
 				"ELEMENTAL",	     Tok_Kwd_Elemental,
+				"EXTENDS",	     Tok_Kwd_Extends,
 				"EXTERNAL",	     Tok_Kwd_External,
 				"ENCODE",	     Tok_Kwd_Encode,
 				"ENTRY",	     Tok_Kwd_Entry,

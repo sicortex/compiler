@@ -3074,6 +3074,15 @@
 # define ATT_UNIQUE_ID(IDX)		attr_aux_tbl[IDX].fld.field3
 # endif
 
+# ifdef _DEBUG
+# define ATT_PARENT_TYPE(IDX)						       \
+	((AT_OBJ_CLASS(IDX) == Derived_Type) ?				       \
+		attr_tbl : sytb_var_error("ATT_PARENT_TYPE", IDX))     \
+		[IDX].fld.field14
+# else
+# define ATT_PARENT_TYPE(IDX)		attr_tbl[IDX].fld.field14
+# endif
+
 
 
 /*  ATTR LIST TABLE */

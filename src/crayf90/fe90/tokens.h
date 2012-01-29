@@ -144,6 +144,7 @@ enum	token_values {
 #endif /* KEY Bug 10572 */
 		Tok_Kwd_Equivalence,	/* EQUIVALENCE			      */
 		Tok_Kwd_Exit,		/* EXIT				      */
+		Tok_Kwd_Extends,	/* EXTENDS			      */
 		Tok_Kwd_External,	/* EXTERNAL			      */
 		Tok_Kwd_File,		/* FILE	     ENDFILE		      */
 		Tok_Kwd_Flush,		/* FLUSH			      */

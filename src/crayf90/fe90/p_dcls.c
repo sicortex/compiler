@@ -992,6 +992,14 @@ static void parse_cpnt_dcl_stmt()
                                  TOKEN_LEN(token),
                                  &sn_idx);
 
+      if (attr_idx == NULL_IDX && ATT_PARENT_TYPE(CURR_BLK_NAME) != NULL_IDX) {
+	  int sn2_idx;
+
+	  sn2_idx = ATT_FIRST_CPNT_IDX(ATT_PARENT_TYPE(CURR_BLK_NAME));
+	  attr_idx = srch_linked_sn(TOKEN_STR(token), TOKEN_LEN(token),
+				    &sn2_idx);
+      }
+
       if (attr_idx == NULL_IDX) {
          NTR_SN_TBL(sn_idx);
          NTR_NAME_POOL(TOKEN_ID(token).words, TOKEN_LEN(token), np_idx);
@@ -1595,11 +1603,129 @@ EXIT:
 
 }  /* parse_data_stmt */
 
+
+/******************************************************************************\
+|*									      *|
+|* Description:								      *|
+|*      Parse the extends specification:     ( parent-type-name )             *|
+|*									      *|
+|* Input parameters:							      *|
+|*	NONE								      *|
+|*									      *|
+|* Output parameters:							      *|
+|*	NONE								      *|
+|*									      *|
+|* Returns:								      *|
+|*	Index of the parent-type-name, -1 on error			      *|
+|*									      *|
+\******************************************************************************/
+
+static int parse_extends_spec(void) {
+int attr_idx, name_idx;
+
+    if (LA_CH_VALUE != LPAREN) {
+	PRINTMSG(TOKEN_LINE(token), 197, Error, TOKEN_COLUMN(token),
+		 "(", TOKEN_STR(token));
+	goto error;
+    }
+
+    NEXT_LA_CH;
+
+    if (!MATCHED_TOKEN_CLASS(Tok_Class_Id))
+	goto error;
+
+    attr_idx = srch_sym_tbl(TOKEN_STR(token), TOKEN_LEN(token), &name_idx);
+
+    if (attr_idx == NULL_IDX || AT_OBJ_CLASS(attr_idx) != Derived_Type ||
+	ATT_SEQUENCE_SET(attr_idx))
+	goto error;
+
+    if (LA_CH_VALUE != RPAREN) {
+	PRINTMSG(TOKEN_LINE(token), 197, Error, TOKEN_COLUMN(token), ")",
+		 TOKEN_STR(token));
+	goto flush;
+    }
+
+    NEXT_LA_CH;
+    return attr_idx;
+
+ error:
+    PRINTMSG(TOKEN_LINE(token), 1709, Error, TOKEN_COLUMN(token));
+
+ flush:
+    flush_LA_to_EOS();
+    NEXT_LA_CH;
+    return -1;
+}
+
+
+/******************************************************************************\
+|*									      *|
+|* Description:								      *|
+|*      Extend a type.  Adds the base type as a component of the type.	      *|
+|*									      *|
+|* Input parameters:							      *|
+|*	NONE								      *|
+|*									      *|
+|* Output parameters:							      *|
+|*	NONE								      *|
+|*									      *|
+|* Returns:								      *|
+|*	NONE								      *|
+|*									      *|
+\******************************************************************************/
+
+static void extend_type(int dt_idx) {
+int sn_idx, attr_idx, base_idx;
+
+    base_idx = ATT_PARENT_TYPE(dt_idx);
+    if (base_idx == NULL_IDX)
+	return;
+
+    NTR_ATTR_TBL(attr_idx);
+
+    AT_DEF_LINE(attr_idx)   = AT_DEF_LINE(dt_idx);
+    AT_DEF_COLUMN(attr_idx) = AT_DEF_COLUMN(dt_idx);
+
+    AT_NAME_IDX(attr_idx)   = AT_NAME_IDX(base_idx);
+    AT_NAME_LEN(attr_idx)   = AT_NAME_LEN(base_idx);
+
+    NTR_SN_TBL(sn_idx);
+    SN_NAME_IDX(sn_idx)     = AT_NAME_IDX(base_idx);
+    SN_NAME_LEN(sn_idx)     = AT_NAME_LEN(base_idx);
+    SN_ATTR_IDX(sn_idx)     = attr_idx;
+
+    /* Guaranteed to be the first component */
+
+    ATT_FIRST_CPNT_IDX(dt_idx)     = sn_idx;
+    ATT_NUM_CPNTS(dt_idx)          = 1;
+    ATT_NUMERIC_CPNT(dt_idx)       = TRUE;
+    BLK_LAST_CPNT_IDX(blk_stk_idx) = sn_idx;
+
+    AT_SEMANTICS_DONE(attr_idx)    = TRUE;
+    ATD_CLASS(attr_idx)            = Struct_Component;
+    ATD_DERIVED_TYPE_IDX(attr_idx) = base_idx;
+
+    AT_TYPED(attr_idx)             = TRUE;
+    ATD_CPNT_OFFSET_IDX(attr_idx)  = CN_INTEGER_ZERO_IDX;
+    ATD_OFFSET_ASSIGNED(attr_idx)  = TRUE;
+
+    CLEAR_TBL_NTRY(type_tbl, TYP_WORK_IDX);
+    TYP_TYPE(TYP_WORK_IDX)   = Structure;
+    TYP_LINEAR(TYP_WORK_IDX) = Structure_Type;
+    TYP_IDX(TYP_WORK_IDX)    = base_idx;
+    ATD_TYPE_IDX(attr_idx)   = ntr_type_tbl();
+
+    assign_offset(attr_idx);
+}
+
 
 /******************************************************************************\
 |*									      *|
 |* Description:								      *|
-|*      BNF       - TYPE [[,access_spec]::type-name                           *|
+|*      BNF       - TYPE [type-attr-spec]::type-name                          *|
+|*      type-attr-spec -  [ access-spec ] [, EXTENDS(parent) ]                *|
+|*                        [, ABSTRACT] [, BIND(C) ]                           *|
 |*									      *|
 |* Input parameters:							      *|
 |*	NONE								      *|
@@ -1620,6 +1746,7 @@ static void parse_derived_type_stmt()
    int		 dt_idx		= NULL_IDX;
    boolean	 err;
    int		 name_idx;
+   int		 extends_idx = 0;
    char		*str;
 #ifdef KEY /* Bug 14150 */
    int		 found_bind = 0;
@@ -1639,9 +1766,12 @@ static void parse_derived_type_stmt()
 	int is_public = 0;
 	int is_private = 0;
 	int is_bind = 0;
+	int is_extends = 0;
+	int is_abstract = 0;
 	int access_set_line = 0;
 	int access_set_col = 0;
-	for (int i = 0; i < 2; i += 1) {
+
+	for (;;) {
 	  if (matched_specific_token(Tok_Kwd_Private, Tok_Class_Keyword)) {
 	     access = Private;
 	     access_set = TRUE;
@@ -1661,18 +1791,29 @@ static void parse_derived_type_stmt()
 	     found_bind = 1;
 	     is_bind += 1;
 	  }
+	  else if (matched_specific_token(Tok_Kwd_Abstract, Tok_Class_Keyword)) {
+	     is_abstract += 1;
+	  }
+	  else if (matched_specific_token(Tok_Kwd_Extends, Tok_Class_Keyword)) {
+	     extends_idx = parse_extends_spec();
+	     if (extends_idx < 0)
+		 return;
+
+	     is_extends++;
+	  }
 	  else { /* No keyword after "," */
-	    parse_err_flush(Find_None, "BIND, PUBLIC, or PRIVATE");
+	    parse_err_flush(Find_None, "EXTENDS, ABSTRACT, BIND, PUBLIC, or PRIVATE");
 	    break;
 	  }
+
 	  if (LA_CH_VALUE != COMMA) {
 	    break;
 	  }
 	  NEXT_LA_CH; /* consume comma */
 	}
-	if (is_private > 1 || is_public > 1 || is_bind > 1) {
+	if (is_private > 1 || is_public > 1 || is_bind > 1 || is_extends > 1) {
 	   PRINTMSG(TOKEN_LINE(token), 424, Error, TOKEN_COLUMN(token),
-	     "PUBLIC, PRIVATE, or BIND");
+	     "PUBLIC, PRIVATE, EXTENDS, or BIND");
 	}
 	else if (is_private && is_public) {
 	   PRINTMSG(TOKEN_LINE(token), 425, Error, TOKEN_COLUMN(token),
@@ -1685,7 +1826,7 @@ static void parse_derived_type_stmt()
 	   access_set = FALSE;
 	}
 	/* Require "::" if any attribute appeared */
-	if ((is_private + is_public + is_bind) &&
+	if ((is_private || is_public || is_bind || is_extends) &&
 	   !matched_specific_token(Tok_Punct_Colon_Colon, Tok_Class_Punct)) {
 	   parse_err_flush(Find_None, "::");
 	}
@@ -1845,6 +1986,7 @@ static void parse_derived_type_stmt()
       LN_DEF_LOC(name_idx)	= TRUE;
       AT_DEFINED(dt_idx)	= TRUE;
       AT_LOCKED_IN(dt_idx)	= TRUE;
+      ATT_PARENT_TYPE(dt_idx)   = extends_idx;
 
       if (AT_ACCESS_SET(dt_idx)) {
 
@@ -1900,6 +2042,7 @@ static void parse_derived_type_stmt()
    CURR_BLK_NO_EXEC		= TRUE;
    CURR_BLK_NAME		= dt_idx;
 
+   extend_type(dt_idx);
    NEXT_LA_CH;			/* Skip EOS */
 
    TRACE (Func_Exit, "parse_derived_type_stmt", NULL);

@@ -1631,7 +1631,6 @@ static	void  set_mod_link_tbl_for_attr(int	attr_idx)
       break;
 
    case Derived_Type:
-
       switch (ATT_STRUCT_BIT_LEN_FLD(attr_idx)) {
       case AT_Tbl_Idx:
          KEEP_ATTR(ATT_STRUCT_BIT_LEN_IDX(attr_idx));
@@ -1649,6 +1648,8 @@ static	void  set_mod_link_tbl_for_attr(int	attr_idx)
          set_mod_link_tbl_for_il(ATT_STRUCT_BIT_LEN_IDX(attr_idx));
          break;
       }
+
+      KEEP_ATTR(ATT_PARENT_TYPE(attr_idx));
 
       sn_idx			= ATT_FIRST_CPNT_IDX(attr_idx);
 
@@ -3496,7 +3497,6 @@ static	void  update_idxs_in_attr_entry(int	start_idx,
 
 
    case Derived_Type:
-
       if (ATT_STRUCT_BIT_LEN_IDX(at_idx) != NULL_IDX) {
 
          switch (ATT_STRUCT_BIT_LEN_FLD(at_idx)) {
@@ -3527,6 +3527,8 @@ static	void  update_idxs_in_attr_entry(int	start_idx,
             break;
          }
       }
+
+      ATT_PARENT_TYPE(at_idx) = ML_AT_IDX(ATT_PARENT_TYPE(at_idx));
 
       ATT_FIRST_CPNT_IDX(at_idx)	= ML_SN_IDX(ATT_FIRST_CPNT_IDX(at_idx));
       break;
@@ -8245,6 +8247,9 @@ static void  assign_new_idxs_after_input(int	module_attr_idx)
          if (ATT_FIRST_CPNT_IDX(attr_idx) != NULL_IDX) {
             ATT_FIRST_CPNT_IDX(attr_idx)	+= sn_idx;
          }
+
+	 if (ATT_PARENT_TYPE(attr_idx) != NULL_IDX)
+	    ATT_PARENT_TYPE(attr_idx) += at_idx;
 
          if (!ATP_IN_CURRENT_COMPILE(module_attr_idx)) {
 

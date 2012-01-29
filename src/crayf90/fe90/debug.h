@@ -1508,6 +1508,7 @@ char		*token_value_str[Tok_LAST+1]	= {
 #endif /* KEY Bug 10572 */
 			"Tok_Kwd_Equivalence",	/* Tok_Kwd_Equivalence	*/
 			"Tok_Kwd_Exit",		/* Tok_Kwd_Exit		*/
+			"Tok_Kwd_Extends",	/* Tok_Kwd_Extends	*/
 			"Tok_Kwd_External",	/* Tok_Kwd_External	*/
 			"Tok_Kwd_File",		/* Tok_Kwd_File		*/
 			"Tok_Kwd_Flush",	/* Tok_Kwd_Flush	*/

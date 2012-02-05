@@ -8058,6 +8058,7 @@ gcc2gs (int code)
    case WITH_CLEANUP_EXPR: return GS_WITH_CLEANUP_EXPR;
    case WITH_SIZE_EXPR: return GS_WITH_SIZE_EXPR;
    case TEMPLATE_TEMPLATE_PARM: return GS_TEMPLATE_TEMPLATE_PARM;
+   case UNARY_PLUS_EXPR: return GS_NOP_EXPR;
  }
  gcc_assert(0);
  return (gs_code_t) 0;

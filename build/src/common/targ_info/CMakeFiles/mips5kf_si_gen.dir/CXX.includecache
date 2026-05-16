@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../src/common/targ_info/generate/si_gen.h
+targ_isa_subset.h
+../src/common/targ_info/generate/targ_isa_subset.h
+
+/home/jhj/compiler/src/common/targ_info/proc/mips/mips5kf_si.cxx
+si_gen.h
+/home/jhj/compiler/src/common/targ_info/proc/mips/si_gen.h
+targ_isa_subset.h
+/home/jhj/compiler/src/common/targ_info/proc/mips/targ_isa_subset.h
+topcode.h
+/home/jhj/compiler/src/common/targ_info/proc/mips/topcode.h
+

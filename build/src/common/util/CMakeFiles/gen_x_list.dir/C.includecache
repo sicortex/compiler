@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/jhj/compiler/src/common/util/gen_x_list.c
+stdio.h
+-
+stdarg.h
+-
+stdlib.h
+-
+string.h
+-
+string_case.h
+/home/jhj/compiler/src/common/util/string_case.h
+
+/home/jhj/compiler/src/common/util/string_case.h
+

@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/jhj/compiler/src/common/targ_info/generate/gen_util.cxx
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+gen_util.h
+/home/jhj/compiler/src/common/targ_info/generate/gen_util.h
+
+/home/jhj/compiler/src/common/targ_info/generate/gen_util.h
+gen_util_gen.h
+/home/jhj/compiler/src/common/targ_info/generate/gen_util_gen.h
+
+/home/jhj/compiler/src/common/targ_info/generate/gen_util_gen.h
+

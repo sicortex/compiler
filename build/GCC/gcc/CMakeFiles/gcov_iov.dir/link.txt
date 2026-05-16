@@ -1,0 +1,1 @@
+/usr/lib64/ccache/bin/gcc    -w -O0 -g -D_DEBUG   CMakeFiles/gcov_iov.dir/gcov-iov.c.o  -o gcov_iov -rdynamic 

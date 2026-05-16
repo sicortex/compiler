@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../src/common/targ_info/generate/isa_enums_gen.h
+
+/home/jhj/compiler/src/common/targ_info/generate/gen_util.h
+gen_util_gen.h
+/home/jhj/compiler/src/common/targ_info/generate/gen_util_gen.h
+
+/home/jhj/compiler/src/common/targ_info/generate/gen_util_gen.h
+
+/home/jhj/compiler/src/common/targ_info/generate/isa_enums_gen.cxx
+stddef.h
+-
+stdlib.h
+-
+stdarg.h
+-
+stdio.h
+-
+assert.h
+-
+vector
+-
+gen_util.h
+/home/jhj/compiler/src/common/targ_info/generate/gen_util.h
+isa_enums_gen.h
+/home/jhj/compiler/src/common/targ_info/generate/isa_enums_gen.h
+
+/home/jhj/compiler/src/common/targ_info/generate/isa_enums_gen.h
+
+/home/jhj/compiler/src/common/targ_info/isa/mips/isa_enums.cxx
+stddef.h
+-
+isa_enums_gen.h
+/home/jhj/compiler/src/common/targ_info/isa/mips/isa_enums_gen.h
+

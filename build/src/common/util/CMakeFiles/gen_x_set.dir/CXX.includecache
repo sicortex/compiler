@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/jhj/compiler/src/common/util/string_case.cxx
+string_case.h
+/home/jhj/compiler/src/common/util/string_case.h
+cctype
+-
+
+/home/jhj/compiler/src/common/util/string_case.h
+

@@ -1,0 +1,1 @@
+/usr/lib64/ccache/bin/g++   -D_LANGUAGE_C_PLUS_PLUS  -O0 -g -D_DEBUG  -DTARG_MIPS CMakeFiles/whirl2f-exec-mips.dir/whirl2f_main.cxx.o  -o ../../../lib/mips/whirl2f -rdynamic 

@@ -1,0 +1,1 @@
+/usr/lib64/ccache/bin/gcc    -w -O0 -g -D_DEBUG  -DTARG_MIPS CMakeFiles/gspin-mips.dir/gspin-test-driver.c.o  -o ../../lib/mips/gspin -rdynamic ../../lib/mips/libspin.a 

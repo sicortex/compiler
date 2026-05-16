@@ -1,0 +1,586 @@
+Determining if the function fseek64 exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/lib64/ccache/bin/gcc   -DCHECK_FUNCTION_EXISTS=fseek64   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /home/jhj/bin/cmake/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/lib64/ccache/bin/gcc     -DCHECK_FUNCTION_EXISTS=fseek64   CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x30): undefined reference to `fseek64'
+collect2: ld returned 1 exit status
+gmake[1]: *** [cmTryCompileExec] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the function ftell64 exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/lib64/ccache/bin/gcc   -DCHECK_FUNCTION_EXISTS=ftell64   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /home/jhj/bin/cmake/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/lib64/ccache/bin/gcc     -DCHECK_FUNCTION_EXISTS=ftell64   CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x30): undefined reference to `ftell64'
+collect2: ld returned 1 exit status
+gmake[1]: *** [cmTryCompileExec] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the function mkstemps exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/lib64/ccache/bin/gcc   -DCHECK_FUNCTION_EXISTS=mkstemps   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /home/jhj/bin/cmake/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/lib64/ccache/bin/gcc     -DCHECK_FUNCTION_EXISTS=mkstemps   CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x30): undefined reference to `mkstemps'
+collect2: ld returned 1 exit status
+gmake[1]: *** [cmTryCompileExec] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the system is big endian passed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/TestEndianess.c.o
+/usr/lib64/ccache/bin/gcc    -o CMakeFiles/cmTryCompileExec.dir/TestEndianess.c.o   -c /home/jhj/compiler/build/CMakeFiles/CMakeTmp/TestEndianess.c
+Linking C executable cmTryCompileExec
+/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/lib64/ccache/bin/gcc        CMakeFiles/cmTryCompileExec.dir/TestEndianess.c.o  -o cmTryCompileExec -rdynamic 
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+
+TestEndianess.c:
+/* A 16 bit integer is required. */
+typedef unsigned short cmakeint16;
+
+/* On a little endian machine, these 16bit ints will give "THIS IS LITTLE ENDIAN."
+   On a big endian machine the characters will be exchanged pairwise. */
+const cmakeint16 info_little[] =  {0x4854, 0x5349, 0x4920, 0x2053, 0x494c, 0x5454, 0x454c, 0x4520, 0x444e, 0x4149, 0x2e4e, 0x0000};
+
+/* on a big endian machine, these 16bit ints will give "THIS IS BIG ENDIAN."
+   On a little endian machine the characters will be exchanged pairwise. */
+const cmakeint16 info_big[] =     {0x5448, 0x4953, 0x2049, 0x5320, 0x4249, 0x4720, 0x454e, 0x4449, 0x414e, 0x2e2e, 0x0000};
+
+#ifdef __CLASSIC_C__
+int main(argc, argv) int argc; char *argv[];
+#else
+int main(int argc, char *argv[])
+#endif
+{
+  int require = 0;
+  require += info_little[argc];
+  require += info_big[argc];
+  (void)argv;
+  return require;
+}
+
+
+Determining if the system is big endian passed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/TestEndianess.c.o
+/usr/lib64/ccache/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/TestEndianess.c.o   -c /home/jhj/compiler/build/CMakeFiles/CMakeTmp/TestEndianess.c
+Linking C executable cmTryCompileExec
+/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/lib64/ccache/bin/gcc     -w     CMakeFiles/cmTryCompileExec.dir/TestEndianess.c.o  -o cmTryCompileExec -rdynamic 
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+
+TestEndianess.c:
+/* A 16 bit integer is required. */
+typedef unsigned short cmakeint16;
+
+/* On a little endian machine, these 16bit ints will give "THIS IS LITTLE ENDIAN."
+   On a big endian machine the characters will be exchanged pairwise. */
+const cmakeint16 info_little[] =  {0x4854, 0x5349, 0x4920, 0x2053, 0x494c, 0x5454, 0x454c, 0x4520, 0x444e, 0x4149, 0x2e4e, 0x0000};
+
+/* on a big endian machine, these 16bit ints will give "THIS IS BIG ENDIAN."
+   On a little endian machine the characters will be exchanged pairwise. */
+const cmakeint16 info_big[] =     {0x5448, 0x4953, 0x2049, 0x5320, 0x4249, 0x4720, 0x454e, 0x4449, 0x414e, 0x2e2e, 0x0000};
+
+#ifdef __CLASSIC_C__
+int main(argc, argv) int argc; char *argv[];
+#else
+int main(int argc, char *argv[])
+#endif
+{
+  int require = 0;
+  require += info_little[argc];
+  require += info_big[argc];
+  (void)argv;
+  return require;
+}
+
+
+Determining if the include file machine/hal_sysinfo.h exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o
+/usr/lib64/ccache/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o   -c /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/jhj/compiler/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:33: error: machine/hal_sysinfo.h: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the include file sys/pstat.h exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o
+/usr/lib64/ccache/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o   -c /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/jhj/compiler/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:23: error: sys/pstat.h: No such file or directory
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake[1]: *** [CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o] Error 1
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the include file sys/sysmp.h exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o
+/usr/lib64/ccache/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o   -c /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/jhj/compiler/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:23: error: sys/sysmp.h: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the include file sys/systemcfg.h exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o
+/usr/lib64/ccache/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o   -c /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/jhj/compiler/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:27: error: sys/systemcfg.h: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the include file sys/table.h exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o
+/usr/lib64/ccache/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o   -c /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/jhj/compiler/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:23: error: sys/table.h: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the include file vfork.h exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o
+/usr/lib64/ccache/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o   -c /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/jhj/compiler/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:19: error: vfork.h: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the function _doprnt exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/lib64/ccache/bin/gcc   -w  -DCHECK_FUNCTION_EXISTS=_doprnt   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /home/jhj/bin/cmake/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/lib64/ccache/bin/gcc     -w  -DCHECK_FUNCTION_EXISTS=_doprnt   CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x30): undefined reference to `_doprnt'
+collect2: ld returned 1 exit status
+gmake[1]: *** [cmTryCompileExec] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the function getsysinfo exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/lib64/ccache/bin/gcc   -w  -DCHECK_FUNCTION_EXISTS=getsysinfo   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /home/jhj/bin/cmake/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/lib64/ccache/bin/gcc     -w  -DCHECK_FUNCTION_EXISTS=getsysinfo   CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x30): undefined reference to `getsysinfo'
+collect2: ld returned 1 exit status
+gmake[1]: *** [cmTryCompileExec] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the function pstat_getdynamic exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/lib64/ccache/bin/gcc   -w  -DCHECK_FUNCTION_EXISTS=pstat_getdynamic   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /home/jhj/bin/cmake/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/lib64/ccache/bin/gcc     -w  -DCHECK_FUNCTION_EXISTS=pstat_getdynamic   CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x30): undefined reference to `pstat_getdynamic'
+collect2: ld returned 1 exit status
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake[1]: *** [cmTryCompileExec] Error 1
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the function pstat_getstatic exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/lib64/ccache/bin/gcc   -w  -DCHECK_FUNCTION_EXISTS=pstat_getstatic   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /home/jhj/bin/cmake/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/lib64/ccache/bin/gcc     -w  -DCHECK_FUNCTION_EXISTS=pstat_getstatic   CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x30): undefined reference to `pstat_getstatic'
+collect2: ld returned 1 exit status
+gmake[1]: *** [cmTryCompileExec] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the function sysmp exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/lib64/ccache/bin/gcc   -w  -DCHECK_FUNCTION_EXISTS=sysmp   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /home/jhj/bin/cmake/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/lib64/ccache/bin/gcc     -w  -DCHECK_FUNCTION_EXISTS=sysmp   CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x30): undefined reference to `sysmp'
+collect2: ld returned 1 exit status
+gmake[1]: *** [cmTryCompileExec] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the function table exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/lib64/ccache/bin/gcc   -w  -DCHECK_FUNCTION_EXISTS=table   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /home/jhj/bin/cmake/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/lib64/ccache/bin/gcc     -w  -DCHECK_FUNCTION_EXISTS=table   CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x30): undefined reference to `table'
+collect2: ld returned 1 exit status
+gmake[1]: *** [cmTryCompileExec] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+checking for sys_errlist in stdlib.h failed to compile with the following output:
+Change Dir: /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o
+/usr/lib64/ccache/bin/gcc  -DTEST_HAVE_SYS_ERRLIST_IN_STDLIB_H -DHAVE_GETPAGESIZE=1 -DHAVE_INTTYPES_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STDINT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRINGS_H=1 -DHAVE_STRING_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_PARAM_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -w     -o CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o   -c /home/jhj/compiler/GCC/config_cmake/gcc_c_tests.c
+/home/jhj/compiler/GCC/config_cmake/gcc_c_tests.c: In function 'main':
+/home/jhj/compiler/GCC/config_cmake/gcc_c_tests.c:668: error: 'sys_errlist' undeclared (first use in this function)
+/home/jhj/compiler/GCC/config_cmake/gcc_c_tests.c:668: error: (Each undeclared identifier is reported only once
+/home/jhj/compiler/GCC/config_cmake/gcc_c_tests.c:668: error: for each function it appears in.)
+gmake[1]: *** [CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+checking for variable _doprnt failed to compile with the following output:
+Change Dir: /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o
+/usr/lib64/ccache/bin/gcc  -DTEST_HAVE__DOPRNT -DHAVE_GETPAGESIZE=1 -DHAVE_INTTYPES_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STDINT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRINGS_H=1 -DHAVE_STRING_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_PARAM_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -w     -o CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o   -c /home/jhj/compiler/GCC/config_cmake/gcc_c_tests.c
+Linking C executable cmTryCompileExec
+/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/lib64/ccache/bin/gcc     -w     CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o: In function `main':
+gcc_c_tests.c:(.text+0x18): undefined reference to `_doprnt'
+collect2: ld returned 1 exit status
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+gmake[1]: *** [cmTryCompileExec] Error 1
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+checking for variable _system_configuration failed to compile with the following output:
+Change Dir: /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o
+/usr/lib64/ccache/bin/gcc  -DTEST_HAVE__SYSTEM_CONFIGURATION -DHAVE_GETPAGESIZE=1 -DHAVE_INTTYPES_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STDINT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRINGS_H=1 -DHAVE_STRING_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_PARAM_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -w     -o CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o   -c /home/jhj/compiler/GCC/config_cmake/gcc_c_tests.c
+Linking C executable cmTryCompileExec
+/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/lib64/ccache/bin/gcc     -w     CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o: In function `main':
+gcc_c_tests.c:(.text+0x18): undefined reference to `_system_configuration'
+collect2: ld returned 1 exit status
+gmake[1]: *** [cmTryCompileExec] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+checking whether canonicalize_file_name must be declared failed to compile with the following output:
+Change Dir: /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o
+/usr/lib64/ccache/bin/gcc  -DTEST_NEED_DECLARATION_CANONICALIZE_FILE_NAME -DHAVE_GETPAGESIZE=1 -DHAVE_INTTYPES_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STDINT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRINGS_H=1 -DHAVE_STRING_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_PARAM_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -w     -o CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o   -c /home/jhj/compiler/GCC/config_cmake/gcc_c_tests.c
+/home/jhj/compiler/GCC/config_cmake/gcc_c_tests.c: In function 'main':
+/home/jhj/compiler/GCC/config_cmake/gcc_c_tests.c:311: error: 'canonicalize_file_name' undeclared (first use in this function)
+/home/jhj/compiler/GCC/config_cmake/gcc_c_tests.c:311: error: (Each undeclared identifier is reported only once
+/home/jhj/compiler/GCC/config_cmake/gcc_c_tests.c:311: error: for each function it appears in.)
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+gmake[1]: *** [CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o] Error 1
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+checking whether alloca needs Cray hooks failed to compile with the following output:
+Change Dir: /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o
+/usr/lib64/ccache/bin/gcc  -DTEST_CRAY_STACKSEG_END -DHAVE_GETPAGESIZE=1 -DHAVE_INTTYPES_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STDINT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRINGS_H=1 -DHAVE_STRING_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_PARAM_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 -w     -o CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o   -c /home/jhj/compiler/GCC/config_cmake/gcc_c_tests.c
+/home/jhj/compiler/GCC/config_cmake/gcc_c_tests.c: In function 'main':
+/home/jhj/compiler/GCC/config_cmake/gcc_c_tests.c:473: error: 'not_cray' undeclared (first use in this function)
+/home/jhj/compiler/GCC/config_cmake/gcc_c_tests.c:473: error: (Each undeclared identifier is reported only once
+/home/jhj/compiler/GCC/config_cmake/gcc_c_tests.c:473: error: for each function it appears in.)
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+gmake[1]: *** [CMakeFiles/cmTryCompileExec.dir/gcc_c_tests.c.o] Error 1
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the include file direct.h exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o
+/usr/lib64/ccache/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o   -c /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/jhj/compiler/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:20: error: direct.h: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the include file ldfcn.h exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o
+/usr/lib64/ccache/bin/gcc   -w     -o CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o   -c /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/jhj/compiler/build/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:19: error: ldfcn.h: No such file or directory
+gmake[1]: *** [CMakeFiles/cmTryCompileExec.dir/CheckIncludeFile.c.o] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the function atoq exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/lib64/ccache/bin/gcc   -w  -DCHECK_FUNCTION_EXISTS=atoq   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /home/jhj/bin/cmake/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/lib64/ccache/bin/gcc     -w  -DCHECK_FUNCTION_EXISTS=atoq   CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x30): undefined reference to `atoq'
+collect2: ld returned 1 exit status
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake[1]: *** [cmTryCompileExec] Error 1
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Determining if the function fprintf_unlocked exists failed with the following output:
+Change Dir: /home/jhj/compiler/build/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o
+/usr/lib64/ccache/bin/gcc   -w  -DCHECK_FUNCTION_EXISTS=fprintf_unlocked   -o CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o   -c /home/jhj/bin/cmake/share/cmake-2.8/Modules/CheckFunctionExists.c
+Linking C executable cmTryCompileExec
+/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/lib64/ccache/bin/gcc     -w  -DCHECK_FUNCTION_EXISTS=fprintf_unlocked   CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o  -o cmTryCompileExec -rdynamic 
+CMakeFiles/cmTryCompileExec.dir/CheckFunctionExists.c.o: In function `main':
+CheckFunctionExists.c:(.text+0x30): undefined reference to `fprintf_unlocked'
+collect2: ld returned 1 exit status
+gmake[1]: *** [cmTryCompileExec] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Check for fprintf_unlocked failed to compile with the following output:
+Change Dir: /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o
+/usr/lib64/ccache/bin/gcc   -w     -I"/home/jhj/compiler/GCC/gcc" -I"/home/jhj/compiler/GCC/include" -o CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o   -c /home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c
+/home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c: In function 'main':
+/home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c:10: error: 'fprintf_unlocked' undeclared (first use in this function)
+/home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c:10: error: (Each undeclared identifier is reported only once
+/home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c:10: error: for each function it appears in.)
+gmake[1]: *** [CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Check for getopt failed to compile with the following output:
+Change Dir: /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o
+/usr/lib64/ccache/bin/gcc   -w     -I"/home/jhj/compiler/GCC/gcc" -I"/home/jhj/compiler/GCC/include" -o CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o   -c /home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c
+/home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c: In function 'main':
+/home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c:10: error: 'getopt' undeclared (first use in this function)
+/home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c:10: error: (Each undeclared identifier is reported only once
+/home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c:10: error: for each function it appears in.)
+gmake[1]: *** [CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Check for ldgetname failed to compile with the following output:
+Change Dir: /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o
+/usr/lib64/ccache/bin/gcc   -w     -I"/home/jhj/compiler/GCC/gcc" -I"/home/jhj/compiler/GCC/include" -o CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o   -c /home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c
+/home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c: In function 'main':
+/home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c:10: error: 'ldgetname' undeclared (first use in this function)
+/home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c:10: error: (Each undeclared identifier is reported only once
+/home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c:10: error: for each function it appears in.)
+gmake[1]: *** [CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+
+Check for times failed to compile with the following output:
+Change Dir: /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o
+/usr/lib64/ccache/bin/gcc   -w     -I"/home/jhj/compiler/GCC/gcc" -I"/home/jhj/compiler/GCC/include" -o CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o   -c /home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c
+/home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c: In function 'main':
+/home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c:10: error: 'times' undeclared (first use in this function)
+/home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c:10: error: (Each undeclared identifier is reported only once
+/home/jhj/compiler/build/GCC/config_cmake/gcc_check_decl.c:10: error: for each function it appears in.)
+gmake[1]: *** [CMakeFiles/cmTryCompileExec.dir/gcc_check_decl.c.o] Error 1
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/GCC/config_cmake/CMakeFiles/CMakeTmp'
+gmake: *** [cmTryCompileExec/fast] Error 2
+
+

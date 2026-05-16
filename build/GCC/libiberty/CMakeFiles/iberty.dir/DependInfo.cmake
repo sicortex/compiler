@@ -1,0 +1,83 @@
+# The set of languages for which implicit dependencies are needed:
+SET(CMAKE_DEPENDS_LANGUAGES
+  "C"
+  )
+# The set of files for implicit dependencies of each language:
+SET(CMAKE_DEPENDS_CHECK_C
+  "/home/jhj/compiler/GCC/libiberty/alloca.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/alloca.c.o"
+  "/home/jhj/compiler/GCC/libiberty/argv.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/argv.c.o"
+  "/home/jhj/compiler/GCC/libiberty/choose-temp.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/choose-temp.c.o"
+  "/home/jhj/compiler/GCC/libiberty/concat.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/concat.c.o"
+  "/home/jhj/compiler/GCC/libiberty/cp-demangle.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/cp-demangle.c.o"
+  "/home/jhj/compiler/GCC/libiberty/cp-demint.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/cp-demint.c.o"
+  "/home/jhj/compiler/GCC/libiberty/cplus-dem.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/cplus-dem.c.o"
+  "/home/jhj/compiler/GCC/libiberty/dyn-string.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/dyn-string.c.o"
+  "/home/jhj/compiler/GCC/libiberty/fdmatch.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/fdmatch.c.o"
+  "/home/jhj/compiler/GCC/libiberty/fibheap.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/fibheap.c.o"
+  "/home/jhj/compiler/GCC/libiberty/floatformat.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/floatformat.c.o"
+  "/home/jhj/compiler/GCC/libiberty/fnmatch.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/fnmatch.c.o"
+  "/home/jhj/compiler/GCC/libiberty/fopen_unlocked.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/fopen_unlocked.c.o"
+  "/home/jhj/compiler/GCC/libiberty/getopt.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/getopt.c.o"
+  "/home/jhj/compiler/GCC/libiberty/getopt1.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/getopt1.c.o"
+  "/home/jhj/compiler/GCC/libiberty/getpwd.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/getpwd.c.o"
+  "/home/jhj/compiler/GCC/libiberty/getruntime.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/getruntime.c.o"
+  "/home/jhj/compiler/GCC/libiberty/hashtab.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/hashtab.c.o"
+  "/home/jhj/compiler/GCC/libiberty/hex.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/hex.c.o"
+  "/home/jhj/compiler/GCC/libiberty/lbasename.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/lbasename.c.o"
+  "/home/jhj/compiler/GCC/libiberty/lrealpath.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/lrealpath.c.o"
+  "/home/jhj/compiler/GCC/libiberty/make-relative-prefix.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/make-relative-prefix.c.o"
+  "/home/jhj/compiler/GCC/libiberty/make-temp-file.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/make-temp-file.c.o"
+  "/home/jhj/compiler/GCC/libiberty/md5.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/md5.c.o"
+  "/home/jhj/compiler/GCC/libiberty/mkstemps.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/mkstemps.c.o"
+  "/home/jhj/compiler/GCC/libiberty/objalloc.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/objalloc.c.o"
+  "/home/jhj/compiler/GCC/libiberty/obstack.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/obstack.c.o"
+  "/home/jhj/compiler/GCC/libiberty/partition.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/partition.c.o"
+  "/home/jhj/compiler/GCC/libiberty/pex-common.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/pex-common.c.o"
+  "/home/jhj/compiler/GCC/libiberty/pex-one.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/pex-one.c.o"
+  "/home/jhj/compiler/GCC/libiberty/pex-unix.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/pex-unix.c.o"
+  "/home/jhj/compiler/GCC/libiberty/pexecute.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/pexecute.c.o"
+  "/home/jhj/compiler/GCC/libiberty/physmem.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/physmem.c.o"
+  "/home/jhj/compiler/GCC/libiberty/regex.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/regex.c.o"
+  "/home/jhj/compiler/GCC/libiberty/safe-ctype.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/safe-ctype.c.o"
+  "/home/jhj/compiler/GCC/libiberty/sort.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/sort.c.o"
+  "/home/jhj/compiler/GCC/libiberty/spaces.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/spaces.c.o"
+  "/home/jhj/compiler/GCC/libiberty/splay-tree.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/splay-tree.c.o"
+  "/home/jhj/compiler/GCC/libiberty/strerror.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/strerror.c.o"
+  "/home/jhj/compiler/GCC/libiberty/ternary.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/ternary.c.o"
+  "/home/jhj/compiler/GCC/libiberty/unlink-if-ordinary.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/unlink-if-ordinary.c.o"
+  "/home/jhj/compiler/GCC/libiberty/xatexit.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/xatexit.c.o"
+  "/home/jhj/compiler/GCC/libiberty/xexit.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/xexit.c.o"
+  "/home/jhj/compiler/GCC/libiberty/xmalloc.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/xmalloc.c.o"
+  "/home/jhj/compiler/GCC/libiberty/xmemdup.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/xmemdup.c.o"
+  "/home/jhj/compiler/GCC/libiberty/xstrdup.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/xstrdup.c.o"
+  "/home/jhj/compiler/GCC/libiberty/xstrerror.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/xstrerror.c.o"
+  "/home/jhj/compiler/GCC/libiberty/xstrndup.c" "/home/jhj/compiler/build/GCC/libiberty/CMakeFiles/iberty.dir/xstrndup.c.o"
+  )
+SET(CMAKE_C_COMPILER_ID "GNU")
+
+# Preprocessor definitions for this target.
+SET(CMAKE_TARGET_DEFINITIONS
+  "HAVE_ALLOCA_H=1"
+  "X86_WHIRL_OBJECTS"
+  "PATH64_ENABLE_PSCRUNTIME"
+  "_SGI_SOURCE"
+  "__GNU_BUG_WORKAROUND"
+  "KEY"
+  "FE_GNU_4_2_0"
+  "_LONGLONG"
+  "_MIPSEL"
+  "TARG_LINUX"
+  "_GNU_SOURCE"
+  "HOST_IS_BIG_ENDIAN=0"
+  "HOST_IS_LITTLE_ENDIAN=1"
+  "ALMOST_STDC"
+  "Is_True_On"
+  "HAVE_CONFIG_H"
+  "FE_GNU_4_2_0"
+  "KEY"
+  "HAVE_CONFIG_H=1"
+  )
+
+# Targets to which this target links.
+SET(CMAKE_TARGET_LINKED_INFO_FILES
+  )

@@ -1,0 +1,83 @@
+# The set of languages for which implicit dependencies are needed:
+SET(CMAKE_DEPENDS_LANGUAGES
+  "C"
+  )
+# The set of files for implicit dependencies of each language:
+SET(CMAKE_DEPENDS_CHECK_C
+  "/home/jhj/compiler/src/libelf/lib/32.fsize.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/32.fsize.c.o"
+  "/home/jhj/compiler/src/libelf/lib/32.getehdr.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/32.getehdr.c.o"
+  "/home/jhj/compiler/src/libelf/lib/32.getphdr.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/32.getphdr.c.o"
+  "/home/jhj/compiler/src/libelf/lib/32.getshdr.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/32.getshdr.c.o"
+  "/home/jhj/compiler/src/libelf/lib/32.newehdr.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/32.newehdr.c.o"
+  "/home/jhj/compiler/src/libelf/lib/32.newphdr.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/32.newphdr.c.o"
+  "/home/jhj/compiler/src/libelf/lib/32.xlatetof.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/32.xlatetof.c.o"
+  "/home/jhj/compiler/src/libelf/lib/64.xlatetof.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/64.xlatetof.c.o"
+  "/home/jhj/compiler/src/libelf/lib/assert.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/assert.c.o"
+  "/home/jhj/compiler/src/libelf/lib/begin.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/begin.c.o"
+  "/home/jhj/compiler/src/libelf/lib/checksum.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/checksum.c.o"
+  "/home/jhj/compiler/src/libelf/lib/cntl.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/cntl.c.o"
+  "/home/jhj/compiler/src/libelf/lib/cook.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/cook.c.o"
+  "/home/jhj/compiler/src/libelf/lib/data.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/data.c.o"
+  "/home/jhj/compiler/src/libelf/lib/end.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/end.c.o"
+  "/home/jhj/compiler/src/libelf/lib/errmsg.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/errmsg.c.o"
+  "/home/jhj/compiler/src/libelf/lib/errno.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/errno.c.o"
+  "/home/jhj/compiler/src/libelf/lib/fill.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/fill.c.o"
+  "/home/jhj/compiler/src/libelf/lib/flag.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/flag.c.o"
+  "/home/jhj/compiler/src/libelf/lib/gelfehdr.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/gelfehdr.c.o"
+  "/home/jhj/compiler/src/libelf/lib/gelfphdr.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/gelfphdr.c.o"
+  "/home/jhj/compiler/src/libelf/lib/gelfshdr.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/gelfshdr.c.o"
+  "/home/jhj/compiler/src/libelf/lib/gelftrans.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/gelftrans.c.o"
+  "/home/jhj/compiler/src/libelf/lib/getarhdr.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/getarhdr.c.o"
+  "/home/jhj/compiler/src/libelf/lib/getarsym.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/getarsym.c.o"
+  "/home/jhj/compiler/src/libelf/lib/getbase.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/getbase.c.o"
+  "/home/jhj/compiler/src/libelf/lib/getdata.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/getdata.c.o"
+  "/home/jhj/compiler/src/libelf/lib/getident.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/getident.c.o"
+  "/home/jhj/compiler/src/libelf/lib/getscn.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/getscn.c.o"
+  "/home/jhj/compiler/src/libelf/lib/hash.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/hash.c.o"
+  "/home/jhj/compiler/src/libelf/lib/input.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/input.c.o"
+  "/home/jhj/compiler/src/libelf/lib/kind.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/kind.c.o"
+  "/home/jhj/compiler/src/libelf/lib/memset.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/memset.c.o"
+  "/home/jhj/compiler/src/libelf/lib/ndxscn.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/ndxscn.c.o"
+  "/home/jhj/compiler/src/libelf/lib/newdata.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/newdata.c.o"
+  "/home/jhj/compiler/src/libelf/lib/newscn.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/newscn.c.o"
+  "/home/jhj/compiler/src/libelf/lib/next.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/next.c.o"
+  "/home/jhj/compiler/src/libelf/lib/nextscn.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/nextscn.c.o"
+  "/home/jhj/compiler/src/libelf/lib/nlist.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/nlist.c.o"
+  "/home/jhj/compiler/src/libelf/lib/opt.delscn.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/opt.delscn.c.o"
+  "/home/jhj/compiler/src/libelf/lib/rand.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/rand.c.o"
+  "/home/jhj/compiler/src/libelf/lib/rawdata.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/rawdata.c.o"
+  "/home/jhj/compiler/src/libelf/lib/rawfile.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/rawfile.c.o"
+  "/home/jhj/compiler/src/libelf/lib/strptr.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/strptr.c.o"
+  "/home/jhj/compiler/src/libelf/lib/swap64.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/swap64.c.o"
+  "/home/jhj/compiler/src/libelf/lib/update.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/update.c.o"
+  "/home/jhj/compiler/src/libelf/lib/verdef_32_tof.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/verdef_32_tof.c.o"
+  "/home/jhj/compiler/src/libelf/lib/verdef_32_tom.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/verdef_32_tom.c.o"
+  "/home/jhj/compiler/src/libelf/lib/verdef_64_tof.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/verdef_64_tof.c.o"
+  "/home/jhj/compiler/src/libelf/lib/verdef_64_tom.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/verdef_64_tom.c.o"
+  "/home/jhj/compiler/src/libelf/lib/version.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/version.c.o"
+  "/home/jhj/compiler/src/libelf/lib/x.movscn.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/x.movscn.c.o"
+  "/home/jhj/compiler/src/libelf/lib/x.remscn.c" "/home/jhj/compiler/build/src/libelf/CMakeFiles/elf.dir/lib/x.remscn.c.o"
+  )
+SET(CMAKE_C_COMPILER_ID "GNU")
+
+# Preprocessor definitions for this target.
+SET(CMAKE_TARGET_DEFINITIONS
+  "HAVE_ALLOCA_H=1"
+  "X86_WHIRL_OBJECTS"
+  "PATH64_ENABLE_PSCRUNTIME"
+  "_SGI_SOURCE"
+  "__GNU_BUG_WORKAROUND"
+  "KEY"
+  "FE_GNU_4_2_0"
+  "_LONGLONG"
+  "_MIPSEL"
+  "TARG_LINUX"
+  "_GNU_SOURCE"
+  "HOST_IS_BIG_ENDIAN=0"
+  "HOST_IS_LITTLE_ENDIAN=1"
+  "HAVE_CONFIG_H"
+  )
+
+# Targets to which this target links.
+SET(CMAKE_TARGET_LINKED_INFO_FILES
+  )

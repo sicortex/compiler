@@ -1,0 +1,1 @@
+/usr/lib64/ccache/bin/gcc    -w -O0 -g -D_DEBUG   CMakeFiles/genattrtab.dir/genattrtab.c.o  -o genattrtab -rdynamic libgen.a libiberty.a 

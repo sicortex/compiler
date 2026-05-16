@@ -63,6 +63,8 @@
 #include "ipa_lno_info.h"
 #include "ipl_summary.h"
 
+#define	ET_IR	(ET_LOPROC + 0)
+
 // Put this here for now.  Later move it on to /usr/include/sys/elf.h and 
 // change SHT_MIPS_NUM to 42.  
 #define SHT_MIPS_IPALNO  (SHT_LOPROC + 42)

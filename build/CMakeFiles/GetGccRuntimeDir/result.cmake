@@ -1,0 +1,19 @@
+set(GCCRTDATA "Change Dir: /.root0/local/home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/CMakeFiles/CMakeTmp'
+/.root0/local/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /.root0/local/home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec.dir/rt.cc.o
+/usr/bin/g++     -o CMakeFiles/cmTryCompileExec.dir/rt.cc.o -c /home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/rt.cc
+Linking CXX executable cmTryCompileExec
+/.root0/local/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/g++         CMakeFiles/cmTryCompileExec.dir/rt.cc.o  -o cmTryCompileExec -rdynamic -v 
+Reading specs from /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/specs
+Target: mips64el-sicortex-linux-gnu
+Configured with: /.root0/local/tmp/portage/sys-devel/gcc-4.2.3_p190-r4/work/sourceryg++-4.2/configure --prefix=/usr --bindir=/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3 --includedir=/usr/lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/include --datadir=/usr/share/gcc-data/mips64el-sicortex-linux-gnu/4.2.3 --mandir=/usr/share/gcc-data/mips64el-sicortex-linux-gnu/4.2.3/man --infodir=/usr/share/gcc-data/mips64el-sicortex-linux-gnu/4.2.3/info --with-gxx-include-dir=/usr/lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/include/g++-v4 --host=mips64el-sicortex-linux-gnu --build=mips64el-sicortex-linux-gnu --disable-altivec --disable-nls --with-system-zlib --disable-checking --disable-werror --enable-secureplt --disable-libunwind-exceptions --enable-multilib --enable-libmudflap --disable-libssp --disable-libgcj --with-abi=64 --with-arch=5kf --enable-languages=c,c++,fortran --enable-shared --enable-threads=posix --enable-__cxa_atexit --enable-clocale=gnu
+Thread model: posix
+gcc version 4.2.3
+ /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../libexec/gcc/mips64el-sicortex-linux-gnu/4.2.3/collect2 --sysroot=/ --eh-frame-hdr -EL -EL -export-dynamic -dynamic-linker /lib64/ld.so.1 -melf64ltsmip -o cmTryCompileExec /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64/crt1.o /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64/crti.o /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/crtbegin.o -L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3 -L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc -L/usr/lib/gcc/mips64el-sicortex-linux-gnu/4.2.3 -L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64 -L//lib/../lib64 -L//usr/lib/../lib64 -L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../mips64el-sicortex-linux-gnu/lib -L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../.. -L//lib -L//usr/lib CMakeFiles/cmTryCompileExec.dir/rt.cc.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/crtend.o /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64/crtn.o
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/CMakeFiles/CMakeTmp'
+")

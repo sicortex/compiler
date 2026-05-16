@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../src/common/targ_info/access/ti_si_types.h
+topcode.h
+-
+
+/home/jhj/compiler/build/src/common/targ_info/mips5kf.c
+ti_si_types.h
+/home/jhj/compiler/build/src/common/targ_info/ti_si_types.h
+

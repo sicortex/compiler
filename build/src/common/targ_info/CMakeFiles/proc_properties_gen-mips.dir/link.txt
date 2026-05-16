@@ -1,0 +1,1 @@
+/usr/lib64/ccache/bin/g++   -D_LANGUAGE_C_PLUS_PLUS  -fPIC -O0 -g -D_DEBUG  -DTARG_MIPS CMakeFiles/proc_properties_gen-mips.dir/generate/proc_properties_gen.cxx.o CMakeFiles/proc_properties_gen-mips.dir/proc/mips/proc_properties.cxx.o  -o ../../../lib/mips/proc_properties_gen -rdynamic ../../../lib/mips/libtarg_proc.a ../../../lib/mips/libgen_util.a 

@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../src/common/targ_info/generate/isa_lits_gen.h
+
+/home/jhj/compiler/src/common/targ_info/generate/gen_util.h
+gen_util_gen.h
+/home/jhj/compiler/src/common/targ_info/generate/gen_util_gen.h
+
+/home/jhj/compiler/src/common/targ_info/generate/gen_util_gen.h
+
+/home/jhj/compiler/src/common/targ_info/generate/isa_lits_gen.cxx
+inttypes.h
+-
+stddef.h
+-
+stdlib.h
+-
+stdarg.h
+-
+stdio.h
+-
+assert.h
+-
+limits.h
+-
+gen_util.h
+/home/jhj/compiler/src/common/targ_info/generate/gen_util.h
+isa_lits_gen.h
+/home/jhj/compiler/src/common/targ_info/generate/isa_lits_gen.h
+
+/home/jhj/compiler/src/common/targ_info/generate/isa_lits_gen.h
+
+/home/jhj/compiler/src/common/targ_info/isa/mips/isa_lits.cxx
+isa_lits_gen.h
+/home/jhj/compiler/src/common/targ_info/isa/mips/isa_lits_gen.h
+

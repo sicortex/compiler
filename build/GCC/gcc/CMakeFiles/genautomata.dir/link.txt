@@ -1,0 +1,1 @@
+/usr/lib64/ccache/bin/gcc    -w -O0 -g -D_DEBUG   CMakeFiles/genautomata.dir/genautomata.c.o  -o genautomata -rdynamic libgen.a -lm libiberty.a 

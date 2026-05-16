@@ -1,0 +1,2 @@
+/usr/bin/ar cr ../../../lib/mips/libtarg_proc_properties.a  CMakeFiles/targ_proc_properties-mips.dir/mips/targ_proc_properties.c.o
+/usr/bin/ranlib ../../../lib/mips/libtarg_proc_properties.a

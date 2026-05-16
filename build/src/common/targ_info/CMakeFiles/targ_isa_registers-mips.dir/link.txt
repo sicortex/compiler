@@ -1,0 +1,2 @@
+/usr/bin/ar cr ../../../lib/mips/libtarg_isa_registers.a  CMakeFiles/targ_isa_registers-mips.dir/mips/targ_isa_registers.c.o
+/usr/bin/ranlib ../../../lib/mips/libtarg_isa_registers.a

@@ -1,0 +1,121 @@
+The system is: Linux - 2.6.18.8-sc-lustre-perfmon - mips64
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /usr/bin/g++ 
+Build flags: 
+Id flags: 
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/.root0/local/home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/CMakeFiles/CompilerIdCXX/a.out"
+
+Determining if the CXX compiler works passed with the following output:
+Change Dir: /.root0/local/home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/CMakeFiles/CMakeTmp'
+/.root0/local/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /.root0/local/home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec.dir/testCXXCompiler.cxx.o
+/usr/bin/g++     -o CMakeFiles/cmTryCompileExec.dir/testCXXCompiler.cxx.o -c /.root0/local/home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/CMakeFiles/CMakeTmp/testCXXCompiler.cxx
+Linking CXX executable cmTryCompileExec
+/.root0/local/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/g++         CMakeFiles/cmTryCompileExec.dir/testCXXCompiler.cxx.o  -o cmTryCompileExec -rdynamic 
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/CMakeFiles/CMakeTmp'
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /.root0/local/home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/CMakeFiles/CMakeTmp
+
+Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"
+/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build
+gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/CMakeFiles/CMakeTmp'
+/.root0/local/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /.root0/local/home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building CXX object CMakeFiles/cmTryCompileExec.dir/CMakeCXXCompilerABI.cpp.o
+/usr/bin/g++     -o CMakeFiles/cmTryCompileExec.dir/CMakeCXXCompilerABI.cpp.o -c /.root0/local/home/jhj/bin/cmake/share/cmake-2.8/Modules/CMakeCXXCompilerABI.cpp
+Linking CXX executable cmTryCompileExec
+/.root0/local/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1
+/usr/bin/g++        -v CMakeFiles/cmTryCompileExec.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec -rdynamic  
+Reading specs from /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/specs
+Target: mips64el-sicortex-linux-gnu
+Configured with: /.root0/local/tmp/portage/sys-devel/gcc-4.2.3_p190-r4/work/sourceryg++-4.2/configure --prefix=/usr --bindir=/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3 --includedir=/usr/lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/include --datadir=/usr/share/gcc-data/mips64el-sicortex-linux-gnu/4.2.3 --mandir=/usr/share/gcc-data/mips64el-sicortex-linux-gnu/4.2.3/man --infodir=/usr/share/gcc-data/mips64el-sicortex-linux-gnu/4.2.3/info --with-gxx-include-dir=/usr/lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/include/g++-v4 --host=mips64el-sicortex-linux-gnu --build=mips64el-sicortex-linux-gnu --disable-altivec --disable-nls --with-system-zlib --disable-checking --disable-werror --enable-secureplt --disable-libunwind-exceptions --enable-multilib --enable-libmudflap --disable-libssp --disable-libgcj --with-abi=64 --with-arch=5kf --enable-languages=c,c++,fortran --enable-shared --enable-threads=posix --enable-__cxa_atexit --enable-clocale=gnu
+Thread model: posix
+gcc version 4.2.3
+ /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../libexec/gcc/mips64el-sicortex-linux-gnu/4.2.3/collect2 --sysroot=/ --eh-frame-hdr -EL -EL -export-dynamic -dynamic-linker /lib64/ld.so.1 -melf64ltsmip -o cmTryCompileExec /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64/crt1.o /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64/crti.o /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/crtbegin.o -L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3 -L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc -L/usr/lib/gcc/mips64el-sicortex-linux-gnu/4.2.3 -L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64 -L//lib/../lib64 -L//usr/lib/../lib64 -L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../mips64el-sicortex-linux-gnu/lib -L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../.. -L//lib -L//usr/lib CMakeFiles/cmTryCompileExec.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/crtend.o /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64/crtn.o
+gmake[1]: Leaving directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/CMakeFiles/CMakeTmp'
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /.root0/local/home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command:/usr/bin/gmake "cmTryCompileExec/fast"]
+  ignore line: [/usr/bin/gmake -f CMakeFiles/cmTryCompileExec.dir/build.make CMakeFiles/cmTryCompileExec.dir/build]
+  ignore line: [gmake[1]: Entering directory `/.root0/local/home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/CMakeFiles/CMakeTmp']
+  ignore line: [/.root0/local/home/jhj/bin/cmake/bin/cmake -E cmake_progress_report /.root0/local/home/jhj/compiler/build/CMakeFiles/GetGccRuntimeDir/CMakeFiles/CMakeTmp/CMakeFiles 1]
+  ignore line: [Building CXX object CMakeFiles/cmTryCompileExec.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/usr/bin/g++     -o CMakeFiles/cmTryCompileExec.dir/CMakeCXXCompilerABI.cpp.o -c /.root0/local/home/jhj/bin/cmake/share/cmake-2.8/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Linking CXX executable cmTryCompileExec]
+  ignore line: [/.root0/local/home/jhj/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec.dir/link.txt --verbose=1]
+  ignore line: [/usr/bin/g++        -v CMakeFiles/cmTryCompileExec.dir/CMakeCXXCompilerABI.cpp.o  -o cmTryCompileExec -rdynamic  ]
+  ignore line: [Reading specs from /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/specs]
+  ignore line: [Target: mips64el-sicortex-linux-gnu]
+  ignore line: [Configured with: /.root0/local/tmp/portage/sys-devel/gcc-4.2.3_p190-r4/work/sourceryg++-4.2/configure --prefix=/usr --bindir=/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3 --includedir=/usr/lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/include --datadir=/usr/share/gcc-data/mips64el-sicortex-linux-gnu/4.2.3 --mandir=/usr/share/gcc-data/mips64el-sicortex-linux-gnu/4.2.3/man --infodir=/usr/share/gcc-data/mips64el-sicortex-linux-gnu/4.2.3/info --with-gxx-include-dir=/usr/lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/include/g++-v4 --host=mips64el-sicortex-linux-gnu --build=mips64el-sicortex-linux-gnu --disable-altivec --disable-nls --with-system-zlib --disable-checking --disable-werror --enable-secureplt --disable-libunwind-exceptions --enable-multilib --enable-libmudflap --disable-libssp --disable-libgcj --with-abi=64 --with-arch=5kf --enable-languages=c,c++,fortran --enable-shared --enable-threads=posix --enable-__cxa_atexit --enable-clocale=gnu]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 4.2.3]
+  link line: [ /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../libexec/gcc/mips64el-sicortex-linux-gnu/4.2.3/collect2 --sysroot=/ --eh-frame-hdr -EL -EL -export-dynamic -dynamic-linker /lib64/ld.so.1 -melf64ltsmip -o cmTryCompileExec /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64/crt1.o /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64/crti.o /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/crtbegin.o -L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3 -L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc -L/usr/lib/gcc/mips64el-sicortex-linux-gnu/4.2.3 -L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64 -L//lib/../lib64 -L//usr/lib/../lib64 -L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../mips64el-sicortex-linux-gnu/lib -L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../.. -L//lib -L//usr/lib CMakeFiles/cmTryCompileExec.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/crtend.o /.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64/crtn.o]
+    arg [/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../libexec/gcc/mips64el-sicortex-linux-gnu/4.2.3/collect2] ==> ignore
+    arg [--sysroot=/] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-EL] ==> ignore
+    arg [-EL] ==> ignore
+    arg [-export-dynamic] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld.so.1] ==> ignore
+    arg [-melf64ltsmip] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTryCompileExec] ==> ignore
+    arg [/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64/crt1.o] ==> ignore
+    arg [/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64/crti.o] ==> ignore
+    arg [/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/crtbegin.o] ==> ignore
+    arg [-L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3] ==> dir [/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3]
+    arg [-L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc] ==> dir [/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc]
+    arg [-L/usr/lib/gcc/mips64el-sicortex-linux-gnu/4.2.3] ==> dir [/usr/lib/gcc/mips64el-sicortex-linux-gnu/4.2.3]
+    arg [-L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64] ==> dir [/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64]
+    arg [-L//lib/../lib64] ==> dir [//lib/../lib64]
+    arg [-L//usr/lib/../lib64] ==> dir [//usr/lib/../lib64]
+    arg [-L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../mips64el-sicortex-linux-gnu/lib] ==> dir [/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../mips64el-sicortex-linux-gnu/lib]
+    arg [-L/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../..] ==> dir [/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../..]
+    arg [-L//lib] ==> dir [//lib]
+    arg [-L//usr/lib] ==> dir [//usr/lib]
+    arg [CMakeFiles/cmTryCompileExec.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lstdc++] ==> lib [stdc++]
+    arg [-lm] ==> lib [m]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lc] ==> lib [c]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/crtend.o] ==> ignore
+    arg [/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64/crtn.o] ==> ignore
+  remove lib [gcc_s]
+  remove lib [gcc]
+  remove lib [gcc_s]
+  remove lib [gcc]
+  collapse dir [/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3] ==> [/.root0/usr/lib/gcc/mips64el-sicortex-linux-gnu/4.2.3]
+  collapse dir [/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc] ==> [/.root0/usr/lib/gcc]
+  collapse dir [/usr/lib/gcc/mips64el-sicortex-linux-gnu/4.2.3] ==> [/usr/lib/gcc/mips64el-sicortex-linux-gnu/4.2.3]
+  collapse dir [/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../lib64] ==> [/.root0/usr/lib64]
+  collapse dir [//lib/../lib64] ==> [//lib64]
+  collapse dir [//usr/lib/../lib64] ==> [//usr/lib64]
+  collapse dir [/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../../../mips64el-sicortex-linux-gnu/lib] ==> [/.root0/usr/mips64el-sicortex-linux-gnu/lib]
+  collapse dir [/.root0/usr/mips64el-sicortex-linux-gnu/gcc-bin/4.2.3/../../../lib/gcc/mips64el-sicortex-linux-gnu/4.2.3/../../..] ==> [/.root0/usr/lib]
+  collapse dir [//lib] ==> [//lib]
+  collapse dir [//usr/lib] ==> [//usr/lib]
+  implicit libs: [stdc++;m;c]
+  implicit dirs: [/.root0/usr/lib/gcc/mips64el-sicortex-linux-gnu/4.2.3;/.root0/usr/lib/gcc;/usr/lib/gcc/mips64el-sicortex-linux-gnu/4.2.3;/.root0/usr/lib64;//lib64;//usr/lib64;/.root0/usr/mips64el-sicortex-linux-gnu/lib;/.root0/usr/lib;//lib;//usr/lib]
+
+

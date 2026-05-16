@@ -1,0 +1,39 @@
+FILE(REMOVE_RECURSE
+  "CMakeFiles/elfutil.dir/xlate_init_elf.c.o"
+  "CMakeFiles/elfutil.dir/xlate_init_fd.c.o"
+  "CMakeFiles/elfutil.dir/xlate_named_init_elf.c.o"
+  "CMakeFiles/elfutil.dir/xlate_named_init_fd.c.o"
+  "CMakeFiles/elfutil.dir/xlate_get_info.c.o"
+  "CMakeFiles/elfutil.dir/xlate_address.c.o"
+  "CMakeFiles/elfutil.dir/xlate_block_index.c.o"
+  "CMakeFiles/elfutil.dir/xlate_block_search.c.o"
+  "CMakeFiles/elfutil.dir/xlate_get_range.c.o"
+  "CMakeFiles/elfutil.dir/xlate_get_reg.c.o"
+  "CMakeFiles/elfutil.dir/xlate_get_all_reg.c.o"
+  "CMakeFiles/elfutil.dir/xlate_get_reg_internal.c.o"
+  "CMakeFiles/elfutil.dir/xlate_expand_reg.c.o"
+  "CMakeFiles/elfutil.dir/xlate_expand_reg2.c.o"
+  "CMakeFiles/elfutil.dir/xlate_pro_init.c.o"
+  "CMakeFiles/elfutil.dir/xlate_pro_add_info.c.o"
+  "CMakeFiles/elfutil.dir/xlate_pro_add_reg_info.c.o"
+  "CMakeFiles/elfutil.dir/xlate_pro_add_range.c.o"
+  "CMakeFiles/elfutil.dir/xlate_pro_add_range_internal.c.o"
+  "CMakeFiles/elfutil.dir/xlate_pro_disk_header.c.o"
+  "CMakeFiles/elfutil.dir/xlate_pro_disk_next_block.c.o"
+  "CMakeFiles/elfutil.dir/xlate_update_for_movement.c.o"
+  "CMakeFiles/elfutil.dir/lebdecodeu32.c.o"
+  "CMakeFiles/elfutil.dir/lebencodeu32.c.o"
+  "CMakeFiles/elfutil.dir/lebencodes32.c.o"
+  "CMakeFiles/elfutil.dir/lebdecodes32.c.o"
+  "CMakeFiles/elfutil.dir/lebdecodeu64.c.o"
+  "CMakeFiles/elfutil.dir/lebdecodes64.c.o"
+  "CMakeFiles/elfutil.dir/lebencodeu64.c.o"
+  "CMakeFiles/elfutil.dir/lebencodes64.c.o"
+  "../../lib/libelfutil.pdb"
+  "../../lib/libelfutil.a"
+)
+
+# Per-language clean rules from dependency scanning.
+FOREACH(lang C)
+  INCLUDE(CMakeFiles/elfutil.dir/cmake_clean_${lang}.cmake OPTIONAL)
+ENDFOREACH(lang)

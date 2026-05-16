@@ -1,0 +1,2 @@
+/usr/bin/ar cr ../../../lib/mips/libtarg_proc.a  CMakeFiles/targ_proc-mips.dir/mips/targ_proc.c.o
+/usr/bin/ranlib ../../../lib/mips/libtarg_proc.a

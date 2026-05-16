@@ -1,0 +1,2 @@
+/usr/bin/ar cr ../../lib/libcmplrs.a  CMakeFiles/cmplrs.dir/array_alloc.c.o CMakeFiles/cmplrs.dir/make_depend.c.o
+/usr/bin/ranlib ../../lib/libcmplrs.a

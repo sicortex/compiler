@@ -1,0 +1,1 @@
+/usr/lib64/ccache/bin/gcc    -w -O0 -g -D_DEBUG   CMakeFiles/genconstants.dir/genconstants.c.o  -o genconstants -rdynamic libgen.a libiberty.a 

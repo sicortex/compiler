@@ -1,0 +1,2 @@
+/usr/bin/ar cr ../../../lib/mips/libisa_gen_topcode.a  CMakeFiles/isa_gen_topcode-mips.dir/mips/topcode.c.o
+/usr/bin/ranlib ../../../lib/mips/libisa_gen_topcode.a

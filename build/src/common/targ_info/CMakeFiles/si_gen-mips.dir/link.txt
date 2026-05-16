@@ -1,0 +1,2 @@
+/usr/bin/ar cr ../../../lib/mips/libsi_gen.a  CMakeFiles/si_gen-mips.dir/generate/si_gen.cxx.o
+/usr/bin/ranlib ../../../lib/mips/libsi_gen.a

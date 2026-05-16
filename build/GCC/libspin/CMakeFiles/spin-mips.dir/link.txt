@@ -1,0 +1,2 @@
+/usr/bin/ar cr ../../lib/mips/libspin.a  CMakeFiles/spin-mips.dir/gspin-alloc.c.o CMakeFiles/spin-mips.dir/gspin-assert.c.o CMakeFiles/spin-mips.dir/gspin-io.c.o CMakeFiles/spin-mips.dir/gspin-list.c.o CMakeFiles/spin-mips.dir/gspin-mempool.c.o CMakeFiles/spin-mips.dir/gspin-tel.c.o CMakeFiles/spin-mips.dir/gspin-test-driver.c.o CMakeFiles/spin-mips.dir/gspin-tree.c.o
+/usr/bin/ranlib ../../lib/mips/libspin.a

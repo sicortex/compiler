@@ -1,0 +1,2 @@
+/home/jhj/compiler/build/GCC/config_cmake/gcc_asm_tests/CMakeFiles/test_weak.dir
+/home/jhj/compiler/build/GCC/config_cmake/gcc_asm_tests/CMakeFiles/test_weakref.dir

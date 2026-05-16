@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/jhj/compiler/build/src/common/targ_info/mips/targ_isa_hazards.c
+topcode.h
+/home/jhj/compiler/build/src/common/targ_info/mips/topcode.h
+targ_isa_subset.h
+/home/jhj/compiler/build/src/common/targ_info/mips/targ_isa_subset.h
+targ_isa_hazards.h
+/home/jhj/compiler/build/src/common/targ_info/mips/targ_isa_hazards.h
+
+/home/jhj/compiler/build/src/common/targ_info/mips/targ_isa_hazards.h
+inttypes.h
+-
+targ_isa_subset.h
+/home/jhj/compiler/build/src/common/targ_info/mips/targ_isa_subset.h
+
+/home/jhj/compiler/build/src/common/targ_info/mips/targ_isa_subset.h
+inttypes.h
+-
+topcode.h
+/home/jhj/compiler/build/src/common/targ_info/mips/topcode.h
+
+/home/jhj/compiler/build/src/common/targ_info/mips/topcode.h
+inttypes.h
+-
+

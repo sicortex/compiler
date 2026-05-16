@@ -1,0 +1,37 @@
+# The set of languages for which implicit dependencies are needed:
+SET(CMAKE_DEPENDS_LANGUAGES
+  "CXX"
+  )
+# The set of files for implicit dependencies of each language:
+SET(CMAKE_DEPENDS_CHECK_CXX
+  "/home/jhj/compiler/src/be/whirl2f/whirl2f_main.cxx" "/home/jhj/compiler/build/src/be/whirl2f/CMakeFiles/whirl2f-exec-mips.dir/whirl2f_main.cxx.o"
+  )
+SET(CMAKE_CXX_COMPILER_ID "GNU")
+
+# Preprocessor definitions for this target.
+SET(CMAKE_TARGET_DEFINITIONS
+  "HAVE_ALLOCA_H=1"
+  "X86_WHIRL_OBJECTS"
+  "PATH64_ENABLE_PSCRUNTIME"
+  "_SGI_SOURCE"
+  "__GNU_BUG_WORKAROUND"
+  "KEY"
+  "FE_GNU_4_2_0"
+  "_LONGLONG"
+  "_MIPSEL"
+  "TARG_LINUX"
+  "_GNU_SOURCE"
+  "HOST_IS_BIG_ENDIAN=0"
+  "HOST_IS_LITTLE_ENDIAN=1"
+  "__STDC_FORMAT_MACROS"
+  "NO_VALGRIND"
+  "MONGOOSE_BE"
+  "BACK_END"
+  "__MIPS_AND_IA64_ELF_H"
+  "BUILD_WHIRL2F"
+  "MONGOOSE_BE"
+  )
+
+# Targets to which this target links.
+SET(CMAKE_TARGET_LINKED_INFO_FILES
+  )

@@ -53,6 +53,9 @@
 #include "ipc_symtab_merge.h"		// for idx_map
 #include "ipl_summary.h"		// for SUMMARY_PROCEDURE, etc.
 
+#define ET_IR (ET_LOPROC + 0)
+#define SHT_MIPS_WHIRL                0x70000026 
+
 BOOL IPA_Has_Feedback = FALSE;      /* set if ANY input file contains
                                        feedback information */
 

@@ -1,0 +1,2 @@
+/usr/bin/ar cr ../../../lib/mips/libtarg_isa_bundle.a  CMakeFiles/targ_isa_bundle-mips.dir/mips/targ_isa_bundle.c.o
+/usr/bin/ranlib ../../../lib/mips/libtarg_isa_bundle.a

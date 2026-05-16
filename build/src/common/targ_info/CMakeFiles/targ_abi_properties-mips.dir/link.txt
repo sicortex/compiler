@@ -1,0 +1,2 @@
+/usr/bin/ar cr ../../../lib/mips/libtarg_abi_properties.a  CMakeFiles/targ_abi_properties-mips.dir/mips/targ_abi_properties.c.o
+/usr/bin/ranlib ../../../lib/mips/libtarg_abi_properties.a

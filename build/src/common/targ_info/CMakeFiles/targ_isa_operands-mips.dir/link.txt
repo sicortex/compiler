@@ -1,0 +1,2 @@
+/usr/bin/ar cr ../../../lib/mips/libtarg_isa_operands.a  CMakeFiles/targ_isa_operands-mips.dir/mips/targ_isa_operands.c.o
+/usr/bin/ranlib ../../../lib/mips/libtarg_isa_operands.a

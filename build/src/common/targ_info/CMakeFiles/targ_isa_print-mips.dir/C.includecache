@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/jhj/compiler/build/src/common/targ_info/mips/targ_isa_print.c
+string.h
+-
+topcode.h
+/home/jhj/compiler/build/src/common/targ_info/mips/topcode.h
+targ_isa_print.h
+/home/jhj/compiler/build/src/common/targ_info/mips/targ_isa_print.h
+
+/home/jhj/compiler/build/src/common/targ_info/mips/targ_isa_print.h
+inttypes.h
+-
+topcode.h
+/home/jhj/compiler/build/src/common/targ_info/mips/topcode.h
+
+/home/jhj/compiler/build/src/common/targ_info/mips/topcode.h
+inttypes.h
+-
+

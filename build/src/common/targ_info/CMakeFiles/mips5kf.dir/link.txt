@@ -1,0 +1,1 @@
+/usr/lib64/ccache/bin/gcc  -fPIC -D_LANGUAGE_C  -fPIC -O0 -g -D_DEBUG  -shared -Wl,-soname,mips5kf.so -o ../../../lib/mips/mips5kf.so CMakeFiles/mips5kf.dir/mips5kf.c.o 

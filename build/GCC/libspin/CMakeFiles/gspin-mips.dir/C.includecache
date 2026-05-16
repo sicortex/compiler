@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/jhj/compiler/GCC/libspin/gspin-alloc.h
+
+/home/jhj/compiler/GCC/libspin/gspin-assert.h
+
+/home/jhj/compiler/GCC/libspin/gspin-base-types.h
+stdbool.h
+-
+
+/home/jhj/compiler/GCC/libspin/gspin-io.h
+
+/home/jhj/compiler/GCC/libspin/gspin-test-driver.c
+stdio.h
+-
+stdlib.h
+-
+gspin-tree.h
+/home/jhj/compiler/GCC/libspin/gspin-tree.h
+gspin-io.h
+/home/jhj/compiler/GCC/libspin/gspin-io.h
+
+/home/jhj/compiler/GCC/libspin/gspin-tree.h
+string.h
+-
+gspin-base-types.h
+/home/jhj/compiler/GCC/libspin/gspin-base-types.h
+gspin-assert.h
+/home/jhj/compiler/GCC/libspin/gspin-assert.h
+gspin-alloc.h
+/home/jhj/compiler/GCC/libspin/gspin-alloc.h
+gspin-tree_avx.h
+/home/jhj/compiler/GCC/libspin/gspin-tree_avx.h
+
+/home/jhj/compiler/GCC/libspin/gspin-tree_avx.h
+

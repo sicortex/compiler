@@ -1,0 +1,44 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../src/common/targ_info/generate/isa_registers_gen.h
+
+/home/jhj/compiler/src/common/targ_info/generate/gen_util.h
+gen_util_gen.h
+/home/jhj/compiler/src/common/targ_info/generate/gen_util_gen.h
+
+/home/jhj/compiler/src/common/targ_info/generate/gen_util_gen.h
+
+/home/jhj/compiler/src/common/targ_info/generate/isa_registers_gen.cxx
+stddef.h
+-
+stdlib.h
+-
+stdio.h
+-
+assert.h
+-
+list
+-
+gen_util.h
+/home/jhj/compiler/src/common/targ_info/generate/gen_util.h
+targ_isa_subset.h
+/home/jhj/compiler/src/common/targ_info/generate/targ_isa_subset.h
+isa_registers_gen.h
+/home/jhj/compiler/src/common/targ_info/generate/isa_registers_gen.h
+
+/home/jhj/compiler/src/common/targ_info/generate/isa_registers_gen.h
+
+/home/jhj/compiler/src/common/targ_info/isa/mips/isa_registers.cxx
+stddef.h
+-
+isa_registers_gen.h
+/home/jhj/compiler/src/common/targ_info/isa/mips/isa_registers_gen.h
+targ_isa_subset.h
+/home/jhj/compiler/src/common/targ_info/isa/mips/targ_isa_subset.h
+

@@ -1,0 +1,41 @@
+FILE(REMOVE_RECURSE
+  "CMakeFiles/ir_b2a-mips.dir/ir_a2b.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/config.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/const.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/dwarf_DST.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/dwarf_DST_dump.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/dwarf_DST_mem.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/glob.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/ir_bcom.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/ir_bread.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/ir_bwrite.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/ir_reader.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/irbdata.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/mtypes.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/opcode.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/opcode_core.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/pu_info.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/strtab.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/symtab.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/symtab_verify.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/wn.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/wn_map.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/wn_pragmas.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/wn_simp.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/wn_util.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/wutil.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/xstats.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/mips/config_elf_targ.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/mips/config_targ.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/mips/targ_const.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/mips/targ_sim.cxx.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/mips/config_host.c.o"
+  "CMakeFiles/ir_b2a-mips.dir/__/common/com/mips/config_platform.c.o"
+  "../../lib/mips/ir_b2a.pdb"
+  "../../lib/mips/ir_b2a"
+)
+
+# Per-language clean rules from dependency scanning.
+FOREACH(lang C CXX)
+  INCLUDE(CMakeFiles/ir_b2a-mips.dir/cmake_clean_${lang}.cmake OPTIONAL)
+ENDFOREACH(lang)

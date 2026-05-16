@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/jhj/compiler/build/src/common/targ_info/mips/targ_proc.c
+targ_proc.h
+/home/jhj/compiler/build/src/common/targ_info/mips/targ_proc.h
+
+/home/jhj/compiler/build/src/common/targ_info/mips/targ_proc.h
+inttypes.h
+-
+

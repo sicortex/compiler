@@ -1,0 +1,2 @@
+/usr/bin/ar cr ../../../lib/mips/libtarg_isa_print.a  CMakeFiles/targ_isa_print-mips.dir/mips/targ_isa_print.c.o
+/usr/bin/ranlib ../../../lib/mips/libtarg_isa_print.a

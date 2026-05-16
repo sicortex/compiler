@@ -1,0 +1,1 @@
+/usr/lib64/ccache/bin/g++   -D_LANGUAGE_C_PLUS_PLUS  -fPIC -O0 -g -D_DEBUG  -DTARG_MIPS CMakeFiles/isa_lits_gen-mips.dir/generate/isa_lits_gen.cxx.o CMakeFiles/isa_lits_gen-mips.dir/isa/mips/isa_lits.cxx.o  -o ../../../lib/mips/isa_lits_gen -rdynamic ../../../lib/mips/libisa_gen_topcode.a ../../../lib/mips/libgen_util.a 

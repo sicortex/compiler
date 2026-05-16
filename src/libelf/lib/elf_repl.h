@@ -188,6 +188,7 @@ typedef struct {
 #define ET_HIOS		0xfeff
 #define ET_LOPROC	0xff00
 #define ET_HIPROC	0xffff
+#define ET_IR  (ET_LOPROC + 0) 
 
 /*
  * e_machine

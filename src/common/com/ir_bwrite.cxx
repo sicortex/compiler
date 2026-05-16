@@ -29,6 +29,8 @@
 
 */
 
+#define ET_IR	(ET_LOPROC + 0)
+#define SHT_MIPS_WHIRL	0x70000026
 
 
 #ifdef USE_PCH

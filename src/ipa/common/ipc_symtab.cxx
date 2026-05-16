@@ -57,6 +57,9 @@
 #include "ipc_main.h"			// for ipa_dot_so_init
 #include "ir_bread.h"                   // low-level WHIRL I/O routines
 
+#define	ET_IR	(ET_LOPROC + 0)
+#define SHT_MIPS_WHIRL                0x70000026
+
 static void
 get_global_symtab (IPC_GLOBAL_TABS &gtabs, FILE_INFO &finfo,
 		   an_object_file_ptr p_obj,

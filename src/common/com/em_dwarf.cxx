@@ -395,6 +395,7 @@ Em_Dwarf_Begin (BOOL is_64bit, BOOL dwarf_trace, BOOL is_cplus,
 		    &dw_error);
 #endif
 #elif defined(TARG_MIPS)
+#if 0
   // Generate a CIE for .eh_frame only if it is C++ or if -DEBUG:eh_frame=on
   if (is_cplus || DEBUG_Emit_Ehframe)
     eh_cie_index = dwf_add_ehframe_cie (dw_dbg, augmenter,
@@ -406,6 +407,7 @@ Em_Dwarf_Begin (BOOL is_64bit, BOOL dwarf_trace, BOOL is_cplus,
 		    init_bytes,
 		    sizeof(init_bytes),
 		    &dw_error);
+#endif
 #endif
   return dw_dbg;
 }

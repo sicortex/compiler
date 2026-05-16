@@ -85,6 +85,9 @@
 #include "pf_cg.h"
 #endif
 
+#define SHT_MIPS_WHIRL                0x70000026
+#define	ET_IR			(ET_LOPROC + 0)
+
 #ifdef BACK_END
 extern "C" {
 extern void Init_Dep_Graph(void *g);

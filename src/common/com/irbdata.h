@@ -570,4 +570,92 @@ Irb_Init_Complex_F16 (INT size, F16_TYPE real, F16_TYPE imag,
 
 #endif /* MONGOOSE_BE */
 
+
+
+class initv_block_builder {
+public:
+    initv_block_builder():
+        block_idx_(New_INITV()),
+        last_idx_(INITV_IDX_ZERO)
+    {
+        INITV_Init_Block(block_idx_, INITV_IDX_ZERO);
+    }
+
+
+    initv_block_builder(INITV_IDX block_idx):
+        block_idx_(block_idx),
+        last_idx_(INITV_blk(block_idx_))
+    {
+
+        if (last_idx_ == INITV_IDX_ZERO)
+            return;
+
+        while (INITV_next(last_idx_) != INITV_IDX_ZERO)
+            last_idx_ = INITV_next(last_idx_);
+    }
+
+
+    INITV_IDX result() const {
+        return block_idx_;
+    }
+
+    void add_initv(INITV_IDX iv_idx) {
+        if (last_idx_ == INITV_IDX_ZERO) {
+            Set_INITV_blk(block_idx_, iv_idx);
+            last_idx_ = iv_idx;
+            return;
+        }
+
+        Set_INITV_next(last_idx_, iv_idx);
+        last_idx_ = iv_idx;
+    }
+
+    void add_symoff(const ST & st, INT32 ofst = 0) {
+        INITV_IDX iv_idx = New_INITV();
+        INITV_Set_SYMOFF(Initv_Table[iv_idx], 1, ST_st_idx(st), ofst);
+        add_initv(iv_idx);
+    }
+
+    void add_zero(TYPE_ID mtype) {
+        INITV_IDX iv_idx = New_INITV();
+        INITV_Set_ZERO(Initv_Table[iv_idx], mtype, 1);
+        add_initv(iv_idx);
+    }
+
+    void add_one(TYPE_ID mtype) {
+        INITV_IDX iv_idx = New_INITV();
+        INITV_Set_ONE(Initv_Table[iv_idx], mtype, 1);
+        add_initv(iv_idx);
+    }
+
+    void add_val(TCON_IDX val) {
+        INITV_IDX iv_idx = New_INITV();
+        INITV_Set_VAL(Initv_Table[iv_idx], val, 1);
+        add_initv(iv_idx);
+    }
+
+    void add_pad(UINT32 bytes) {
+        INITV_IDX iv_idx = New_INITV();
+        INITV_Set_PAD(Initv_Table[iv_idx], bytes);
+        add_initv(iv_idx);
+    }
+
+    void add_symdiff(LABEL_IDX s1, const ST & s2) {
+        INITV_IDX iv_idx = New_INITV();
+        INITV_Set_SYMDIFF(Initv_Table[iv_idx], 1, s1, ST_st_idx(s2), FALSE);
+        add_initv(iv_idx);
+    }
+
+    void add_symdiff16(LABEL_IDX s1, const ST & s2) {
+        INITV_IDX iv_idx = New_INITV();
+        INITV_Set_SYMDIFF(Initv_Table[iv_idx], 1, s1, ST_st_idx(s2), TRUE);
+        add_initv(iv_idx);
+    }
+
+private:
+    INITV_IDX block_idx_;
+    INITV_IDX last_idx_;
+};
+
+
 #endif /* irbdata_INCLUDED */

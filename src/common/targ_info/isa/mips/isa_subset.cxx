@@ -50,6 +50,7 @@
 #include "topcode.h"
 #include "isa_subset_gen.h"
 
+int
 main()
 {
   ISA_SUBSET mips4, mipst;

@@ -2896,6 +2896,7 @@ Handle_Imm_Op (WN * expr, INT * kidno /* counted from 0 */)
 		case INTRN_INSERTPS:
     case INTRN_PALIGNR128:
     case INTRN_PALIGNR:
+	case INTRN_PCLMULDQD:
     case INTRN_VBLENDPD256:
     case INTRN_VBLENDPS256:
     case INTRN_VDPPS256:
@@ -2933,7 +2934,9 @@ Handle_Imm_Op (WN * expr, INT * kidno /* counted from 0 */)
 		case INTRN_PEXTRB:
 		case INTRN_PEXTRD:
 		case INTRN_PEXTRQ:
+		case INTRN_VEC_EXT_V4SF:
 		case INTRN_EXTRACTPS:
+		case INTRN_AESKEYGENASSIST:
 		/*avx*/
 		case INTRN_VPERMILPS128:
 		case INTRN_VEXTRACTF128D:
@@ -3165,6 +3168,38 @@ Get_Intrinsic_Op_Parameters( WN *expr, TN **result, TN ***opnds, INT *numopnds, 
 #undef CHECK_OPNDS
 }
 
+static BOOL
+INTRINSIC_Is_SETROP(INTRINSIC id){
+  switch (id){
+  	case INTRN_SETREPI32:
+  	case INTRN_SETREPI16:
+	case INTRN_SETREPI8:
+	  return TRUE;
+	default:
+	  return FALSE;
+
+  }
+}
+
+static TN*
+Handle_INTRINSIC_SETOP(WN *expr, TN *result){
+  INTRINSIC id = (INTRINSIC) WN_intrinsic(expr);
+  TN *kid[16];// max 16 kids
+  for(INT i = 0; i < 16; i++)
+  	kid[i] = NULL;
+  for(INT i = 0; i < WN_kid_count(expr); i++){
+  	kid[i] = (WN_operator(WN_kid0(WN_kid(expr, i)))== OPR_INTCONST) ? 
+	  	Gen_Literal_TN(WN_const_val(WN_kid0(WN_kid(expr, i))),1) :
+	  	Expand_Expr(WN_kid(expr, i), expr, NULL);
+  }
+  
+  Exp_Intrinsic_Op_SETE(id, result, kid[0], kid[1], kid[2], kid[3],
+	 kid[4], kid[5], kid[6], kid[7], kid[8], kid[9], kid[10],
+	 kid[11],kid[12], kid[13], kid[14], kid[15], WN_rtype( WN_kid0(expr) ), &New_OPs);
+	  
+  
+  return result; 
+}
 
 static TN*
 Handle_INTRINSIC_OP (WN *expr, TN *result)
@@ -3175,6 +3210,13 @@ Handle_INTRINSIC_OP (WN *expr, TN *result)
   TN *kid0 = Expand_Expr(WN_kid0(expr), expr, NULL);
 
 #ifdef TARG_X8664
+  if(INTRINSIC_Is_SETROP(id)){
+  	/*For some intrinsic like _mm_set_epi8 of SSE2*/
+	if(result == NULL)
+	  result = Allocate_Result_TN(expr, NULL);
+  	Handle_INTRINSIC_SETOP(expr, result);
+	return result;
+  }
   INT imm_kidno = 0;
   // Get any immediate operand in intrinsic.
   TN * imm_kid = Handle_Imm_Op (expr, &imm_kidno);
@@ -3183,7 +3225,7 @@ Handle_INTRINSIC_OP (WN *expr, TN *result)
 
   if (imm_kid)
   {
-    Is_True (imm_kidno == 1 || imm_kidno == 2,
+    Is_True (imm_kidno >= 1 && imm_kidno <= 5,
              ("Immediate kid0 of intrinsic not supported"));
     switch ( imm_kidno ) {
         case 1:
@@ -3502,7 +3544,13 @@ Expand_Expr (
 	WN_rtype(expr) == MTYPE_V16I1 ||
 	WN_rtype(expr) == MTYPE_V16I2 ||
 	WN_rtype(expr) == MTYPE_V16I4 ||
-	WN_rtype(expr) == MTYPE_V16I8) {
+	WN_rtype(expr) == MTYPE_V16I8 ||
+	WN_rtype(expr) == MTYPE_V32I1 ||
+	WN_rtype(expr) == MTYPE_V32I2 ||
+	WN_rtype(expr) == MTYPE_V32I4 ||
+	WN_rtype(expr) == MTYPE_V32I8 ||
+	WN_rtype(expr) == MTYPE_V32F4 ||
+	WN_rtype(expr) == MTYPE_V32F8) {
       TCON then = ST_tcon_val(WN_st(expr));
       TCON now  = Create_Simd_Const (WN_rtype(expr), then);
       ST *sym = New_Const_Sym (Enter_tcon (now), Be_Type_Tbl(WN_rtype(expr)));
@@ -5587,6 +5635,7 @@ convert_stmt_list_to_OPs(WN *stmt)
 void 
 Convert_WHIRL_To_OPs (WN *tree)
 {
+  //Target_AVX = 1;//delete this line
   WN *stmt;
   CGRIN *cgrin;
   BB *last_bb;

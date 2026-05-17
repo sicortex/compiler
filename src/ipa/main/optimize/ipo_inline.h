@@ -239,6 +239,7 @@ struct IPO_INLINE_AUX
     WN* part_inl_leftover_call_site;	// the WN block which will contain the call
                                         // site to the leftover function 
                                         // after partial inlining.
+    bool enclosing_eh;                  // Is there enclosing EH region in caller
     PROCESSED_SET processed_local_syms; // Set of symbols that have PRAGMA LOCAL processed
 #ifdef KEY
     replace_st_vec replace_st;
@@ -254,7 +255,8 @@ struct IPO_INLINE_AUX
 	copy_in_block (NULL),
 	copy_out_block (NULL),
 	inlined_body (NULL),
-        part_inl_leftover_call_site (NULL)
+        part_inl_leftover_call_site (NULL),
+        enclosing_eh(false)
 #ifdef KEY
 	, replace_st (pool)
 	, header_file_offset (0)
@@ -369,6 +371,12 @@ public:
 
     WN * Clone_Callee( BOOL); // Use IPO_CLONE class to clone callee in inlining
 
+    // Searches for enclosing EH region in caller
+    bool Find_Enclosing_EH_Region ();
+
+    // Returns ST for _Unwind_Resume_or_Rethrow symbol
+    ST_IDX Get_Unwind_Resume_or_Rethrow();
+
     // pre-processing in caller needed BEFORE Process_Callee (eg mp processing)
     void Pre_Process_Caller (LABEL_IDX& return_label);
 
@@ -407,6 +415,7 @@ public:
 
     // Insert inline pragmas, alloca-code
     void Post_Process_Caller (IPO_INLINE_AUX& aux);
+
 #ifdef KEY
     // Merge callee's exception tables into caller's
     void Merge_EH_Tables (void);

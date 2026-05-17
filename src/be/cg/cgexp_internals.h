@@ -109,6 +109,7 @@ extern void Expand_Max (TN *dest, TN *src1, TN *src2, TYPE_ID mtype, OPS *ops);
 extern void Expand_MinMax (TN *dest, TN *dest2, TN *src1, TN *src2, TYPE_ID mtype, OPS *ops);
 extern void Expand_Select (TN *dest_tn, TN *cond_tn, TN *true_tn, TN *false_tn, TYPE_ID mtype, BOOL float_cond, OPS *ops);
 extern void Expand_Flop (OPCODE opcode, TN *result, TN *src1, TN *src2, TN *src3, OPS *ops);
+extern void Expand_Madd(TN *dest, TN *src1, TN *src2, TN* src3, TYPE_ID mtype, OPS *ops);
 
 #ifdef KEY
 #define OP_NEED_PAIR(t)  \

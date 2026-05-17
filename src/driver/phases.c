@@ -41,7 +41,7 @@
 
 */
 
-#ifdef __linux
+#if defined(__linux) && !defined(_GNU_SOURCE)
 #define _GNU_SOURCE /* For *asprintf */
 #endif
 
@@ -53,6 +53,9 @@
 #include <sys/param.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#ifdef __FreeBSD__
+#include <sys/sysctl.h>
+#endif
 #ifdef _WIN32
 #include <alloca.h>
 #endif
@@ -70,7 +73,6 @@
 #include "run.h"
 #include "objects.h"
 #include "opt_actions.h"
-#include "profile_type.h"    /* for PROFILE_TYPE */
 #include "get_options.h"
 #include "targets.h"
 
@@ -434,6 +436,31 @@ add_targ_options ( string_list_t *args )
     else
       add_string(args, "-TARG:sse4_2=off");
 
+	if (avx == TRUE)
+	  add_string(args, "-TARG:avx=on");
+	else
+	  add_string(args, "-TARG:avx=off");
+			
+	if (fma_enable == TRUE)
+	  add_string(args, "-TARG:fma=on");
+	else
+	  add_string(args, "-TARG:fma=off");
+
+	if (xop == TRUE)
+	  add_string(args, "-TARG:xop=on");
+	else
+	  add_string(args, "-TARG:xop=off");
+
+	if (aes == TRUE)
+	  add_string(args, "-TARG:aes=on");
+	else
+	  add_string(args, "-TARG:aes=off");
+
+	if (pclmul == TRUE)
+	  add_string(args, "-TARG:pclmul=on");
+	else
+	  add_string(args, "-TARG:pclmul=off");
+
     if (m3dnow == TRUE)
       add_string(args, "-TARG:3dnow=on");
     else
@@ -498,25 +525,6 @@ char *dirname(char *const s)
 
 static char *input_source ;	/* src to next phase */
 
-static void add_arg(string_list_t *args, const char *format, ...)
-	__attribute__((format (printf, 2, 3)));
-
-static void
-add_arg(string_list_t *args, const char *format, ...)
-{
-	char *arg;
-	va_list ap;
-
-	va_start(ap, format);
-
-	vasprintf(&arg, format, ap);
-	add_string(args, arg);
-	free(arg);
-
-	va_end(ap);
-}
-
-
 // Returns path to library directory
 
 
@@ -551,9 +559,7 @@ fix_name_by_phase (char *name, phases_t phase)
 		case P_gcpp:
 		case P_gcpp_plus:
 #endif // PATH64_ENABLE_GNU_FRONTEND
-#ifdef PATH64_ENABLE_PSCLANG
         case P_psclang_cpp:
-#endif // PATH64_ENABLE_PSCLANG
 			break;
 		default:
 			switch (source_kind) {
@@ -660,13 +666,11 @@ add_file_args_first (string_list_t *args, phases_t index)
       break;
 #endif // PATH64_ENABLE_GNU_FRONTEND
 
-#ifdef PATH64_ENABLE_PSCLANG
     case P_psclang_cpp:
       add_common_cpp_definitions(args);
       break;
 
     case P_psclang:
-#endif // PATH64_ENABLE_PSCLANG
 
     default:
       break;
@@ -755,9 +759,13 @@ add_target_linker_args(string_list_t *args, boolean is_ipa) {
         if((abi == ABI_M64 || abi == ABI_64) && !is_ipa) {
             add_string(args, "-64");
         }
-#elif defined(__FreeBSD__)
-    add_string(args, (abi == ABI_N32) ? "-melf_i386_fbsd" : "-melf_x86_64_fbsd");
 #else
+#ifdef __FreeBSD__
+        if (!is_ipa) {
+            // XXX ipa_link cannot handle FreeBSD ABI.
+            add_string(args, (abi == ABI_M32) ? "-melf_i386_fbsd" : "-melf_x86_64_fbsd");
+        } else
+#endif
         add_string(args, (abi == ABI_M32) ? "-melf_i386" : "-melf_x86_64");
 #endif
     }
@@ -798,9 +806,7 @@ add_sysroot(string_list_t *args, phases_t phase)  // 15149
   case P_gcpp:
   case P_gcpp_plus:
 #endif // PATH64_ENABLE_GNU_FRONTEND
-#ifdef PATH64_ENABLE_PSCLANG
   case P_psclang_cpp:
-#endif // PATH64_ENABLE_PSCLANG
     add_string(args, "-isysroot");
     add_string(args, sysroot);
     break;
@@ -918,6 +924,11 @@ add_sse_cc1_options(string_list_t *args, boolean sys_cpp)
 			add_string(args, "-msse4_2");
 		else
 			add_string(args, "-mno-sse4_2");
+
+		if (avx == TRUE)
+			add_string(args, "-mavx");
+		else
+			add_string(args, "-mno-avx");
         }
 #endif // PATH64_ENABLE_PSCRUNTIME
 }
@@ -966,6 +977,7 @@ void add_std_includes(string_list_t *args) {
         }
     }
 
+    add_inc_path(args, target_include_path());
     add_inc_path(args, "%s/lib/" PSC_FULL_VERSION "/include", root);
     free(root);
 }
@@ -1098,6 +1110,10 @@ add_file_args (string_list_t *args, phases_t index)
 #endif // !PATH64_ENABLE_PSCRUNTIME
 		}
 
+		if (pic == TRUE) {
+			add_string(args, "-fpic");
+		}
+
 #ifdef PATH64_ENABLE_PSCRUNTIME
 		if (source_lang == L_CC) {
 			add_string(args, "-D_GNU_SOURCE");
@@ -1219,7 +1235,6 @@ add_file_args (string_list_t *args, phases_t index)
 		
 		break;
 
-#ifdef PATH64_ENABLE_PSCLANG
     case P_psclang_cpp:
         // psclang preprocessor
 
@@ -1308,7 +1323,6 @@ add_file_args (string_list_t *args, phases_t index)
         }
 
         break;
-#endif // PATH64_ENABLE_PSCLANG
 
 	case P_f_coco:	// bug 9058
 		{
@@ -1548,7 +1562,6 @@ add_file_args (string_list_t *args, phases_t index)
 		break;
 #endif // PATH64_ENABLE_GNU_FRONTEND
 
-#ifdef PATH64_ENABLE_PSCLANG
     case P_psclang:
         // psclang front-end
 
@@ -1575,7 +1588,6 @@ add_file_args (string_list_t *args, phases_t index)
         add_string(args, "-o");
         add_string(args, construct_name(the_file,"B"));
         break;
-#endif // PATH64_ENABLE_PSCLANG
 
 	case P_inline:
         add_targ_options (args);
@@ -2070,8 +2082,11 @@ add_final_ld_args (string_list_t *args)
 	char *temp;
 
     if(ipa == TRUE) {
-        if(option_was_seen(O_static_libgcc)) {
-            add_arg(args, "-static-libgcc");
+
+	/* Need to give ipa_link openmp flag or it will get lost during
+	 * final linking */
+	if(option_was_seen(O_fopenmp)) {
+            add_arg(args, "-openmp");
         }
 
 	// Must add fstart or the Fortran main will get dropped by ipa
@@ -2093,7 +2108,7 @@ add_final_ld_args (string_list_t *args)
     extern boolean link_with_mathlib;
     if ((link_with_mathlib || source_lang == L_CC) && 
         option_was_seen(O_m64) && 
-        strcmp(target_cpu, "em64t") && strcmp(target_cpu, "anyx86"))
+        strcmp(target_cpu, "em64t") && strcmp(target_cpu, "generic"))
         // Bug 4680 - Link with libacml_mv by default.
         add_library(args, "acml_mv");
 #endif
@@ -2113,147 +2128,85 @@ add_final_ld_args (string_list_t *args)
         if( ! option_was_seen(O_nostartfiles)) add_crtend(args);
         return;
     }
-#ifdef PATH64_ENABLE_PSCRUNTIME
-    if(source_lang == L_CC &&
-       !option_was_seen(O_nodefaultlibs) &&
-       !option_was_seen(O_nostdlib) &&
-       !option_was_seen(O_nostdlib__)) {
-    
-        // STL library
-    	add_library(args, "stl");
-    
-        // C++ support library
-        add_library(args, "cxxrt");
-    
-        // other dependencies
-        add_library(args, "pthread");
 
-#ifndef  __FreeBSD__
-        add_library(args, "dl");
-#endif // !__FreeBSD__
-
-        // always link C++ programs with math library
-        add_library(args, "m");
-
+    // adding runtime libraries to ld flags
+    {
+        string_list_t *runtime_libs_ld_flags = get_runtime_libraries_ld_flags();
+        append_string_lists(args, runtime_libs_ld_flags);
+        free(runtime_libs_ld_flags);
     }
-
-    // static libc should be grouped with libgcc and libeh
-    // because there is loop in dependencies between these libs
-    if (option_was_seen(O_static) || option_was_seen(O__static)) {
-        add_arg(args, "--start-group");
-    }
-
-    if(option_was_seen(O_static_libgcc)) {
-        add_arg(args, "-Bstatic");
-    }
-
-    add_library(args, "gcc");
-
-    // Exception support library (used by stl and gcc)
-    // staic libc also depends on libeh
-    if(option_was_seen(O_static) ||
-       source_lang == L_CC ||
-       option_was_seen(O_fexceptions)) {
-        add_library(args, "eh");
-    }
-
-    if(option_was_seen(O_static_libgcc)) {
-        add_arg(args, "-Bdynamic");
-    }
-
-    add_library(args, "c");
-
-    if (option_was_seen(O_static) || option_was_seen(O__static)) {
-        add_arg(args, "--end-group");
-    }
-#else
-    if(source_lang == L_CC) {
-        add_arg(args, "-L%s", current_target->libstdcpp_path);
-        add_library(args, "stdc++");
-    }
-
-    if (option_was_seen(O_static) || option_was_seen(O__static)){
-        add_arg(args, "--start-group");
-
-        add_arg(args, "-L%s", current_target->libgcc_path);
-        add_library(args, "gcc");
-
-        add_arg(args, "-L%s", current_target->libgcc_eh_path);
-        add_library(args, "gcc_eh");
-
-        add_library(args, "c");  /* the above libs should be grouped together */
-
-        add_arg(args, "--end-group");
-         
-        if(invoked_lang == L_CC){
-            add_arg(args, "-L%s", current_target->libsupcpp_path);
-            add_library(args, "supc++");
-        }
-    }
-#endif
 	
     if( ! option_was_seen(O_nostartfiles)) add_crtend(args);
 
-	if (shared != RELOCATABLE) {
-	    if (invoked_lang == L_f90) {
-		if (!option_was_seen(O_shared)) {
-			add_library(args, PSC_NAME_PREFIX "fstart");
-		}
-		add_library(args, PSC_NAME_PREFIX "fortran");
-		if (!option_was_seen(O_shared)) {
-			add_library(args, PSC_NAME_PREFIX "fstart");
-		}
-		if (! option_was_seen(O_fbootstrap_hack)) {
-		  add_string(args, "-lmv");
-#ifdef TARG_MIPS
-          if (is_target_arch_MIPS()) {
-		    if (ffast_math_prescan == 1) {  // Bug 14245
-		      // Link with libscm and open64 libmpath before libm
-		      add_string(args, "-lscm");
-		      add_string(args, "-lm" PSC_NAME_PREFIX);
-		    }
-          } else {
-#endif // TARG_MIPS
-		    add_string(args, "-lm" PSC_NAME_PREFIX);
-#ifdef TARG_MIPS
-          }
-#endif // TARG_MIPS
-		}
-		add_string(args, "-lm");
-		if (! option_was_seen(O_fbootstrap_hack)) {
-		  add_library(args, "mv");
-#ifdef TARG_MIPS
-        if (is_target_arch_MIPS()) {
-		  if (ffast_math_prescan == 1) {  // Bug 14245
-		    // Link with libscm and open64 libmpath before libm
-		    add_library(args, "scm");
-		    add_library(args, "m" PSC_NAME_PREFIX);
-		  }
-        } else {
-#endif // TARG_MIPS
-		  add_library(args, "m" PSC_NAME_PREFIX);
-#ifdef TARG_MIPS
-        }
-#endif // TARG_MIPS
-		}
-		add_library(args, "m");
-	    }
-	    if (option_was_seen(O_mp) ||
-		option_was_seen(O_apo) ||	// bug 6334
-		option_was_seen(O_fopenmp)) {
-                add_string(args, "-lopenmp");
+    if (shared != RELOCATABLE) {
+        if (invoked_lang == L_f90) {
+            if (!option_was_seen(O_shared)) {
+            	add_library(args, PSC_NAME_PREFIX "fstart");
             }
 
-            if (option_was_seen (O_fprofile_arcs))
-                add_string(args, "-lgcov");    // bug 12754
-  // bug 4230
-	    if (option_was_seen(O_pthread) ||
-		option_was_seen(O_mp) ||
-		option_was_seen(O_fopenmp) ||
-		option_was_seen(O_apo)) {	// bug 6334
-		add_string(args, "-lpthread");
-	    }
-	}
+            add_library(args, PSC_NAME_PREFIX "fortran");
+
+            if (!option_was_seen(O_shared)) {
+            	add_library(args, PSC_NAME_PREFIX "fstart");
+            }
+
+            if (! option_was_seen(O_fbootstrap_hack)) {
+                add_string(args, "-lmv");
+
+#ifdef TARG_MIPS
+                if (is_target_arch_MIPS()) {
+                    if (ffast_math_prescan == 1) {  // Bug 14245
+                        // Link with libscm and open64 libmpath before libm
+                        add_string(args, "-lscm");
+                        add_string(args, "-lm" PSC_NAME_PREFIX);
+                    }
+                } else {
+#endif // TARG_MIPS
+                    add_string(args, "-lm" PSC_NAME_PREFIX);
+#ifdef TARG_MIPS
+                }
+#endif // TARG_MIPS
+            }
+
+            add_string(args, "-lm");
+            
+            if (! option_was_seen(O_fbootstrap_hack)) {
+                add_library(args, "mv");
+#ifdef TARG_MIPS
+                if (is_target_arch_MIPS()) {
+                    if (ffast_math_prescan == 1) {  // Bug 14245
+                        // Link with libscm and open64 libmpath before libm
+                        add_library(args, "scm");
+                        add_library(args, "m" PSC_NAME_PREFIX);
+                    }
+                } else {
+#endif // TARG_MIPS
+                    add_library(args, "m" PSC_NAME_PREFIX);
+#ifdef TARG_MIPS
+                }
+#endif // TARG_MIPS
+            }
+
+            add_library(args, "m");
+        }
+    
+        if (option_was_seen(O_mp) ||
+            option_was_seen(O_apo) ||	// bug 6334
+            option_was_seen(O_fopenmp)) {
+            add_string(args, "-lopenmp");
+        }
+    
+        if (option_was_seen (O_fprofile_arcs))
+            add_string(args, "-lgcov");    // bug 12754
+    
+        // bug 4230
+        if (option_was_seen(O_pthread) ||
+            option_was_seen(O_mp) ||
+            option_was_seen(O_fopenmp) ||
+            option_was_seen(O_apo)) {	// bug 6334
+            add_string(args, "-lpthread");
+        }
+    }
 
     // Put pscrt & gcc after all the libraries that are built with PathScale
     // compilers, since those libraries could use PathScale routines.
@@ -2265,11 +2218,11 @@ add_final_ld_args (string_list_t *args)
 
 #if !defined(PATH64_ENABLE_PSCRUNTIME)
     if(option_was_seen(O_static) || option_was_seen(O__static)) {
-    	add_arg(args, "-L%s", current_target->libgcc_path);
-    	add_library(args, "gcc");
+        add_arg(args, "-L%s", current_target->libgcc_path);
+        add_library(args, "gcc");
     } else {
-    	add_arg(args, "-L%s", current_target->libgcc_s_path);
-    	add_library(args, "gcc_s");
+        add_arg(args, "-L%s", current_target->libgcc_s_path);
+        add_library(args, "gcc_s");
     }
 #endif
 
@@ -2287,6 +2240,7 @@ add_final_ld_args (string_list_t *args)
 #endif 
 
 
+#ifndef PATH64_ENABLE_PSCRUNTIME
 	if (shared != RELOCATABLE) {
 	  if ( fbuiltin != 0 && ! option_was_seen(O_fbootstrap_hack) ) {
 	    /* Once -fbuiltin is used, some functions, i.e., __sincos, are only
@@ -2310,6 +2264,7 @@ add_final_ld_args (string_list_t *args)
 	    }
 	  }
 	}
+#endif // !PATH64_ENABLE_PSCRUNTIME
 }
 
 
@@ -2451,10 +2406,6 @@ postprocess_ld_args (string_list_t *args, phases_t phase)
             }
 	}
     }
-
-    if (add_huge_lib) {
-        add_library(args, "hugetlbfs-psc");
-    }
 #endif /* defined(BUILD_OS_DARWIN) */
 }
 
@@ -2523,7 +2474,6 @@ add_inline_option(void)
 }
 
 
-#ifdef PATH64_ENABLE_PSCLANG
 // Returns true if psclang should be used as preprocessor/front-end
 int is_psclang_enabled() {
 #ifdef PATH64_ENABLE_DEFAULT_PSCLANG
@@ -2532,7 +2482,6 @@ int is_psclang_enabled() {
     return option_was_seen(O_fpsclang);
 #endif // !PATH64_ENABLE_DEFAULT_PSCLANG
 }
-#endif // PATH64_ENABLE_PSCLANG
 
 
 static void
@@ -2546,11 +2495,9 @@ determine_phase_order (void)
 	phase_order_index = 0;
  
 	/* determine which cpp to use */
-#ifdef PATH64_ENABLE_PSCLANG
     if ((source_lang == L_cc || source_lang == L_CC) && is_psclang_enabled()) {
         cpp_phase = P_psclang_cpp;
     } else
-#endif // PATH64_ENABLE_PSCLANG
 #ifdef PATH64_ENABLE_GNU_FRONTEND
 	if (source_lang == L_CC) {
 		cpp_phase = P_gcpp_plus;
@@ -2589,14 +2536,12 @@ determine_phase_order (void)
 	} else {
 #ifdef PATH64_ENABLE_GNU_FRONTEND
         cpp_phase = P_gcpp;
-#elif defined(PATH64_ENABLE_PSCLANG)
+#else
         if (source_lang == L_as) {
             cpp_phase = P_psclang_cpp;
         } else {
             cpp_phase = P_cpp;
         }
-#else
-        cpp_phase = P_cpp;
 #endif // PATH64_ENABLE_GNU_FRONTEND
 	}
 
@@ -2642,12 +2587,10 @@ determine_phase_order (void)
 		} else {
             add_phase(cpp_phase);
 
-#ifdef PATH64_ENABLE_PSCLANG
             if (is_psclang_enabled()) {
                 next_phase = P_psclang;
             }
             else
-#endif // PATH64_ENABLE_PSCLANG
 		    next_phase = (source_lang == L_CC ? cplus_fe : c_fe);
 		}
 		break;
@@ -2737,12 +2680,10 @@ determine_phase_order (void)
 			break;
 #endif // PATH64_ENABLE_GNU_FRONTEND
 
-#ifdef PATH64_ENABLE_PSCLANG
         case P_psclang:
 			add_phase(next_phase);
 			next_phase = post_fe_phase ();
 			break;
-#endif // PATH64_ENABLE_PSCLANG
 
 #ifdef PATH64_ENABLE_GNU_FRONTEND
 		case P_wgen:
@@ -2857,18 +2798,7 @@ check_existence_of_phases (void)
 			
 	    /* check if be phase exists, to warn about wrong toolroot */
 	case P_ipl:
-	    if (!file_exists (concat_strings (get_phase_dir(phase_order[i]),
-					      "/" FN_DSO("ipl"))))
-		give_warning = TRUE;
-
-	    /* fall through */
-	    
 	case P_be:
-
-	    if (!file_exists (concat_strings (get_phase_dir(phase_order[i]),
-					      "/" FN_DSO("be"))))
-		give_warning = TRUE;
-
 	    if (!file_exists(get_full_phase_name(phase_order[i])))
 		give_warning = TRUE;
 
@@ -2878,35 +2808,6 @@ check_existence_of_phases (void)
 	    break;
 	}
     }
-}
-
-static void
-add_instr_archive (string_list_t* args)
-{
-  extern int profile_type;
-
-  /* Add instrumentation archives */
-  if (instrumentation_invoked != UNDEFINED && instrumentation_invoked) {
-
-    unsigned long f = WHIRL_PROFILE | CG_EDGE_PROFILE | CG_VALUE_PROFILE |
-      CG_STRIDE_PROFILE ;
-    if (!(profile_type & ~f)) {
-      if (profile_type & (CG_EDGE_PROFILE |
-			  CG_VALUE_PROFILE | CG_STRIDE_PROFILE)) {
-	add_library (args,"cginstr");
-      }
-
-      add_library (args, "instr2");
-#ifndef PATH64_ENABLE_PSCRUNTIME
-      if (!option_was_seen(O_static) && !option_was_seen(O__static)) {
-        add_arg(args, "-L%s", current_target->libgcc_s_path);
-	add_library(args, "gcc_s");
-      }
-#endif // PATH64_ENABLE_PSCRUNTIME
-    } else {
-      fprintf (stderr, "Unknown profile types %#lx\n", profile_type & ~f);
-    }
-  }
 }
 
 
@@ -2920,6 +2821,14 @@ get_gnu_prefix (void)
   char path[MAXPATHLEN];
   int i, j, len, rval;
 
+#if defined(__FreeBSD__)
+  int path_mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1 };
+  size_t path_size = sizeof(path);
+
+  if (sysctl(path_mib, 4, path, &path_size, NULL, 0) != 0) {
+    strncpy(path, orig_program_name, sizeof(path));
+  }
+#else
   /* Look in this special place for a link to the executable.  This only
      works on Linux, but it should work since pathcc runs only on Linux. */
   rval = readlink ("/proc/self/exe", path, sizeof(path));
@@ -2929,6 +2838,7 @@ get_gnu_prefix (void)
   } else {
     path[rval] = '\0';		// readlink doesn't append NULL
   }
+#endif
 
   // Extract command from command path.  If command path is
   // /foo/mips64el-key-linux-pathcc, then command is mips64el-key-linux-pathcc.
@@ -3048,7 +2958,6 @@ extern char *get_binutils_lib_path(void);
 void
 init_phase_info (void)
 {
-	char *toolroot;
 	char *comp_target_root;
 
 	init_gnu_phase_info();
@@ -3071,11 +2980,7 @@ init_phase_info (void)
 	  old_ld_library_path = get_binutils_lib_path();
 	}
 
-	toolroot = getenv("TOOLROOT");
-	if (toolroot != NULL) {
-		/* add toolroot as prefix to phase dirs */
-                prefix_all_phase_dirs(PHASE_MASK, toolroot);
-	}
+
 	comp_target_root = getenv("COMP_TARGET_ROOT");
 	if (comp_target_root != NULL) {
 		/* add comp_target_root as prefix to phase dirs */
@@ -3132,13 +3037,6 @@ run_ld (void)
 #endif
 
 	if (ipa == TRUE) {
-	    ldpath = get_phase_dir (ldphase);
-	    ldpath = concat_strings (ldpath, "/" FN_DSO("ipa"));
-	    if (!file_exists (ldpath)) {
-		error (FN_DSO("ipa") " is not installed on %s", 
-			   get_phase_dir (ldphase));
-		return;
-	    }
 	    // Tell ipa_link about the LD_LIBRARY_PATH that was in effect
 	    // before the compiler was run.
 	    char *str = "-INTERNAL:old_ld_lib_path=";
@@ -3204,8 +3102,6 @@ run_ld (void)
     if (is_target_arch_MIPS())
         add_string(args, "-mips64");	// call gcc with -mips64
 #endif
-
-	add_instr_archive (args);
 
 	add_final_ld_args (args);
 	postprocess_ld_args (args, ldphase);
@@ -3375,9 +3271,7 @@ run_compiler (int argc, char *argv[])
 			    phase_order[i] != P_spin_cc1plus &&
 			    phase_order[i] != P_wgen &&
 #endif // PATH64_ENABLE_GNU_FRONTEND
-#ifdef PATH64_ENABLE_PSCLANG
                 phase_order[i] != P_psclang &&
-#endif // PATH64_ENABLE_PSCLANG
 			    phase_order[i] < P_any_fe) 
 			{
 			    add_command_line_arg(args, source_file);

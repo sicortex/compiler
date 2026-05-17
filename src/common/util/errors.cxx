@@ -142,6 +142,8 @@ static INT   Max_Errors = 100;		/* Maximum errors allowed */
 
 static BOOL Had_Compiler_Error = FALSE;
 
+static signal_cleanup_handler cleanup_handler = NULL;
+
 /* ====================================================================
  *
  * Severity Description Table
@@ -1212,7 +1214,7 @@ Fail_FmtAssertion ( const char *fmt, ... )
 
   /* Abort: */
   Signal_Cleanup( 0 );
-  exit(RC_INTERNAL_ERROR);
+  abort();
 }
 
 /* ====================================================================
@@ -1396,6 +1398,8 @@ DevWarn( const char *fmt, ... )
     vfprintf ( stderr, fmt, args );
     fprintf ( stderr, "\n" );
     fflush ( stderr );
+    va_end(args);
+    va_start ( args, fmt );
   }
  
   /* Then write to error file if enabled: */
@@ -1404,6 +1408,8 @@ DevWarn( const char *fmt, ... )
     vfprintf ( Error_File, fmt, args );
     fprintf ( Error_File, "\n" );
     fflush ( Error_File );
+    va_end(args);
+    va_start ( args, fmt );
   }
 
   /* Finally write to trace file: */
@@ -1537,3 +1543,27 @@ Had_Internal_Error (void)
 {
 	return Had_Compiler_Error;
 }
+
+
+/* ====================================================================
+ *
+ * Signal_Cleanup
+ *
+ * Clean up before dying in response to a signal.
+ *
+ * ====================================================================
+ */
+
+void
+Signal_Cleanup ( INT sig )
+{
+  if(cleanup_handler != NULL) {
+    cleanup_handler();
+  }
+}
+
+
+void Set_Signal_Cleanup(signal_cleanup_handler handler) {
+  cleanup_handler = handler;
+}
+

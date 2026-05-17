@@ -94,6 +94,7 @@
 #include "wn_simp.h"               // for WN_Simp_Rsqrt_Newton_Raphson
 #endif
 
+#define MODULE_NAME lno
 #include "err_host.tab"
 
 
@@ -118,7 +119,7 @@ lno_main (INT lno_argc, char **lno_argv, INT be_argc, char **be_argv)
 		   ("WHIRL revision mismatch between be.so (%s) and lno.so (%s)", 
 		    Whirl_Revision, WHIRL_REVISION));
 
-    Set_Error_Tables (Phases, host_errlist);
+    Set_Error_Tables (PHASES_NAME, ERRLIST_NAME);
     Set_Error_Descriptor (EP_BE, EDESC_BE);
 } /* lno_main */
 
@@ -131,7 +132,6 @@ extern BOOL Run_Dsm_Check;
 }
 
 IPA_LNO_READ_FILE* IPA_LNO_File = NULL; 
-extern FILE* STDOUT; 
 
 //-----------------------------------------------------------------------
 // NAME: IPA_LNO_Open_Input_File
@@ -213,14 +213,14 @@ Lno_Init (void)
    alloca: TRUE means ok to use alloca, FALSE means use malloc
 */
 WN *
-Perform_Loop_Nest_Optimization (PU_Info* current_pu, WN *pu_wn, 
-			        WN *region_wn, BOOL alloca)
+Perform_Loop_Nest_Optimization (PU_Info* current_pu, PU *pu, WN *pu_wn, 
+                                WN *region_wn, BOOL alloca)
 {
+    
     WN *opt_pu = NULL;
     struct DU_MANAGER *du_mgr;
     struct ALIAS_MANAGER *alias_mgr;
     if (!alloca) LNO_Use_Malloc = TRUE;
-    STDOUT = stdout; 
 
     MEM_POOL_Popper popper(&MEM_local_pool);
 
@@ -270,7 +270,7 @@ Perform_Loop_Nest_Optimization (PU_Info* current_pu, WN *pu_wn,
     }
 
     region_wn =
-      Pre_Optimizer(PREOPT_LNO_PHASE, region_wn, du_mgr, alias_mgr);
+      Pre_Optimizer(PREOPT_LNO_PHASE, pu, region_wn, du_mgr, alias_mgr);
     Check_for_IR_Dump(TP_LNOPT3, region_wn, "LNO PREOPT");
 
     if (Run_prompf) {
@@ -288,7 +288,7 @@ Perform_Loop_Nest_Optimization (PU_Info* current_pu, WN *pu_wn,
       Delete_Du_Manager(du_mgr, MEM_pu_nz_pool_ptr);
       du_mgr = Create_Du_Manager(MEM_pu_nz_pool_ptr);
       region_wn =
-	Pre_Optimizer(PREOPT_LNO1_PHASE, region_wn, du_mgr, alias_mgr);
+	Pre_Optimizer(PREOPT_LNO1_PHASE, pu, region_wn, du_mgr, alias_mgr);
       Check_for_IR_Dump(TP_LNOPT3, region_wn, "LNO1 PREOPT");
       RID_level(REGION_get_rid(region_wn)) = RL_LNO1_PREOPT;
       Is_True(REGION_consistency_check(region_wn),(""));

@@ -37,7 +37,11 @@ __CTOR_LIST__:
 __DTOR_LIST__:
 	.long -1
 
+#ifdef __sun
+	.section	.eh_frame, "aw", @progbits
+#else
 	.section	.eh_frame, "a", @progbits
+#endif
 	.align 4
 __EH_FRAME_LIST__:
 

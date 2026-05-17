@@ -606,7 +606,7 @@ fill_option_info (void)
 	option_list_t *p;
 	index_list_t *pc;
 	char *s;
-	char buffer[MAX_OPTION_LENGTH];
+	char buffer[MAX_OPTION_LENGTH] = {0};
 	for (i = 0; i < num_options; i++) {
 		p = options[i].implies;
 		while (p != NULL) {
@@ -617,7 +617,7 @@ fill_option_info (void)
 		}
 		if (options[i].syntax == combo) {
 			options[i].combo_list = NULL;
-			strcpy(buffer, options[i].name);
+			strncpy(buffer, options[i].name, MAX_OPTION_LENGTH);
 			s = strtok(buffer, SPACE);
 			while (s != NULL) {
 				pc = (index_list_t*) malloc(sizeof(index_list_t));
@@ -1262,6 +1262,7 @@ main (int argc, char *argv[])
 	if (argc == 2 && strcmp(argv[1], "-phase") == 0) {
 		table_for_phase = TRUE;
 	} 
+	init_error_list();
 	read_table();
 	fill_option_info();
 	if (debug) dump_option_info();

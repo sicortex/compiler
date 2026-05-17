@@ -61,6 +61,7 @@ void obtain_license (char *exedir, int argc, char *argv[]) {
 	int errnum;
     const char *argvec[8] ;
 	int waitstatus;
+    int status;
 
     const char *errortext = "Unable to obtain subscription.  The PathScale compiler cannot run without a subscription.\nPlease see http://www.pathscale.com/subscription/1.1/msgs.html for details.\n" ;
    
@@ -172,25 +173,19 @@ void obtain_license (char *exedir, int argc, char *argv[]) {
         argvec[7] = NULL ;
     }
   
-    if (execute(exename, argvec, NULL, NULL, &errmsg, &waitstatus) != 0 ||
-        !WIFEXITED(waitstatus)) {
-
-        fprintf(stderr, "%s\n", errmsg); 
+    status = execute(exename, argvec, NULL, NULL, &errmsg, &waitstatus);
+    if (status == -1) {
+        fprintf(stderr, "Subscription client error: %s\n", errmsg);
         do_exit(RC_SYSTEM_ERROR);
     }
 
-    if (WIFEXITED(waitstatus)) {
-        if (WEXITSTATUS(waitstatus) == 6) {     // no subclient program?
-            do_exit(RC_INTERNAL_ERROR) ;
-        } else if (WEXITSTATUS(waitstatus) == 7) {  // hard stop?
-            fprintf(stderr, "Compilation terminated\n");
-            do_exit(RC_INTERNAL_ERROR) ;
-        } else if (WEXITSTATUS(waitstatus) != 0) {  // license client failed, can't rely on output
-            fprintf(stderr, "Subscription client exited with error status\n");
-            do_exit(RC_INTERNAL_ERROR) ;
-        }
-    } else {
-        fprintf(stderr, "Subscription client error\n"); // bug 9164
-        do_exit(RC_INTERNAL_ERROR);
+    if (status == 6) {     // no subclient program?
+        do_exit(RC_INTERNAL_ERROR) ;
+    } else if (status == 7) {  // hard stop?
+        fprintf(stderr, "Compilation terminated\n");
+        do_exit(RC_INTERNAL_ERROR) ;
+    } else if (status != 0) {  // license client failed, can't rely on output
+        fprintf(stderr, "Subscription client exited with error status\n");
+        do_exit(RC_INTERNAL_ERROR) ;
     }
 }

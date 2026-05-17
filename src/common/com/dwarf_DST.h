@@ -459,7 +459,6 @@ typedef struct DST_inlined_subroutine
    DST_CHILDREN   child;           /* Formal parameters, and local scope*/
    USRCPOS	  decl;		   /* so can check if cross-file */
    DST_STR_IDX	  abstract_name;   /* "name" for cross-file matching */
-   USRCPOS        srcpos;
 } DST_INLINED_SUBROUTINE;
 
 #define DST_INLINED_SUBROUTINE_low_pc(attr) ((attr)->low_pc)
@@ -470,7 +469,6 @@ typedef struct DST_inlined_subroutine
 #define DST_INLINED_SUBROUTINE_last_child(attr) ((attr)->child.last)
 #define DST_INLINED_SUBROUTINE_decl(attr) ((attr)->decl)
 #define DST_INLINED_SUBROUTINE_abstract_name(attr) ((attr)->abstract_name)
-#define DST_INLINED_SUBROUTINE_srcpos(attr) ((attr)->srcpos)
 
 
 
@@ -1260,6 +1258,20 @@ typedef struct DST_namelist_item
 
 #define DST_NAMELIST_ITEM_decl(attr) ((attr)->decl)
 #define DST_NAMELIST_ITEM_name(attr) ((attr)->name)
+
+/* [tag==DW_TAG_namelist_item]
+*/
+typedef struct DST_namespace
+{
+   USRCPOS      decl;      /* Source location */
+   DST_STR_IDX  name;      /* Name of type */
+   DST_CHILDREN  child;       /* The file-scope decls/defs */
+} DST_NAMESPACE;
+
+#define DST_NAMESPACE_decl(attr) ((attr)->decl)
+#define DST_NAMESPACE_name(attr) ((attr)->name)
+#define DST_NAMESPACE_first_child(attr) ((attr)->child.first)
+#define DST_NAMESPACE_last_child(attr) ((attr)->child.last)
 #endif
 
 

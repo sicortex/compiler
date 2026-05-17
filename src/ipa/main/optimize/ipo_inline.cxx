@@ -62,16 +62,17 @@
 #include "ipo_tlog_utils.h"		// for tlog
 #include "ipa_option.h"			// for Trace_IPA
 
+#if (!defined(_STANDALONE_INLINER) && !defined(_LIGHTWEIGHT_INLINER))
 #include "dwarf_DST_producer.h"		// for DST_*
 #include "clone_DST_utils.h"		// for DST_enter_inlined_subroutine
 #include "ipaa.h"			// IPAA_NODE_INFO
+#endif // _STANDALONE_INLINER
 
 #include "ipo_inline.h"
 
 static INT initial_initv_tab_size;
 
 MEM_POOL Ipo_mem_pool;
-WN_MAP Parent_Map;
 
 #if defined(KEY) && !defined(_STANDALONE_INLINER) && !defined(_LIGHTWEIGHT_INLINER)
 extern UINT16 DST_copy_directories_and_files (DST_TYPE, DST_TYPE, MEM_POOL *);
@@ -1636,6 +1637,71 @@ Save_And_Restore_Stack (WN* call)
 
 } // Save_And_Restore_Stack
 
+bool IPO_INLINE::Find_Enclosing_EH_Region ()
+{
+    Set_Tables (Caller_node ()); // Set the globals: Scope_tab, Current_scope, Current_pu
+
+    for (WN* wn = Call_Wn(); wn != NULL;
+         wn = WN_Get_Parent(wn, Parent_Map, Current_Map_Tab)) {
+
+        if (WN_operator(wn) != OPR_REGION || WN_region_kind(wn) != REGION_KIND_EH)
+            continue;
+
+        INITO_IDX ereg_inito = WN_ereg_supp(wn);
+        INITV_IDX ereg_val = INITO_val(ereg_inito);
+
+        if (INITV_kind(ereg_val) != INITVKIND_BLOCK) {
+            // not an EH region
+            continue;
+        }
+
+        INITV_IDX initv = INITV_blk(INITO_val(ereg_inito));
+        if (INITV_kind(initv) != INITVKIND_LABEL) {
+            // no landing pad
+            continue;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+
+ST_IDX
+IPO_INLINE::Get_Unwind_Resume_or_Rethrow()
+{
+    int i;
+    ST *st;
+    FOREACH_SYMBOL (GLOBAL_SYMTAB, st, i) {
+        if (strcmp(ST_name(st), "_Unwind_Resume_or_Rethrow") == 0) {
+            return ST_st_idx(st);
+        }
+    }
+
+    // create new st for _Unwind_Resume_or_Rethrow
+
+    TY_IDX func_ty_idx;
+    TY &func_ty = New_TY(func_ty_idx);
+    TY_Init(func_ty, 0, KIND_FUNCTION, MTYPE_UNKNOWN, STR_IDX_ZERO);
+
+    uint32_t tylist_idx;
+    Set_TYLIST_type(New_TYLIST(tylist_idx), MTYPE_To_TY(MTYPE_V));
+    Set_TY_tylist(func_ty, tylist_idx);
+    Set_TYLIST_type(New_TYLIST(tylist_idx), MTYPE_To_TY(Pointer_Mtype));
+    Set_TYLIST_type(New_TYLIST(tylist_idx), 0);
+
+    PU_IDX pu_idx;
+    PU &pu = New_PU(pu_idx);
+    st = New_ST(GLOBAL_SYMTAB);
+    PU_Init(pu, func_ty_idx, CURRENT_SYMTAB);
+    ST_Init(st, Save_Str("_Unwind_Resume_or_Rethrow"), CLASS_FUNC,
+            SCLASS_EXTERN, EXPORT_PREEMPTIBLE, TY_IDX(pu_idx));
+
+    return ST_st_idx(st);
+}
+
+
 void
 IPO_INLINE::Pre_Process_Caller (LABEL_IDX& return_label)
 {
@@ -1648,8 +1714,11 @@ IPO_INLINE::Pre_Process_Caller (LABEL_IDX& return_label)
     // 
     Recognize_Caller_MP (Caller_node (), Callee_node ());
       
-    LABEL &label = New_LABEL (Caller_level (), return_label);
-    label.flags |= LABEL_ADDR_SAVED;
+    if (Callee_Summary_Proc()->Has_early_returns())
+	New_LABEL (Caller_level (), return_label);
+    else
+	return_label = 0;
+
 } // IPO_INLINE::Pre_Process_Caller() 
 
 
@@ -2069,21 +2138,30 @@ IPO_INLINE::Process_Op_Code (TREE_ITER& iter, IPO_INLINE_AUX& aux)
     {
         WN * kid0;
 	if (WN_kid_count(wn) == 1 && (kid0 = WN_kid0 (WN_kid0 (wn))))
-	{
+	{            
 	    if (WN_operator (kid0) == OPR_LDID &&
 	        ST_one_per_pu (&St_Table[WN_st_idx (kid0)]))
 	    {
     		ST_IDX i = WN_st_idx (wn);
 		char * func_name = ST_name (St_Table[i]);
-		Is_True (func_name && 
-			   (!strcmp (func_name, "_Unwind_Resume") || 
-			    !strcmp (func_name, "__cxa_call_unexpected") || 
-			    !strcmp (func_name, "__cxa_begin_catch") ||
-			    !strcmp (func_name, "__cxa_get_exception_ptr")), 
-			   ("Function %s has one-per-pu paramter", func_name));
-	    	// Fixup parameter
-	    	INITV_IDX exc_ptr = INITO_val (PU_misc_info (Get_Current_PU ()));
-		WN_st_idx (kid0) = TCON_uval (INITV_tc_val (exc_ptr));
+
+                // Replace call to _Unwind_Resume with call to _Unwind_Resume_or_Rethrow
+                // if there is enclosing EH region in caller
+                if (strcmp (func_name, "_Unwind_Resume") == 0 && aux.enclosing_eh) {
+                    WN_st_idx(wn) = Get_Unwind_Resume_or_Rethrow();
+                }
+
+                Is_True (func_name &&
+                           (!strcmp (func_name, "_Unwind_Resume_or_Rethrow") ||
+                            !strcmp (func_name, "_Unwind_Resume") ||
+                            !strcmp (func_name, "__cxa_call_unexpected") ||
+                            !strcmp (func_name, "__cxa_begin_catch") ||
+                            !strcmp (func_name, "__cxa_get_exception_ptr")),
+                           ("Function %s has one-per-pu paramter", func_name));
+
+                // Fixup parameter
+                INITV_IDX exc_ptr = INITO_val (PU_misc_info (Get_Current_PU ()));
+                WN_st_idx (kid0) = TCON_uval (INITV_tc_val (exc_ptr));
 	    }
 	}
     }
@@ -2128,12 +2206,12 @@ IPO_INLINE::Process_Op_Code (TREE_ITER& iter, IPO_INLINE_AUX& aux)
 		    break;
 		ttable = INITV_next (ttable);
 	    }
-	    FmtAssert (filter == current_filter, ("No matching ST for exception filter in callee typeinfo-table"));
+            FmtAssert (filter == current_filter, ("No matching ST for exception filter in callee typeinfo-table"));
 	    ST_IDX current_st = 0;
 	    {
 	      INITV_IDX i = INITV_blk (ttable);
 	      FmtAssert (INITV_kind (i) != INITVKIND_ZERO, ("Unexpected 0 st_idx for cmp operand"));
-	      current_st = TCON_uval (INITV_tc_val (i));
+              current_st = INITV_st(i);
 	    }
 #ifdef Is_True_On
 	    {// DGLOBAL: user defined types. EXTERN: builtin types like 'char'
@@ -2149,10 +2227,8 @@ IPO_INLINE::Process_Op_Code (TREE_ITER& iter, IPO_INLINE_AUX& aux)
 	    while (ttable)
 	    {
 		INITV_IDX i = INITV_blk (ttable);
-		if (INITV_kind (i) == INITVKIND_ZERO)
-		    search = 0;
-		else
-	    	    search = TCON_uval (INITV_tc_val (i));
+                FmtAssert (INITV_kind (i) == INITVKIND_SYMOFF, ("Bad TI table"));
+                search = INITV_st (i);
 		if (search == current_st)
 		    break;
 		ttable = INITV_next (ttable);
@@ -3547,14 +3623,20 @@ IPO_INLINE::Merge_EH_Spec_Tables (void)
 
     blk = INITV_blk (INITO_val (callee_spec));
     mUINT32 callee_spec_size=0;
-    vector<ST_IDX> callee_spec_types;
+    vector<ST*> callee_spec_types;
     while (blk)
     {
+        if (INITV_kind(blk) == INITVKIND_ZERO)
+        {
+            // zero separator
+            callee_spec_types.push_back (NULL);
+        }
+        else if (INITV_kind(blk) == INITVKIND_SYMOFF)
+        {
+            callee_spec_types.push_back (&St_Table[INITV_st (blk)]);
+        }
+
     	callee_spec_size++;
-	if (INITV_kind (blk) == INITVKIND_ZERO)
-	    callee_spec_types.push_back (0);
-	else
-	    callee_spec_types.push_back (TCON_uval (INITV_tc_val (blk)));
 	blk = INITV_next (blk);
     }
     if (!Callee_node()->EH_spec_size())
@@ -3572,12 +3654,13 @@ IPO_INLINE::Merge_EH_Spec_Tables (void)
     	blk = INITV_blk (INITO_val (caller_spec));
     else
     	blk = 0;	// no specification in caller
+
     mUINT32 caller_spec_size=0;
     INITV_IDX last_ti = INITV_IDX_ZERO;
     while (blk)
     {
-    	caller_spec_size++;
-	last_ti = blk;
+        caller_spec_size++;
+        last_ti = blk;
 	blk = INITV_next (blk);
     }
     if (!Caller_node()->EH_spec_size())
@@ -3587,16 +3670,22 @@ IPO_INLINE::Merge_EH_Spec_Tables (void)
 #endif
 
     INITV_IDX first_insert = INITV_IDX_ZERO, prev_insert = INITV_IDX_ZERO;
-    for (vector<ST_IDX>::iterator i = callee_spec_types.begin();
+    for (vector<ST*>::iterator i = callee_spec_types.begin();
     	 i != callee_spec_types.end();
 	 i++)
     {
 	INITV_IDX insert = New_INITV();
-	if (*i == 0)
-	  INITV_Set_ZERO (Initv_Table[insert], MTYPE_U4, 1);
-	else
-	  INITV_Set_VAL (Initv_Table[insert], 
-		         Enter_tcon (Host_To_Targ (MTYPE_U4, *i)), 1);
+
+        if (*i == NULL)
+        {
+            // zero separator
+            INITV_Set_ZERO (Initv_Table[insert], MTYPE_I4, 1);
+        }
+        else
+        {
+            INITV_Set_SYMOFF (Initv_Table[insert], 1, ST_st_idx(*i), 0);
+        }
+
         if (prev_insert)
 	    Set_INITV_next (prev_insert, insert);
 	else
@@ -3629,112 +3718,91 @@ IPO_INLINE::Merge_EH_Spec_Tables (void)
 void
 IPO_INLINE::Merge_EH_Typeinfo_Tables (void)
 {
-    vector<ST_IDX> callee_typeinfos, caller_typeinfos;
-    INITV_IDX start, blk, last_blk=0;
+    PU::type_info_table callee_typeinfos, caller_typeinfos;
     if (!PU_cxx_lang (Callee_node()->Get_PU()))
-      return;
-    // callee side
-    INITO_IDX tmp = PU_misc_info (Callee_node()->Get_PU());
-    if (tmp)
-    	start = INITO_val (tmp);
-    else
-    	return;
-    const INITO_IDX callee_ttable = TCON_uval (INITV_tc_val (INITV_next (INITV_next (start))));
-    if (!callee_ttable) // nothing to merge
-	return;
-    blk = INITO_val (callee_ttable);
-    while (blk)
-    {
-	INITV_IDX ti = INITV_blk (blk);
-	if (INITV_kind (ti) == INITVKIND_ZERO)
-	  callee_typeinfos.push_back (0);
-	else
-          callee_typeinfos.push_back (TCON_uval (INITV_tc_val (ti)));
-        blk = INITV_next (blk);
+       return;
+
+    Callee_node()->Get_PU().Get_type_info_table(callee_typeinfos);
+    
+    if (callee_typeinfos.empty()) {
+        // nothing to merge
+        return;
     }
+
+    INITO_IDX misc = PU_misc_info (Callee_node()->Get_PU());
+    const INITO_IDX callee_ttable = TCON_uval (INITV_tc_val (INITV_next (INITV_next (INITO_val(misc)))));
+
     // caller side
     // change tables temporarily
     Set_Tables (Caller_node());
-    start = INITO_val (PU_misc_info (Pu_Table [ST_pu (Caller_node()->Func_ST())]));
+
+    INITV_IDX start = INITO_val (PU_misc_info (Pu_Table [ST_pu (Caller_node()->Func_ST())]));
     INITO_IDX caller_ttable = TCON_uval (INITV_tc_val (INITV_next (INITV_next (start))));
-    if (caller_ttable) blk = INITO_val (caller_ttable);
-    else blk = 0;
-    while (blk)
+
+    Caller_node()->Get_PU().Get_type_info_table(caller_typeinfos);
+
+    if (caller_typeinfos.empty())
     {
-	INITV_IDX ti = INITV_blk (blk);
-	if (INITV_kind (ti) == INITVKIND_ZERO)
-	  caller_typeinfos.push_back (0);
-	else
-          caller_typeinfos.push_back (TCON_uval (INITV_tc_val (ti)));
-        last_blk = blk;
-        blk = INITV_next (blk);
-    }
-    std::sort (caller_typeinfos.begin(), caller_typeinfos.end());
-    int last_caller_filter = caller_typeinfos.size();
-    if (!last_caller_filter)
-    { // special case, there is no typeinfo table in caller
-        FmtAssert (!last_blk && !caller_ttable, ("EH Tables processing error in inliner"));
-	IPO_SYMTAB* cloned = Callee_node()->Cloned_Symtab();
-	// return the already cloned inito and get its st
-	INITO_IDX cloned_ttable = cloned->Get_INITO_IDX (callee_ttable);
-	ST * new_st = Copy_ST (INITO_st (cloned_ttable), CURRENT_SYMTAB);
-	INITV_IDX to_iter = New_INITV();
-	INITO_IDX new_ttable = New_INITO (ST_st_idx (new_st), to_iter);
+        // special case, there is no typeinfo table in caller
+        FmtAssert (!caller_ttable, ("EH Tables processing error in inliner"));
+        IPO_SYMTAB* cloned = Callee_node()->Cloned_Symtab();
+
+        // return the already cloned inito and get its st
+        INITO_IDX cloned_ttable = cloned->Get_INITO_IDX (callee_ttable);
+        ST * new_st = Copy_ST (INITO_st (cloned_ttable), CURRENT_SYMTAB);
+        INITV_IDX to_iter = New_INITV();
+        INITO_IDX new_ttable = New_INITO (ST_st_idx (new_st), to_iter);
     	INITV_IDX from_iter = INITO_val (cloned_ttable);
     	while (from_iter)
     	{
-	    memcpy (&Initv_Table[to_iter], &Initv_Table[from_iter], sizeof(INITV));
+            memcpy (&Initv_Table[to_iter], &Initv_Table[from_iter], sizeof(INITV));
 
-	    INITV_IDX from = INITV_blk (from_iter);
-	    INITV_IDX to_ti = New_INITV();
-	    INITV_Init_Block (to_iter, to_ti);
+            INITV_IDX from = INITV_blk (from_iter);
+            INITV_IDX to_ti = New_INITV();
+            INITV_Init_Block (to_iter, to_ti);
 
-	    memcpy (&Initv_Table[to_ti], &Initv_Table[from], sizeof(INITV));
-	    from = INITV_next (from);
-	    INITV_IDX to_filter = New_INITV();
-	    memcpy (&Initv_Table[to_filter], &Initv_Table[from], sizeof(INITV));
-	    Set_INITV_next (to_ti, to_filter);
-	    from_iter = INITV_next (from_iter);
-	    if (from_iter)
-	    {
-	        INITV_IDX tmp = New_INITV();
-	        Set_INITV_next (to_iter, tmp);
-	        to_iter = tmp;
-	    }
+            memcpy (&Initv_Table[to_ti], &Initv_Table[from], sizeof(INITV));
+            from = INITV_next (from);
+            INITV_IDX to_filter = New_INITV();
+            memcpy (&Initv_Table[to_filter], &Initv_Table[from], sizeof(INITV));
+            Set_INITV_next (to_ti, to_filter);
+            from_iter = INITV_next (from_iter);
+            if (from_iter)
+            {
+                INITV_IDX tmp = New_INITV();
+                Set_INITV_next (to_iter, tmp);
+                to_iter = tmp;
+            }
         }
 
-	INITV_IDX insert = INITV_next (INITV_next (start));
-	INITV_IDX bkup = INITV_next (insert);
-	INITV_Set_VAL (Initv_Table[insert],
-	               Enter_tcon (Host_To_Targ (MTYPE_U4, new_ttable)), 1);
-    	Set_INITV_next (insert, bkup);
+        INITV_IDX insert = INITV_next (INITV_next (start));
+        INITV_IDX bkup = INITV_next (insert);
+        INITV_Set_VAL (Initv_Table[insert],
+                       Enter_tcon (Host_To_Targ (MTYPE_U4, new_ttable)), 1);
+                       Set_INITV_next (insert, bkup);
     }
     else
     {
-        FmtAssert (last_blk, ("EH Tables processing error in inliner"));
-        int filter = last_caller_filter+1;
-        vector<ST_IDX>::iterator i = callee_typeinfos.begin();
-        for (; i!=callee_typeinfos.end(); ++i)
-        {
-            if (!std::binary_search (caller_typeinfos.begin(),
-                                     caller_typeinfos.end(), (*i)))
-            { // insert the entry
-		INITV_IDX st = New_INITV();
-		if (*i == 0)
-		  INITV_Set_ZERO (Initv_Table[st], MTYPE_U4, 1);
-		else
-                  INITV_Set_VAL (Initv_Table[st],
-			       Enter_tcon (Host_To_Targ (MTYPE_U4, *i)), 1);
-                INITV_IDX f = New_INITV();
-                INITV_Set_VAL (Initv_Table[f],
-                        Enter_tcon (Host_To_Targ (MTYPE_U4, filter)), 1);
-                Set_INITV_next (st, f);
+        initv_block_builder caller_tt_builder(caller_ttable);
 
-		INITV_IDX next_blk = New_INITV();
-                INITV_Init_Block (next_blk, st);
-                Set_INITV_next (last_blk, next_blk);
-                last_blk = next_blk;
-		filter++;
+        int filter = caller_typeinfos.size() + 1;
+        for (PU::type_info_table::const_iterator i = callee_typeinfos.begin(); i != callee_typeinfos.end(); ++i)
+        {
+            if (caller_typeinfos.find(i->first) == caller_typeinfos.end())
+            {
+                // insert the entry
+                initv_block_builder entry_builder;
+
+                if (i->first != NULL)
+                    entry_builder.add_symoff(*i->first);
+                else
+                    entry_builder.add_zero(MTYPE_I4);
+                
+                entry_builder.add_val(Enter_tcon (Host_To_Targ (MTYPE_U4, filter)));
+
+                caller_tt_builder.add_initv(entry_builder.result());
+
+                filter++;
             }
         }
     }
@@ -4246,6 +4314,25 @@ Identify_Partial_Inline_Candiate(IPA_NODE *callee, WN *wn, BOOL prune_tree,
    return FALSE;
 }
 
+
+struct promote_global_sclass
+{
+    void operator() (UINT, ST* st) const
+    {
+        ST *base = st;
+        while (base != ST_base(base)) {
+            base = ST_base(base);
+        }
+
+        if ((ST_sclass(base) == SCLASS_DGLOBAL || ST_sclass(base) == SCLASS_UGLOBAL) &&
+            ST_sclass(st) == SCLASS_FSTATIC) {
+
+            Set_ST_sclass(st, ST_sclass(base));
+        }
+    }
+};
+
+
 // This function does modify the Caller.
 void
 IPO_INLINE::Process_Callee (IPO_INLINE_AUX& aux, BOOL same_file)
@@ -4380,6 +4467,10 @@ IPO_INLINE::Process_Callee (IPO_INLINE_AUX& aux, BOOL same_file)
     // eg with generation of pregs for actuals, we need to create 
     // pragma "shared" for such pregs IF there is a mp region in callee
 
+    // Previous step can change storage class to [D|U]GLOBAL for some symbols.
+    // We need promote storage class to child symbols.
+    For_all (St_Table, GLOBAL_SYMTAB, promote_global_sclass());
+
 } // Process_Callee
 
 
@@ -4468,14 +4559,15 @@ IPO_INLINE::Post_Process_Caller (IPO_INLINE_AUX& aux)
     Insert_Block_Around (parent_wn, call, aux.copy_in_block,
 			 aux.copy_out_block);
 
-    if (IPA_Enable_DST) {
-      LABEL &label = New_LABEL (Caller_level (), aux.entry_label);
-      label.flags |= LABEL_ADDR_SAVED;
-    } else
-      aux.entry_label = 0;
+    if (Callee_Summary_Proc()->Has_early_returns()) {
+	if (IPA_Enable_DST)
+	    New_LABEL (Caller_level (), aux.entry_label);
+	else
+	    aux.entry_label = 0;
 
-    Insert_Labels (call, aux.return_label, aux.entry_label,
-                   aux.inlined_body);
+	Insert_Labels (call, aux.return_label, aux.entry_label,
+		       aux.inlined_body);
+    }
   
     // Finally, replace the call by the inlined block
     if (WN_first (aux.inlined_body) != NULL) {
@@ -4591,7 +4683,6 @@ IPO_INLINE::Post_Process_Caller (IPO_INLINE_AUX& aux)
 } // IPO_INLINE::Post_Process_Caller() 
 
 
-
 //======================================================================
 // MAIN EXPORTED entry point: perform the actual inlining  
 //======================================================================
@@ -4628,6 +4719,9 @@ IPO_INLINE::Process()
          Header_File_Offsets[caller_file_index][callee_file_index];
   }
 #endif
+
+  // Search landing pad for outer EH region in caller
+  aux_info.enclosing_eh = Find_Enclosing_EH_Region ();
 
   // Pre_Process_Caller to initialize return_label
 
@@ -4672,6 +4766,7 @@ IPO_INLINE::Process()
 #endif // KEY
   }
 
+#if (!defined(_STANDALONE_INLINER) && !defined(_LIGHTWEIGHT_INLINER))
   if (IPA_Enable_DST) {
     /* the following is to set DST_SUBPROGRAM_decl_inline flag
      * appropiately for the callee
@@ -4686,18 +4781,15 @@ IPO_INLINE::Process()
      * for the inlined routine in the caller's DST
      */
 
-    USRCPOS srcpos;
-    USRCPOS_srcpos(srcpos) = WN_Get_Linenum(Call_edge()->Whirl_Node());
     DST_enter_inlined_subroutine(Caller_dst(), Callee_dst(),
 				 aux_info.entry_label, aux_info.return_label,
 				 Caller_file_dst(),
 				 Callee_file_dst(),
 				 Symtab(), Caller_node ()->Mem_Pool (),
 				 Callee_node ()->Mem_Pool (),
-				 same_file ? 0 : Callee_cross_file_id(),
-				 srcpos
-                                 );
+				 same_file ? 0 : Callee_cross_file_id());
   }
+#endif // _STANDALONE_INLINER
 
 } // IPO_INLINE::Process
 

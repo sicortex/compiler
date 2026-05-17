@@ -38,6 +38,7 @@
 #include "targ_proc.h"
 #include "proc_properties_gen.h"
 
+int
 main()
 {
   PROC_PROPERTY 

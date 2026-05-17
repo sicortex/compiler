@@ -91,7 +91,6 @@ ADD_DEFINITIONS(
 	-D_HDW_SQRT
 	-D_libm_weak=1)
 
-IF(PATH64_ENABLE_MATHLIBS)
 
 set_source_files_properties("amd/w_log2.c" "amd/w_log2f.c" PROPERTIES
                             COMPILE_DEFINITIONS "COMPILING_LOG2")
@@ -127,14 +126,10 @@ else()
     path64_set_multitarget_property_(mpath LINK_FLAGS "${BOOTSTRAP_HACK_FLAG} -nodefaultlibs")
 endif()
 
-if(PATH64_ENABLE_PSCRUNTIME)
-    path64_multitarget_link_libraries(mpath gcc)
+if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+    path64_multitarget_link_libraries(mpath m)
 endif()
-path64_multitarget_link_libraries(mpath m)
 path64_add_multitarget_library(mpath SHARED)
-if(PATH64_ENABLE_PSCRUNTIME)
-    path64_add_multitarget_multitarget_dependencies(mpath compiler-rt)
-endif()
 path64_add_multitarget_multitarget_dependencies(mpath pscrt-static)
 path64_add_dependencies_from_multitarget(compiler-stage-libs-C mpath)
 
@@ -151,5 +146,4 @@ if(PATH64_ENABLE_PROFILING)
     path64_add_dependencies_from_multitarget(compiler-stage-libs-C mpath_p)
 endif(PATH64_ENABLE_PROFILING)
 
-ENDIF(PATH64_ENABLE_MATHLIBS)
 

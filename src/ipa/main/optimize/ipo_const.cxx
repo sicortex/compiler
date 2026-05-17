@@ -1113,7 +1113,7 @@ Propagate_Constants (IPA_NODE* node, WN* w, VALUE_DYN_ARRAY* cprop_annot)
     }
 
     LWN_Parentize(w);
-    WN_verifier (w);
+    WN_verifier(&node->Get_PU(), w);
 
 } // Propagate_Constants
 
@@ -1489,7 +1489,7 @@ IPO_propagate_globals(IPA_NODE *n)
     }
 
     LWN_Parentize(pu);
-    WN_verifier(pu);
+    WN_verifier(&n->Get_PU(), pu);
   }
 
 #if 0

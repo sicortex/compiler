@@ -111,6 +111,7 @@ int main (int argc, char *argv[])
 		     TOP_cmovle,
 		     TOP_cmovg,
 		     TOP_cmovs,
+		     TOP_cmovo,
 		     TOP_cmovns,
 		     TOP_cmp8,
 		     TOP_cmp16,
@@ -670,6 +671,12 @@ int main (int argc, char *argv[])
 		     TOP_movsd,
 		     TOP_movss,
 		     TOP_movdq,
+		     TOP_aesmov,
+		     TOP_sivmovdqa,
+  	         TOP_sivmovdqu,
+  	         TOP_sivmovups,
+  	         TOP_sivmovupd,
+  	         TOP_sivmovapd,
 				 TOP_movntdqa,
 		     TOP_movapd,
 		     TOP_movaps,
@@ -1206,6 +1213,11 @@ int main (int argc, char *argv[])
 		    TOP_xzero128v64,
 		    TOP_orps,
 		    TOP_orpd,
+		    /*avx added by hand*/
+            TOP_vxzero128v64,
+            TOP_vxzero128v32,
+            TOP_vxzero256v64,
+            TOP_vxzero256v32,
 		    TOP_UNDEFINED);
   Any_Operand_Access_Time(0);
   Any_Result_Available_Time(3);
@@ -1539,6 +1551,10 @@ int main (int argc, char *argv[])
             TOP_pcmpistrm,
             TOP_pcmpestri,
             TOP_pcmpestrm,
+            TOP_pcmpistriintr,
+            TOP_pcmpistrmintr,
+            TOP_pcmpestriintr,
+            TOP_pcmpestrmintr,
 						TOP_pcmpgtq,
 						TOP_crc32b,
 						TOP_crc32w,
@@ -1558,6 +1574,12 @@ int main (int argc, char *argv[])
 						TOP_phsubw,
 						TOP_phsubd,
 						TOP_phsubsw,
+					TOP_psignb,
+					TOP_psignw,
+					TOP_psignd,
+					TOP_psignb128,
+					TOP_psignw128,
+					TOP_psignd128,
 				TOP_pabsb128,
 				TOP_pabsw128,
 				TOP_pabsd128,
@@ -1567,6 +1589,7 @@ int main (int argc, char *argv[])
 				 TOP_pmaddubsw128,
 				 TOP_pmaddubsw,
 				 TOP_pmulhrsw128,
+		    TOP_pmuludq128,
 				 TOP_pmulhrsw,
 				 TOP_palignr128,
 				 TOP_palignr,
@@ -1726,6 +1749,7 @@ int main (int argc, char *argv[])
 
   Instruction_Group("float-alu for mmx int mpy vector",
 		    TOP_pmullw,
+		    TOP_pmuludq,
 		    TOP_pmulhw,
 		    TOP_pmulhuw,
 		    TOP_pmulhuw128,
@@ -2083,8 +2107,8 @@ int main (int argc, char *argv[])
   Any_Operand_Access_Time(0);
   Any_Result_Available_Time(0);
 
-#include "avx_si.cxx"
 #include "avx_si2.cxx"
+#include "xop_fma_si2.cxx"
 
   Instruction_Group("tls",
                     TOP_tls_get_addr_64,

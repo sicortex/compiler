@@ -797,7 +797,7 @@ IPO_Pad_Whirl(IPA_NODE* node)
   Is_True(w != NULL, (" NULL whirl encountered \n"));
   IPO_Pad_Arrays(w);
 #ifdef Is_True  
-  WN_verifier(w);
+  WN_verifier(&node->Get_PU(), w);
   Verify_GLOBAL_SYMTAB();
 #endif
 }

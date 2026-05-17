@@ -640,7 +640,7 @@ RETYPE_EXPR_stmt(WN *tree)
  * 32-bit without affecting the results
  * ==================================================================== */
 void
-WN_retype_expr(WN *tree)
+WN_retype_expr(PU *pu, WN *tree)
 {
   Start_Timer(T_Lower_CU);
   Set_Error_Phase("WN_retype_expr");
@@ -657,7 +657,7 @@ WN_retype_expr(WN *tree)
 
   WN_Lower_Checkdump("After wn_retype_expr", tree, 0);   
 
-  WN_verifier(tree);
+  WN_verifier(pu, tree);
 
   return;
 }

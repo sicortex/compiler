@@ -42,7 +42,7 @@
 #include "targ_proc.h"
 #include "proc_properties_gen.h"
 
-main()
+int main()
 {
   PROC_PROPERTY 
     branch_delay_slot,		/* branch delay slot */
@@ -79,6 +79,7 @@ main()
   Processor_Group (out_of_order, 
 		   PROCESSOR_opteron,
                    PROCESSOR_barcelona,
+		   PROCESSOR_orochi,
 		   PROCESSOR_em64t,
 		   PROCESSOR_core,
 		   PROCESSOR_wolfdale,
@@ -91,6 +92,7 @@ main()
   Processor_Group (superscalar,
 		   PROCESSOR_opteron,
                    PROCESSOR_barcelona,
+		   PROCESSOR_orochi,
 		   PROCESSOR_em64t,
 		   PROCESSOR_core,
 		   PROCESSOR_wolfdale,

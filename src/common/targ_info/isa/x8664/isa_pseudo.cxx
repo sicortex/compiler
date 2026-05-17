@@ -28,10 +28,11 @@
 /////////////////////////////////////
 #include "topcode.h"
 #include "isa_pseudo_gen.h"
- 
-main()
+
+int main()
 {
   ISA_Pseudo_Begin("x8664");
 
   ISA_Pseudo_End();
+  return 0;
 }

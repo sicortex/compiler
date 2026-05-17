@@ -121,9 +121,6 @@
 #endif
 
 
-/* this next header should be after the external declarations in the others */
-#include "pragma_weak.h"	/* Alias routines defined in wopt.so */
-
 #include <sstream>
 
 /* ====================================================================
@@ -387,7 +384,16 @@ static TYPE_ID Promoted_Mtype[MTYPE_LAST + 1] = {
   MTYPE_M8I1,     /* MTYPE_M8I1 */
   MTYPE_M8I2,     /* MTYPE_M8I2 */
   MTYPE_M8I4,     /* MTYPE_M8I4 */
-  MTYPE_M8F4      /* MTYPE_M8F4 */
+  MTYPE_M8F4,      /* MTYPE_M8F4 */
+  MTYPE_V32C4,		/* vector type for C4 not sure if useful */
+  MTYPE_V32C8,		/* vector type for C8 */
+  MTYPE_V32I1,    /* 256-bit vector of signed bytes            */
+  MTYPE_V32I2,           /* 256-bit vector of signed short ints       */
+  MTYPE_V32I4,           /* 256-bit vector of signed ints             */
+  MTYPE_V32I8,           /* 256-bit vector of signed long long ints   */
+  MTYPE_V32F4,           /* 256-bit vector of signed floats           */
+  MTYPE_V32F8,           /* 256-bit vector of signed doubles          */
+  MTYPE_F32 
 #endif // TARG_X8664
 };
 
@@ -3316,7 +3322,8 @@ static WN *lower_madd(WN *block, WN *tree, LOWER_ACTIONS actions)
   {
   case OPR_NEG:
     {
-      WN	*child = WN_kid0(tree);
+	  
+      WN	*child = lower_madd(block, WN_kid0(tree), actions);
       switch(WN_operator(child))
       {
       case OPR_MADD:
@@ -3686,7 +3693,7 @@ static WN *lower_rsqrt(WN *block, WN *tree, LOWER_ACTIONS actions)
 #ifdef TARG_X8664	// bug 6123
   if (Rsqrt_Allowed == 0 ||
       // x86-64 rsqrt supports single-precision only.
-      !(type == MTYPE_F4 || type == MTYPE_V16F4) ||
+      !(type == MTYPE_F4 || type == MTYPE_V16F4 || type == MTYPE_V32F4) ||
       !Is_Target_SSE2())
 #else
   if (Rsqrt_Allowed == FALSE || MTYPE_is_quad(type))
@@ -4407,6 +4414,12 @@ static WN *lower_return_ldid(WN *block, WN *tree, LOWER_ACTIONS actions)
     case MTYPE_V16I8:
     case MTYPE_V16F4:
     case MTYPE_V16F8:
+	case MTYPE_V32I1:
+    case MTYPE_V32I2:
+    case MTYPE_V32I4:
+    case MTYPE_V32I8:
+    case MTYPE_V32F4:
+    case MTYPE_V32F8:
     case MTYPE_V8I1:
     case MTYPE_V8I2:
     case MTYPE_V8I4:
@@ -5158,16 +5171,18 @@ static WN *lower_expr(WN *block, WN *tree, LOWER_ACTIONS actions)
   *  before children are processed reassociate for madd oportunities
   */
   if ( Action(LOWER_MADD)	&&
-      Madd_Allowed		&&
+      (Madd_Allowed || (Is_Target_FMA()&&Is_Target_XOP()))		&&
 #ifndef TARG_MIPS
-     (MTYPE_id(type) == MTYPE_F4 || MTYPE_id(type) == MTYPE_F8)
+     (MTYPE_id(type) == MTYPE_F4 || MTYPE_id(type) == MTYPE_F8 ||
+     (Is_Target_XOP() && MTYPE_id(type) == MTYPE_I4 && WN_operator(tree) == OPR_ADD))// XOP supports MADD instruction for Integer
 #else
      (MTYPE_id(type) == MTYPE_F4 || MTYPE_id(type) == MTYPE_F8 ||
       MTYPE_id(type) == MTYPE_V8F4)
 #endif
          )
   {
-    tree = lower_nary_madd(block, tree, actions);
+    if(MTYPE_id(type) == MTYPE_F4 || MTYPE_id(type) == MTYPE_F8 )
+      tree = lower_nary_madd(block, tree, actions);
     tree = lower_madd(block, tree, actions);
   }
   if (Action(LOWER_TREEHEIGHT)	&&
@@ -6600,6 +6615,7 @@ static BOOL has_call(WN *expr)
 static WN *lower_store(WN *block, WN *tree, LOWER_ACTIONS actions)
 {
   BOOL kids_lowered = FALSE;	/* becomes TRUE when kids are lowered */
+  INT16 i;
 
   Is_True(OPCODE_is_store(WN_opcode(tree)),
 	  ("expected store node, not %s", OPCODE_name(WN_opcode(tree))));
@@ -7250,11 +7266,11 @@ static WN *lower_store(WN *block, WN *tree, LOWER_ACTIONS actions)
 	      ("MMLDID of Return_Val_Preg cannot be rhs of MSTORE"));
     }
 
+    for (i = 0; i < WN_kid_count(tree); i++)
+      WN_kid(tree,i) = lower_expr(block, WN_kid(tree,i), actions);
+
     if (Align_Object)
     {
-      INT16 i;
-      for (i = 0; i < WN_kid_count(tree); i++)
-        WN_kid(tree,i) = lower_expr(block, WN_kid(tree,i), actions);
 
       tree = improve_Malignment(tree, WN_kid1(tree), WN_kid2(tree),
 				WN_store_offset(tree));
@@ -10013,7 +10029,9 @@ static WN *lower_call(WN *block, WN *tree, LOWER_ACTIONS actions)
       */
       TYPE_ID  type = Mtype_comparison( Fix_TY_mtype(ty));
 
-      if (parmType != type)
+      // we need check size of types because VHO can optimize
+      // MPARM operation
+      if (parmType != type && TY_size(parmType) != TY_size(type))
       {
 	DevWarn("lower_call(): line %d, parm #%d type mismatch (WN_rtype(parm)"
 		" = %s) (cannonical TY_mtype(parm))) %s)",
@@ -14071,8 +14089,11 @@ static void vcast_complex_types(WN* tree)
  *
  * ==================================================================== */
 
-WN *WN_Lower(WN *tree, LOWER_ACTIONS actions, struct ALIAS_MANAGER *alias,
-	     const char *msg)
+WN *WN_Lower(PU *pu,
+             WN *tree,
+             LOWER_ACTIONS actions,
+             struct ALIAS_MANAGER *alias,
+	         const char *msg)
 {
 #ifdef BACK_END
   Start_Timer(T_Lower_CU);
@@ -14140,7 +14161,7 @@ WN *WN_Lower(WN *tree, LOWER_ACTIONS actions, struct ALIAS_MANAGER *alias,
   FmtAssert( current_loop_nest_depth == 0, ("loop nest depth is not 0") );
 #endif
  
-  WN_verifier(tree);
+  WN_verifier(pu, tree);
 
   return tree;
 }

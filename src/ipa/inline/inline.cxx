@@ -150,7 +150,6 @@ static double result_times[LAST_PHASE] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
 
 MEM_POOL *PU_pool;
 
-SUMMARY *Summary;
 
 extern MEM_POOL Ipo_mem_pool;
 extern WN_MAP Parent_Map;
@@ -176,8 +175,6 @@ Perform_inline (IPA_NODE* caller_node, IPA_NODE* callee_node,
 static void 
 inline_init(IP_FILE_HDR& hdr);
 
-DYN_ARRAY<char*>* Ipl_Symbol_Names = NULL;
-DYN_ARRAY<char*>* Ipl_Function_Names = NULL;
 
 static void
 Read_PU(PU_Info *current_pu);
@@ -398,7 +395,7 @@ Write_inline_pu(IPA_NODE* node)
 	Scope_tab = node->Scope();
 #ifdef Is_True
 	CURRENT_SYMTAB = node->Lexical_Level();
-        WN_verifier(node->Whirl_Tree());
+        WN_verifier(&node->Get_PU(), node->Whirl_Tree());
 #endif
 
         write_pu_info (node->PU_Info());

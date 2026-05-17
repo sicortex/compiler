@@ -1028,6 +1028,14 @@ void    sin_intrinsic(opnd_type     *result_opnd,
          IR_OPR(ir_idx) = Log_10_Opr;
          break;
 
+      case Gamma_Intrinsic:
+	 IR_OPR(ir_idx) = Gamma_Opr;
+	 break;
+
+      case Log_Gamma_Intrinsic:
+	 IR_OPR(ir_idx) = Log_Gamma_Opr;
+	 break;
+
       case Tan_Intrinsic:
       case Dtan_Intrinsic:
       case Qtan_Intrinsic:
@@ -6013,11 +6021,11 @@ void    loc_intrinsic(opnd_type     *result_opnd,
 	      PRINTMSG(arg_info_list[info_idx1].line, found_error, Error,
 		       arg_info_list[info_idx1].col, AT_OBJ_NAME_PTR(*spec_idx));
 
+	  }
 	/* For now, call external procedure because giving Loc_Opr a
 	 * result type of type(c_ptr) blows up elsewhere in the front
 	 * end. Sigh. See also table entry in p_driver.c */
-	      goto EXIT;
-	  }
+	  goto EXIT;
       }
 #endif /* KEY Bug 14150 */
 
@@ -8032,7 +8040,7 @@ void    huge_intrinsic(opnd_type     *result_opnd,
    int            info_idx1;
    int            ir_idx;
 
-#if LITTLE_ENDIAN
+#ifdef _LITTLE_ENDIAN
    static unsigned huge4[]  = { 0x7F7FFFFF };
    static unsigned huge8[]  = { 0xFFFFFFFF, 0x7FEFFFFF };
    static unsigned huge16[] = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x7FFFFFFF };
@@ -11407,7 +11415,7 @@ void    tiny_intrinsic(opnd_type     *result_opnd,
    int            info_idx1;
    int            ir_idx;
 
-#if LITTLE_ENDIAN
+#ifdef _LITTLE_ENDIAN
    static unsigned tiny4[]  = { 0x00800000 };
    static unsigned tiny8[]  = { 0, 0x00100000 };
    static unsigned tiny16[] = { 0, 0, 0, 0x00008000 };

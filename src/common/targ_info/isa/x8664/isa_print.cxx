@@ -73,7 +73,7 @@
 // suffix starts with an underscore. To get the assembly name we strip off
 // the suffix.
 
-main()
+int main()
 {
   ISA_Print_Begin("x8664");
 
@@ -146,6 +146,7 @@ main()
 			   TOP_testi64,
 			   TOP_fucomi,
 			   TOP_fucomip,
+			   TOP_ptest,
 			   TOP_UNDEFINED );
 
   ISA_PRINT_TYPE cmpx =  ISA_Print_Type_Create("cmpx", "%s %s%s(%s),%s");
@@ -163,6 +164,7 @@ main()
 			   TOP_cmpx64,
 			   TOP_comixsd,
 			   TOP_comixss,
+			   TOP_ptestx,
 			   TOP_UNDEFINED );
 
   ISA_PRINT_TYPE cmpxr =  ISA_Print_Type_Create("cmpxr", "%s %s,%s%s(%s)");
@@ -209,6 +211,7 @@ main()
 			   TOP_cmpxx64,
 			   TOP_comixxsd,
 			   TOP_comixxss,
+			   TOP_ptestxx,
 			   TOP_UNDEFINED );
 
   ISA_PRINT_TYPE cmpxxr =  ISA_Print_Type_Create("cmpxxr", "%s %s,%s%s(%s,%s,%s)");
@@ -257,6 +260,7 @@ main()
 			   TOP_cmpxxx64,
 			   TOP_comixxxsd,
 			   TOP_comixxxss,
+			   TOP_ptestxxx,
 			   TOP_UNDEFINED );
 
   ISA_PRINT_TYPE cmpxxxr =  ISA_Print_Type_Create("cmpxxxr", "%s %s,%s%s(,%s,%s)");
@@ -300,6 +304,8 @@ main()
 				 TOP_pavgb128,
 				 TOP_pavgw128,
 				 TOP_psadbw128,
+				 TOP_pmuludq,
+				 TOP_pmuludq128,
 				 TOP_pmuldq,
 				 TOP_pmulld,
 			   TOP_add32,
@@ -554,12 +560,13 @@ main()
 				 TOP_pminuw,
 				 TOP_pminud,
 				 TOP_phminposuw,
-				TOP_ptest,
 				 TOP_pcmpgtq,
 				 TOP_crc32b,
 			   TOP_crc32w,
 			   TOP_crc32l,
 			   TOP_crc32q,
+			   TOP_crc32,
+			   TOP_crc32_64,
 				 TOP_phaddw128,
 				 TOP_phaddd128,
 				 TOP_phaddsw128,
@@ -672,6 +679,44 @@ main()
 			   TOP_mulxsd,
 			   TOP_divxss,
 			   TOP_divxsd,
+			   TOP_phaddwx,
+			   TOP_phadddx,
+			   TOP_phaddswx,
+			   TOP_phsubwx,
+			   TOP_phsubdx,
+			   TOP_phsubswx,
+			   TOP_pmaddubswx,
+			   TOP_pmulhrswx,
+			   TOP_pshufbx,
+			   TOP_phaddwx128,
+			   TOP_phadddx128,
+			   TOP_phaddswx128,
+			   TOP_phsubwx128,
+			   TOP_phsubdx128,
+			   TOP_phsubswx128,
+			   TOP_pmaddubswx128,
+			   TOP_pmulhrswx128,
+			   TOP_pshufbx128,
+			   /*SSE4*/
+			   TOP_crc32x,
+			   TOP_crc32_64x,
+			   TOP_pcmpeqqx,
+			   TOP_pcmpgtqx,
+			   TOP_phminposuwx,
+			   TOP_pmaxsbx,
+			   TOP_pmaxsdx,
+			   TOP_pmaxudx,
+			   TOP_pmaxuwx,
+			   TOP_pminsbx,
+			   TOP_pminsdx,
+			   TOP_pminudx,
+			   TOP_pminuwx,
+				TOP_pmuldqx,
+				TOP_pmulldx,
+				TOP_popcnt16x,
+				TOP_popcnt32x,
+				TOP_popcnt64x,
+				TOP_packusdwx,
 			   TOP_UNDEFINED );
 
   /* One result / two operands in x86 style w/ mem operand w/ scaled-index */
@@ -769,6 +814,44 @@ main()
 			   TOP_mulxxsd,
 			   TOP_divxxss,
 			   TOP_divxxsd,
+			   TOP_phaddwxx,
+			   TOP_phadddxx,
+			   TOP_phaddswxx,
+			   TOP_phsubwxx,
+			   TOP_phsubdxx,
+			   TOP_phsubswxx,
+			   TOP_pmaddubswxx,
+			   TOP_pmulhrswxx,
+			   TOP_pshufbxx,
+			   TOP_phaddwxx128,
+			   TOP_phadddxx128,
+			   TOP_phaddswxx128,
+			   TOP_phsubwxx128,
+			   TOP_phsubdxx128,
+			   TOP_phsubswxx128,
+			   TOP_pmaddubswxx128,
+			   TOP_pmulhrswxx128,
+			   TOP_pshufbxx128,
+			   /*SSE4*/
+			   TOP_crc32xx,
+			   TOP_crc32_64xx,
+			   TOP_pcmpeqqxx,
+			   TOP_pcmpgtqxx,
+			   TOP_phminposuwxx,
+			   TOP_pmaxsbxx,
+			   TOP_pmaxsdxx,
+			   TOP_pmaxudxx,
+			   TOP_pmaxuwxx,
+			   TOP_pminsbxx,
+			   TOP_pminsdxx,
+			   TOP_pminudxx,
+			   TOP_pminuwxx,
+				TOP_pmuldqxx,
+				TOP_pmulldxx,
+				TOP_popcnt16xx,
+				TOP_popcnt32xx,
+				TOP_popcnt64xx,
+				TOP_packusdwxx,
 			   TOP_UNDEFINED );
 
   /* One result / two operands in x86 style w/ mem operand w/o base */
@@ -865,6 +948,44 @@ main()
 			   TOP_mulxxxsd,
 			   TOP_divxxxss,
 			   TOP_divxxxsd,
+			   TOP_phaddwxxx,
+			   TOP_phadddxxx,
+			   TOP_phaddswxxx,
+			   TOP_phsubwxxx,
+			   TOP_phsubdxxx,
+			   TOP_phsubswxxx,
+			   TOP_pmaddubswxxx,
+			   TOP_pmulhrswxxx,
+			   TOP_pshufbxxx,
+			   TOP_phaddwxxx128,
+			   TOP_phadddxxx128,
+			   TOP_phaddswxxx128,
+			   TOP_phsubwxxx128,
+			   TOP_phsubdxxx128,
+			   TOP_phsubswxxx128,
+			   TOP_pmaddubswxxx128,
+			   TOP_pmulhrswxxx128,
+			   TOP_pshufbxxx128,
+			   /*SSE4*/
+			   TOP_crc32xxx,
+			   TOP_crc32_64xxx,
+			   TOP_pcmpeqqxxx,
+			   TOP_pcmpgtqxxx,
+			   TOP_phminposuwxxx,
+			   TOP_pmaxsbxxx,
+			   TOP_pmaxsdxxx,
+			   TOP_pmaxudxxx,
+			   TOP_pmaxuwxxx,
+			   TOP_pminsbxxx,
+			   TOP_pminsdxxx,
+			   TOP_pminudxxx,
+			   TOP_pminuwxxx,
+				TOP_pmuldqxxx,
+				TOP_pmulldxxx,
+				TOP_popcnt16xxx,
+				TOP_popcnt32xxx,
+				TOP_popcnt64xxx,
+				TOP_packusdwxxx,
 			   TOP_UNDEFINED );
 
   /* One result / three operands in x86 style */
@@ -1014,6 +1135,23 @@ main()
   			   TOP_xzero64,
   			   TOP_xzero128v32,
   			   TOP_xzero128v64,
+  			   /*avx added by hand*/
+            TOP_vxzero128v64,
+            TOP_vxzero128v32,
+            TOP_vxzero256v64,
+            TOP_vxzero256v32,
+			   TOP_UNDEFINED );
+  ISA_PRINT_TYPE rrr = ISA_Print_Type_Create("rrr", "%s %s, %s, %s");
+  Name();
+  Result(0);
+  Result(0);
+  Result(0);
+  Instruction_Print_Group( rr,
+  			   /*avx added by hand*/
+            TOP_vxzero128v64,
+            TOP_vxzero128v32,
+            TOP_vxzero256v64,
+            TOP_vxzero256v32,
 			   TOP_UNDEFINED );
 
   /* One result / one operand */
@@ -1100,6 +1238,12 @@ main()
 			   TOP_movsd,
 			   TOP_movss,
 			   TOP_movdq,
+			   TOP_aesmov,
+			   TOP_sivmovdqa,
+  	           TOP_sivmovdqu,
+  	           TOP_sivmovups,
+  	           TOP_sivmovupd,
+  	           TOP_sivmovapd,
 			   TOP_movapd,
 			   TOP_movaps,
 			   TOP_movq2dq,
@@ -1121,6 +1265,7 @@ main()
 			   TOP_cmovle,
 			   TOP_cmovg,
 			   TOP_cmovs,
+			   TOP_cmovo,
 			   TOP_cmovns,
 			   TOP_frcp128v32,
 			   TOP_frsqrt128v32,
@@ -1171,14 +1316,180 @@ main()
 				 TOP_pabsb,
 				 TOP_pabsw,
 				 TOP_pabsd,
-			   /*AVX instructions*/
-			   TOP_vlddqa_n32,
-			   TOP_vldaps_n32,
-			   TOP_vldapd_n32,
-			   TOP_vstdqa_n32,
-			   TOP_vstaps_n32,
-			   TOP_vstapd_n32,
+				 TOP_psignb128,
+				 TOP_psignw128,
+				 TOP_psignd128,
+				 TOP_psignb,
+				 TOP_psignw,
+				 TOP_psignd,
 			   TOP_UNDEFINED );
+
+   /* One result / x86-style opr, mem, opr */
+  ISA_PRINT_TYPE ropmemop =  ISA_Print_Type_Create("ropmemop", "%s %s%s(%s),%s,%s");
+  Name();
+  Segment();
+  Operand(2);
+  Operand(1);
+  Operand(3);
+  Result(0);
+  Operand(0);
+  Instruction_Print_Group( ropmemop,
+                           /* SSSE3 instructions */
+                           TOP_palignrx128,
+                           TOP_palignrx,
+                           TOP_UNDEFINED);
+
+  /* One result/ x86-style opr, mem, opr, opr*/
+  ISA_PRINT_TYPE ropmemopop =  ISA_Print_Type_Create("ropmemopop", "%s %s %s,%s(%s),%s");
+  Name();
+  Segment();
+  Operand(3);
+  Operand(2);
+  Operand(1);
+  Result(0);
+  Operand(0);
+  Instruction_Print_Group( ropmemopop,
+                           /*SSE4*/
+                           TOP_blendpdx,
+                           TOP_blendpsx,
+                           TOP_blendvpdx,
+                           TOP_blendvpsx,
+                           TOP_dppdx,
+                           TOP_dppsx,
+                           TOP_extractpsx,
+                           TOP_insertpsx,
+                           TOP_mpsadbwx,
+                           TOP_pblendvbx,
+                           TOP_pblendwx,
+                           TOP_pcmpestrix,
+                           TOP_pcmpestrmx,
+                           TOP_pcmpistrix,
+                           TOP_pcmpistrmx,
+                           TOP_pextrbx,
+                           TOP_pextrdx,
+                           TOP_pextrqx,
+                           TOP_pextrwx,
+                           TOP_pinsrbx,
+                           TOP_pinsrdx,
+                           TOP_pinsrqx,
+                           TOP_roundpdx,
+                           TOP_roundpsx,
+                           TOP_roundsdx,
+                           TOP_roundssx,
+                           TOP_UNDEFINED);
+
+   /* One result / x86 style opr, mem with scaled-index with base, opr*/
+  ISA_PRINT_TYPE ropmemindexop =  ISA_Print_Type_Create("ropmemindexop", "%s %s%s(%s,%s,%s),%s,%s");
+  Name();
+  Segment();
+  Operand(4);
+  Operand(1);
+  Operand(2);
+  Operand(3);
+  Operand(5);
+  Result(0);
+  Operand(0);
+  Instruction_Print_Group( ropmemindexop,
+                           /* SSSE3 instructions */
+                           TOP_palignrxx128,
+                           TOP_palignrxx,
+                           TOP_UNDEFINED);
+
+   /* One result / x86 style opr, mem with scaled-index with base, opr, opr*/
+  ISA_PRINT_TYPE ropmemindexopop =  ISA_Print_Type_Create("ropmemindexopop", "%s %s, %s%s(%s,%s,%s),%s");
+  Name();
+  Segment();
+  Operand(5);
+  Operand(4);
+  Operand(1);
+  Operand(2);
+  Operand(3);
+  Result(0);
+  Operand(0);
+  Instruction_Print_Group( ropmemindexopop,
+                           /*SSE4*/
+                           TOP_blendpdxx,
+                           TOP_blendpsxx,
+                           TOP_blendvpdxx,
+                           TOP_blendvpsxx,
+                           TOP_dppdxx,
+                           TOP_dppsxx,
+                           TOP_extractpsxx,
+                           TOP_insertpsxx,
+                           TOP_mpsadbwxx,
+                           TOP_pblendvbxx,
+                           TOP_pblendwxx,
+                           TOP_pcmpestrixx,
+                           TOP_pcmpestrmxx,
+                           TOP_pcmpistrixx,
+                           TOP_pcmpistrmxx,
+                           TOP_pextrbxx,
+                           TOP_pextrdxx,
+                           TOP_pextrqxx,
+                           TOP_pextrwxx,
+                           TOP_pinsrbxx,
+                           TOP_pinsrdxx,
+                           TOP_pinsrqxx,
+                           TOP_roundpdxx,
+                           TOP_roundpsxx,
+                           TOP_roundsdxx,
+                           TOP_roundssxx,
+                           TOP_UNDEFINED);
+
+  /* One result / x86 style opr, mem with scaled-index w/o base, opr*/
+  ISA_PRINT_TYPE ropmemindexxop =  ISA_Print_Type_Create("ropmemindexxop", "%s %s%s(,%s,%s),%s,%s");
+  Name();
+  Segment();
+  Operand(3);
+  Operand(1);
+  Operand(2);
+  Operand(4);
+  Result(0);
+  Operand(0);
+  Instruction_Print_Group( ropmemindexxop,    
+  						   TOP_palignrxxx128,
+                           TOP_palignrxxx,
+                           TOP_UNDEFINED);
+
+  /* One result / x86 style opr, mem with scaled-index w/o base, opr, opr*/
+  ISA_PRINT_TYPE ropmemindexxopop =  ISA_Print_Type_Create("ropmemindexxopop", "%s %s,%s%s(,%s,%s),%s");
+  Name();
+  Operand(4);
+  Segment();
+  Operand(3);
+  Operand(1);
+  Operand(2);
+  Result(0);
+  Operand(0);
+  Instruction_Print_Group( ropmemindexxop,
+                           /*SSE4*/
+                           TOP_blendpdxxx,
+                           TOP_blendpsxxx,
+                           TOP_blendvpdxxx,
+                           TOP_blendvpsxxx,
+                           TOP_dppdxxx,
+                           TOP_dppsxxx,
+                           TOP_extractpsxxx,
+                           TOP_insertpsxxx,
+                           TOP_mpsadbwxxx,
+                           TOP_pblendvbxxx,
+                           TOP_pblendwxxx,
+                           TOP_pcmpestrixxx,
+                           TOP_pcmpestrmxxx,
+                           TOP_pcmpistrixxx,
+                           TOP_pcmpistrmxxx,
+                           TOP_pextrbxxx,
+                           TOP_pextrdxxx,
+                           TOP_pextrqxxx,
+                           TOP_pextrwxxx,
+                           TOP_pinsrbxxx,
+                           TOP_pinsrdxxx,
+                           TOP_pinsrqxxx,
+                           TOP_roundpdxxx,
+                           TOP_roundpsxxx,
+                           TOP_roundsdxxx,
+                           TOP_roundssxxx,
+                           TOP_UNDEFINED);
 
   /* Two operands / no result */
   ISA_PRINT_TYPE opop1 =  ISA_Print_Type_Create("opop1", "%s %s,%s");
@@ -1243,7 +1554,6 @@ main()
 	TOP_pextrb,
 	TOP_pextrd,
 	TOP_pextrq,
-	TOP_extractps,
 	TOP_pinsrb,
 	TOP_pinsrd,
 	TOP_pinsrq,
@@ -1263,6 +1573,22 @@ main()
   Instruction_Print_Group( opopop1,
                TOP_pcmpestri,
                TOP_pcmpestrm,
+               TOP_pcmpistriintr, 
+               TOP_pcmpistrmintr,         
+               TOP_pcmpestriintr, 
+               TOP_pcmpestrmintr, 
+			   TOP_UNDEFINED );
+
+  /* No result / three operands */
+  ISA_PRINT_TYPE resultopop1 =  ISA_Print_Type_Create("ropop", "%s %s,%s,%s");
+  Name();
+  Operand(2);
+  Operand(1);
+  Result(0);
+  Instruction_Print_Group( opopop1,
+               TOP_pcmpestrm, 
+               TOP_pcmpistrmintr,         
+               TOP_pcmpestrmintr, 
 			   TOP_UNDEFINED );
 
 	/*movntdqa*/
@@ -1326,10 +1652,31 @@ main()
 			   TOP_fmovddupx,			   
 			   TOP_ld64_2m,
 			   TOP_ld64_2sse,
-			   /*AVX instructions*/
-			   TOP_vlddqa,
-			   TOP_vldaps,
-			   TOP_vldapd,
+			   TOP_pabsbx,
+			   TOP_pabswx,
+			   TOP_pabsdx,
+			   TOP_psignbx,
+			   TOP_psignwx,
+			   TOP_psigndx,
+			   TOP_pabsbx128,
+			   TOP_pabswx128,
+			   TOP_pabsdx128,
+			   TOP_psignbx128,
+			   TOP_psignwx128,
+			   TOP_psigndx128,
+			   /*sse4*/
+                TOP_pmovsxbwx,
+			   TOP_pmovsxbdx,
+				TOP_pmovsxbqx,
+				TOP_pmovsxwdx,
+				TOP_pmovsxwqx,
+				TOP_pmovsxdqx,
+				TOP_pmovzxbwx,
+				TOP_pmovzxbdx,
+				TOP_pmovzxbqx,
+				TOP_pmovzxwdx,
+				TOP_pmovzxwqx,
+				TOP_pmovzxdqx,
 			   TOP_UNDEFINED );
 
   /* lea instruction with indx */
@@ -1415,10 +1762,30 @@ main()
 			   TOP_fmovsldupxx,
 			   TOP_fmovshdupxx,
 			   TOP_fmovddupxx,
-			   /*AVX instrucions*/
-			   TOP_vlddqax,
-			   TOP_vldapsx,
-			   TOP_vldapdx,		   
+			   TOP_pabsbxx,
+			   TOP_pabswxx,
+			   TOP_pabsdxx,
+			   TOP_psignbxx,
+			   TOP_psignwxx,
+			   TOP_psigndxx,
+			   TOP_pabsbxx128,
+			   TOP_pabswxx128,
+			   TOP_pabsdxx128,
+			   TOP_psignbxx128,
+			   TOP_psignwxx128,
+			   TOP_psigndxx128,
+			   TOP_pmovsxbwxx,
+			   TOP_pmovsxbdxx,
+				TOP_pmovsxbqxx,
+				TOP_pmovsxwdxx,
+				TOP_pmovsxwqxx,
+				TOP_pmovsxdqxx,
+				TOP_pmovzxbwxx,
+				TOP_pmovzxbdxx,
+				TOP_pmovzxbqxx,
+				TOP_pmovzxwdxx,
+				TOP_pmovzxwqxx,
+				TOP_pmovzxdqxx,
 			   TOP_UNDEFINED );
 
   /* load instruction with indx w/o base*/
@@ -1453,11 +1820,32 @@ main()
 			   TOP_ldapsxx,
 			   TOP_fmovsldupxxx,
 			   TOP_fmovshdupxxx,
-			   TOP_fmovddupxxx,			   
-			   /*AVX instrucions*/
-			   TOP_vlddqaxx,
-			   TOP_vldapsxx,
-			   TOP_vldapdxx,		   
+			   TOP_fmovddupxxx,
+			   TOP_pabsbxxx,
+			   TOP_pabswxxx,
+			   TOP_pabsdxxx,
+			   TOP_psignbxxx,
+			   TOP_psignwxxx,
+			   TOP_psigndxxx,
+			   TOP_pabsbxxx128,
+			   TOP_pabswxxx128,
+			   TOP_pabsdxxx128,
+			   TOP_psignbxxx128,
+			   TOP_psignwxxx128,
+			   TOP_psigndxxx128,
+			   /*sse4*/
+			   TOP_pmovsxbwxxx,
+			   TOP_pmovsxbdxxx,
+				TOP_pmovsxbqxxx,
+				TOP_pmovsxwdxxx,
+				TOP_pmovsxwqxxx,
+				TOP_pmovsxdqxxx,
+				TOP_pmovzxbwxxx,
+				TOP_pmovzxbdxxx,
+				TOP_pmovzxbqxxx,
+				TOP_pmovzxwdxxx,
+				TOP_pmovzxwqxxx,
+				TOP_pmovzxdqxxx,
 			   TOP_UNDEFINED );
 
   /* store instruction with indx */
@@ -1490,10 +1878,6 @@ main()
 			   TOP_sthpdx,
 			   TOP_stapsx,
 			   TOP_stapdx,
-			   /*AVX instructions*/
-			   TOP_vstdqax,
-			   TOP_vstapdx,
-			   TOP_vstapsx,
 			   TOP_UNDEFINED );
 
   /* load_gs_seg_off and load_fs_seg_off are special in that the
@@ -1553,21 +1937,8 @@ main()
 			   TOP_stntpsxx,
 			   TOP_stapsxx,
 			   TOP_stapdxx,
-			   /*AVX instructions*/
-			   TOP_vstdqaxx,
-			   TOP_vstapdxx,
-			   TOP_vstapsxx,
 			   TOP_UNDEFINED );
 
-  /*AVX opopresult*/
-  ISA_PRINT_TYPE avxopopop = ISA_Print_Type_Create("avxopopop", "%s %s,%s,%s");
-  Name();
-  Operand(1);
-  Operand(0);
-  Result(0);
-  Instruction_Print_Group(avxopopop,
-  			   TOP_vaddpd,
-  			   TOP_UNDEFINED);
 
   /* prefetch */
   ISA_PRINT_TYPE prefetch =  ISA_Print_Type_Create("prefetch", "%s %s%s(%s)");
@@ -1662,10 +2033,6 @@ main()
 			   TOP_storenti128,
 			   TOP_storelpd,
 			   TOP_storent64_fm,
-			   /*AVX instructions*/
-			   TOP_vstdqa,
-			   TOP_vstapd,
-			   TOP_vstaps,
 			   TOP_UNDEFINED );
 
   /* instructions that read-modify-write */
@@ -1780,6 +2147,7 @@ main()
 			   TOP_pextrw64,
 			   TOP_pextrw128,
 			   TOP_pshufw64v16,
+			   TOP_extractps,
 			   TOP_UNDEFINED );
 
   ISA_PRINT_TYPE packed_ins = 
@@ -1878,6 +2246,7 @@ main()
                           TOP_UNDEFINED);
 
 #include "isa_avx_print.cxx"
+#include "isa_xop_fma_print.cxx"
 
   /* CFI */
   ISA_PRINT_TYPE cfi_one_arg = ISA_Print_Type_Create("cfi_one_arg", ".%s %s");
@@ -1897,4 +2266,5 @@ main()
                           TOP_UNDEFINED);
 
   ISA_Print_End();
+  return 0;
 }

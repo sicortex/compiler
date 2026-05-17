@@ -149,7 +149,7 @@ extern FLD_HANDLE FLD_And_Offset_From_Field_Id (TY_IDX  struct_ty_idx,
 					        UINT&   cur_field_id,
 					        UINT64& offset);
 
-extern WN *WN_Lower(WN *tree, LOWER_ACTIONS actions, struct ALIAS_MANAGER *alias, const char *msg);
+extern WN *WN_Lower(PU *pu, WN *tree, LOWER_ACTIONS actions, struct ALIAS_MANAGER *alias, const char *msg);
 
 /*
  * lower an scf node but not things underneath it 
@@ -188,10 +188,10 @@ extern void WN_Lower_Checkdump(const char *msg, WN *tree, LOWER_ACTIONS actions)
 /*
  * lower M or lower WHIRL to conform to unsigned 64-bit instruction only ISA
  */
-extern void U64_lower_wn(WN *, BOOL);
+extern void U64_lower_wn(PU *pu, WN *wn, BOOL);
 
 #ifdef KEY
-extern void WN_retype_expr(WN *);
+extern void WN_retype_expr(PU *pu, WN *wn);
 extern WN* Transform_To_Memcpy(WN *dst, WN *src, INT32 offset, TY_IDX dstTY, TY_IDX srcTY, WN *size);
 #endif
 

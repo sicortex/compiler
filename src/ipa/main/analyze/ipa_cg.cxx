@@ -334,64 +334,6 @@ IPA_update_ehinfo_in_pu (IPA_NODE *node)
         int sym_size;
         SUMMARY_SYMBOL* sym_array = IPA_get_symbol_file_array(node->File_Header(), sym_size);
         FmtAssert (sym_array != NULL, ("Missing SUMMARY_SYMBOL section"));
-                                                                                
-        INITV_IDX tinfo = INITV_next (INITV_next (INITO_val (PU_misc_info (node->Get_PU()))));
-        INITO_IDX inito = TCON_uval (INITV_tc_val (tinfo));
-        if (inito)
-        {
-	    INITV_IDX idx = INITO_val (inito);
-            do
-            {
-                INITV_IDX st_entry = INITV_blk (idx);
-                if (INITV_kind (st_entry) == INITVKIND_ZERO)
-                {
-                    idx = INITV_next (idx);
-                    continue;
-                }
-                int st_idx = TCON_uval (INITV_tc_val (st_entry));
-                if (st_idx < 0)
-                {
-                    idx = INITV_next (idx);
-                    continue;
-                }
-                ST_IDX new_idx = sym_array[st_idx].St_idx();
-		// This st would be used at least in the exception table, mark
-		// it so that ipa does not remove it in DVE
-		// TODO: Record this ref in IPL to prevent this situation.
-      		Set_AUX_ST_flags (Aux_St_Table[new_idx], USED_IN_OBJ);
-                Clear_ST_is_not_used (St_Table[new_idx]);
-                INITV_IDX filter = INITV_next (st_entry); // for backup
-                INITV_Set_VAL (Initv_Table[st_entry], Enter_tcon (
-                       Host_To_Targ (MTYPE_U4, new_idx)), 1);
-                Set_INITV_next (st_entry, filter);
-                idx = INITV_next (idx);
-            } while (idx);
-        }
-        tinfo = INITV_next (tinfo);
-        inito = TCON_uval (INITV_tc_val (tinfo));
-        if (inito)
-        {
-	    INITV_IDX idx = INITV_blk (INITO_val (inito));
-	    do
-	    {
-	    	if (INITV_kind (idx) == INITVKIND_ZERO)
-		{
-		    idx = INITV_next (idx);
-		    continue;
-		}
-		int st_idx = TCON_uval (INITV_tc_val (idx));
-		FmtAssert (st_idx > 0, ("Invalid st entry in eh-spec table"));
-		ST_IDX new_idx = sym_array[st_idx].St_idx();
-		// TODO: Record this ref in IPL to prevent this situation.
-		Set_AUX_ST_flags (Aux_St_Table[new_idx], USED_IN_OBJ);
-		Clear_ST_is_not_used (St_Table[new_idx]);
-		INITV_IDX bkup = INITV_next (idx);
-		INITV_Set_VAL (Initv_Table[idx], Enter_tcon (
-			Host_To_Targ (MTYPE_U4, new_idx)), 1);
-		Set_INITV_next (idx, bkup);
-		idx = INITV_next (idx);
-	    } while (idx);
-	}
 }
 
 static inline IPA_NODE *
@@ -1673,6 +1615,14 @@ Mark_Deletable_Funcs (NODE_INDEX v, DFE_ACTION action, mUINT8 *visited)
 	    node->Set_Undeletable();
 	    action = MARK_USED;
 	    visited[v] = VISITED_AND_KEEP;
+#if defined(_LIGHTWEIGHT_INLINER)
+	    /* O0 does not delete functions with no inline attrib */
+	} else if (Opt_Level == 0 && ! node->Has_Inline_Attrib()) {
+	    node->Clear_Deletable();
+	    node->Set_Undeletable();
+	    action = MARK_USED;
+	    visited[v] = VISITED_AND_KEEP;
+#endif
 	} else {
 	    node->Set_Deletable ();
 	    IP_FILE_HDR& s = node->File_Header ();
@@ -2540,7 +2490,7 @@ IPA_NODE::Write_PU ()
 #ifdef Is_True
     WN* w = Whirl_Tree(FALSE);
     if (w && !Is_Nested_PU()) {
-      WN_verifier(w);
+      WN_verifier(&Get_PU(), w);
     }
 #endif
     if ((IP_PROC_INFO_state (proc_info) != IPA_WRITTEN) || !Has_Recursive_In_Edge())

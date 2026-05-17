@@ -22,10 +22,6 @@ path64_set_multitarget_sources(openmp COMMON ${PATHSCALE_OPENMP_SRCS})
 path64_set_multitarget_property_(openmp COMPILE_FLAGS "-std=gnu99 -fPIC")
 path64_set_multitarget_property_(openmp LINK_FLAGS
                                 "-Wl,--version-script=\"${libopenmp_SOURCE_DIR}/libopenmp.vs\" -nodefaultlibs")
-if(PATH64_ENABLE_PSCRUNTIME)
-    path64_multitarget_link_libraries(openmp gcc)
-endif()
-path64_multitarget_link_libraries(openmp m c)
 path64_add_multitarget_library(openmp SHARED)
 path64_add_multitarget_dependencies(openmp compiler-stage-libs-C)
 
@@ -63,7 +59,7 @@ foreach(targ ${PATH64_ENABLE_TARGETS})
         add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/omp_lib-${targ}.f.o
                                   ${CMAKE_CURRENT_BINARY_DIR}/${targ}/OMP_LIB.mod
                                   ${CMAKE_CURRENT_BINARY_DIR}/${targ}/OMP_LIB_KINDS.mod
-                           COMMAND ${CMAKE_Fortran_COMPILER} ${fflags} ${targ_flag}
+                           COMMAND ${Path64_BINARY_DIR}/bin/pathf90 ${fflags} ${targ_flag}
                                    -c ${CMAKE_CURRENT_SOURCE_DIR}/../include/omp/omp_lib.f
                                    -o ${CMAKE_CURRENT_BINARY_DIR}/omp_lib-${targ}.f.o
                            DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/../include/omp/omp_lib.f
@@ -76,7 +72,7 @@ foreach(targ ${PATH64_ENABLE_TARGETS})
                           DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${targ}/OMP_LIB.mod
                                   ${CMAKE_CURRENT_BINARY_DIR}/${targ}/OMP_LIB_KINDS.mod
                          )
-        add_dependencies(OMP_LIB-${targ} switch_fc mfef95-tmp compiler-stage-Fortran)
+        add_dependencies(OMP_LIB-${targ} compiler-stage-Fortran)
 
 
         set(install_mod_dir ${PATH64_LIB_PATH}/${targ_arch}/${targ_bits})

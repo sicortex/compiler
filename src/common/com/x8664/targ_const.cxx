@@ -3707,6 +3707,9 @@ Targ_Print ( const char *fmt, TCON c )
       }
       break;
 
+    case MTYPE_V32I1:
+	case MTYPE_V32I2:
+	case MTYPE_V32I4:
     case MTYPE_V16I1:
     case MTYPE_V16I2:
     case MTYPE_V16I4:
@@ -3721,6 +3724,7 @@ Targ_Print ( const char *fmt, TCON c )
       sprintf(r, fmt, TCON_v0(c));
       break;
 
+    case MTYPE_V32I8:
     case MTYPE_V16I8:
     case MTYPE_I8:
     case MTYPE_U8:
@@ -3728,6 +3732,7 @@ Targ_Print ( const char *fmt, TCON c )
       sprintf(r, fmt, TCON_I8(c));
       break;
 
+	case MTYPE_V32F4:
     case MTYPE_V16F4:
     case MTYPE_F4:
       if (fmt == NULL) fmt = "%#12.7g";
@@ -3738,6 +3743,7 @@ Targ_Print ( const char *fmt, TCON c )
 #endif /* !(defined(FRONT_END_C) || defined(FRONT_END_CPLUSPLUS)) */
       break;
 
+    case MTYPE_V32F8:
     case MTYPE_V16F8:
     case MTYPE_F8:
       if (fmt == NULL) fmt = "%#21.16g";
@@ -4337,6 +4343,16 @@ Host_To_Targ_UV( TYPE_ID ty)
      TCON_v2(c)= 0xfff5a5a5;
      TCON_v3(c)= 0xfff5a5a5;
      break;
+   case MTYPE_F32:
+     TCON_v0(c)= 0xfff5a5a5;
+     TCON_v1(c)= 0xfff5a5a5;
+     TCON_v2(c)= 0xfff5a5a5;
+     TCON_v3(c)= 0xfff5a5a5;
+     TCON_v4(c)= 0xfff5a5a5;
+     TCON_v5(c)= 0xfff5a5a5;
+     TCON_v6(c)= 0xfff5a5a5;
+     TCON_v7(c)= 0xfff5a5a5;
+     break;
    case MTYPE_C4:
      TCON_v0(c)= 0xffa5a5a5;	// 32-bit Signalling NaN
      TCON_iv0(c)= 0xffa5a5a5;
@@ -4365,10 +4381,121 @@ Host_To_Targ_UV( TYPE_ID ty)
      TCON_v0(c)= 0x5a5aa5a5;
      TCON_v1(c)= 0x5a5aa5a5;
      break;
+   case MTYPE_V16I1:
+   case MTYPE_V16I2:
+     TCON_v0(c)= 0x5a5aa5a5;
+     TCON_v1(c)= 0x5a5aa5a5;
+     TCON_v2(c)= 0x5a5aa5a5;
+     TCON_v3(c)= 0x5a5aa5a5;
+     break;
+   case MTYPE_V32I1:
+   case MTYPE_V32I2:
+     TCON_v0(c)= 0x5a5aa5a5;
+     TCON_v1(c)= 0x5a5aa5a5;
+     TCON_v2(c)= 0x5a5aa5a5;
+     TCON_v3(c)= 0x5a5aa5a5;
+     TCON_v4(c)= 0x5a5aa5a5;
+     TCON_v5(c)= 0x5a5aa5a5;
+     TCON_v6(c)= 0x5a5aa5a5;
+     TCON_v7(c)= 0x5a5aa5a5;
+     break;
    case MTYPE_V8I4:
+   case MTYPE_V8F4:
    case MTYPE_M8I4:
+   case MTYPE_M8F4:
+     TCON_v0(c)= 0xffa5a5a5;	// 32-bit Signalling NaN
+     TCON_v1(c)= 0xffa5a5a5;
+     break;
+   case MTYPE_V16I4:
+   case MTYPE_V16F4:
+     TCON_v0(c)= 0xffa5a5a5;	// 32-bit Signalling NaN
+     TCON_v1(c)= 0xffa5a5a5;
+     TCON_v2(c)= 0xffa5a5a5;
+     TCON_v3(c)= 0xffa5a5a5;
+     break;
+   case MTYPE_V16I8:
+   case MTYPE_V16F8:
      TCON_v0(c)= 0xfff5a5a5;	// 64-bit Signalling NaN
      TCON_v1(c)= 0xfff5a5a5;
+     TCON_v2(c)= 0xfff5a5a5;
+     TCON_v3(c)= 0xfff5a5a5;
+     break;
+   case MTYPE_V32I4:
+   case MTYPE_V32F4:
+     TCON_v0(c)= 0xffa5a5a5;	// 32-bit Signalling NaN
+     TCON_v1(c)= 0xffa5a5a5;
+     TCON_v2(c)= 0xffa5a5a5;
+     TCON_v3(c)= 0xffa5a5a5;
+     TCON_v4(c)= 0xffa5a5a5;
+     TCON_v5(c)= 0xffa5a5a5;
+     TCON_v6(c)= 0xffa5a5a5;
+     TCON_v7(c)= 0xffa5a5a5;
+     break;
+   case MTYPE_V32F8:
+     TCON_v0(c)= 0xfff5a5a5;	// 64-bit Signalling NaN
+     TCON_v1(c)= 0xfff5a5a5;
+     TCON_v2(c)= 0xfff5a5a5;
+     TCON_v3(c)= 0xfff5a5a5;
+     TCON_v4(c)= 0xfff5a5a5;
+     TCON_v5(c)= 0xfff5a5a5;
+     TCON_v6(c)= 0xfff5a5a5;
+     TCON_v7(c)= 0xfff5a5a5;
+     break;
+   case MTYPE_V16C4:
+     TCON_v0(c)= 0xffa5a5a5;	// 32-bit Signalling NaN
+     TCON_v1(c)= 0xffa5a5a5;
+     TCON_v2(c)= 0xffa5a5a5;
+     TCON_v3(c)= 0xffa5a5a5;
+     TCON_iv0(c)= 0xffa5a5a5;
+     TCON_iv1(c)= 0xffa5a5a5;
+     TCON_iv2(c)= 0xffa5a5a5;
+     TCON_iv3(c)= 0xffa5a5a5;
+     break;
+   case MTYPE_V16C8:
+     TCON_v0(c)= 0xfff5a5a5;	// 64-bit Signalling NaN
+     TCON_v1(c)= 0xfff5a5a5;
+     TCON_v2(c)= 0xfff5a5a5;
+     TCON_v3(c)= 0xfff5a5a5;
+     TCON_iv0(c)= 0xfff5a5a5;
+     TCON_iv1(c)= 0xfff5a5a5;
+     TCON_iv2(c)= 0xfff5a5a5;
+     TCON_iv3(c)= 0xfff5a5a5;
+     break;
+   case MTYPE_V32C4:
+     TCON_v0(c)= 0xffa5a5a5;	// 32-bit Signalling NaN
+     TCON_v1(c)= 0xffa5a5a5;
+     TCON_v2(c)= 0xffa5a5a5;
+     TCON_v3(c)= 0xffa5a5a5;
+     TCON_v4(c)= 0xffa5a5a5;
+     TCON_v5(c)= 0xffa5a5a5;
+     TCON_v6(c)= 0xffa5a5a5;
+     TCON_v7(c)= 0xffa5a5a5;
+     TCON_iv0(c)= 0xffa5a5a5;
+     TCON_iv1(c)= 0xffa5a5a5;
+     TCON_iv2(c)= 0xffa5a5a5;
+     TCON_iv3(c)= 0xffa5a5a5;
+     TCON_iv4(c)= 0xffa5a5a5;
+     TCON_iv5(c)= 0xffa5a5a5;
+     TCON_iv6(c)= 0xffa5a5a5;
+     TCON_iv7(c)= 0xffa5a5a5;
+     break;
+   case MTYPE_V32C8:
+     TCON_v0(c)= 0xfff5a5a5;	// 64-bit Signalling NaN
+     TCON_v1(c)= 0xfff5a5a5;
+     TCON_v2(c)= 0xfff5a5a5;
+     TCON_v3(c)= 0xfff5a5a5;
+     TCON_v4(c)= 0xfff5a5a5;
+     TCON_v5(c)= 0xfff5a5a5;
+     TCON_v6(c)= 0xfff5a5a5;
+     TCON_v7(c)= 0xfff5a5a5;
+     TCON_iv0(c)= 0xfff5a5a5;
+     TCON_iv1(c)= 0xfff5a5a5;
+     TCON_iv2(c)= 0xfff5a5a5;
+     TCON_iv3(c)= 0xfff5a5a5;
+     TCON_iv4(c)= 0xfff5a5a5;
+     TCON_iv5(c)= 0xfff5a5a5;
+     TCON_iv6(c)= 0xfff5a5a5;
+     TCON_iv7(c)= 0xfff5a5a5;
      break;
    default:
      ErrMsg ( EC_Inv_Mtype, Mtype_Name(ty), "Host_To_Targ_UV" );
@@ -4392,6 +4519,11 @@ NaN_Tcon(TYPE_ID ty, TCON c)
    case MTYPE_F16:
      return TCON_v0(c) == 0xfff5a5a5 && TCON_v1(c) == 0xfff5a5a5 &&
      	    TCON_v2(c) == 0xfff5a5a5 && TCON_v3(c) == 0xfff5a5a5;
+   case MTYPE_F32:
+     return TCON_v0(c) == 0xfff5a5a5 && TCON_v1(c) == 0xfff5a5a5 &&
+     	    TCON_v2(c) == 0xfff5a5a5 && TCON_v3(c) == 0xfff5a5a5 &&
+     	    TCON_v4(c) == 0xfff5a5a5 && TCON_v5(c) == 0xfff5a5a5 &&
+     	    TCON_v6(c) == 0xfff5a5a5 && TCON_v7(c) == 0xfff5a5a5;
    case MTYPE_C4: // 32-bit Signalling NaN
      return TCON_v0(c) == 0xffa5a5a5 && TCON_iv0(c) == 0xffa5a5a5;
    case MTYPE_C8: // 64-bit Signalling NaN
@@ -4405,7 +4537,7 @@ NaN_Tcon(TYPE_ID ty, TCON c)
 	    TCON_iv2(c) == 0xfff5a5a5 && TCON_iv3(c) == 0xfff5a5a5;
   }
   return FALSE;
-} /* Host_To_Targ_UV */
+} /* NaN_Tcon */
 
 /* Make complex TCON from two TCONs representing real and imaginary parts. */
 TCON
@@ -4590,6 +4722,7 @@ Extract_Paired_Hi(TCON v)
   case MTYPE_I8:
   case MTYPE_U8:
   case MTYPE_V16F8:
+  case MTYPE_V32F8:
     {
       /* May want to use F4 instead of I4. */
       TCON_ty(c) = MTYPE_I4;
@@ -4618,6 +4751,7 @@ Extract_Paired_Lo(TCON v)
   case MTYPE_I8:
   case MTYPE_U8:
   case MTYPE_V16F8:
+  case MTYPE_V32F8:
     {
       /* May want to use F4 instead of I4. */
       TCON_ty(c) = MTYPE_I4;

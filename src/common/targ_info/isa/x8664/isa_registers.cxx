@@ -115,7 +115,7 @@ static int Range_ISA_Mask(ISA_SUBSET min_isa, ISA_SUBSET max_isa)
 }
 
 
-main (int argc, char** argv)
+int main (int argc, char** argv)
 {
   ISA_Registers_Begin( "x8664" );
 
@@ -149,4 +149,5 @@ main (int argc, char** argv)
   ISA_Register_Subclass_Create("m32_8bit_regs", rc_integer, 4, m32_8bit_regs, NULL);
 
   ISA_Registers_End();
+  return 0;
 }

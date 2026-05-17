@@ -17,6 +17,7 @@ ELSE()
     ADD_SUBDIRECTORY(csu)
 ENDIF()
 
+ADD_SUBDIRECTORY(common/com)
 ADD_SUBDIRECTORY(driver)
 ADD_SUBDIRECTORY(libcif)
 ADD_SUBDIRECTORY(libcmplrs)
@@ -45,11 +46,11 @@ IF(PATH64_ENABLE_IPA)
 ENDIF()
 
 # TODO : Threading and other things need to be ported
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+IF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD" OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     IF(PATH64_ENABLE_OPENMP)
         ADD_SUBDIRECTORY(libopenmp)
     ENDIF()
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+ENDIF()
 ADD_SUBDIRECTORY(libfi)
 
 # All the math stuff seems to be built from libmpath
@@ -70,9 +71,7 @@ IF(${PATH64_ENABLE_FORTRAN})
 INCLUDE(libF77/config.cmake)
 ADD_SUBDIRECTORY(libpathfortran)
 ADD_SUBDIRECTORY(crayf90)
-IF(${PATH64_ENABLE_MATHLIBS})
 ADD_SUBDIRECTORY(f95_coco)
-ENDIF()
 ENDIF(${PATH64_ENABLE_FORTRAN})
 
 ADD_SUBDIRECTORY(ir_tools)

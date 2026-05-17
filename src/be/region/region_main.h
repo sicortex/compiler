@@ -63,7 +63,7 @@ extern void REGION_CS_NoEarlierSub_First( REGION_CS_ITER *, WN *, RID_TYPE);
 extern void REGION_CS_print( REGION_CS_ITER * );
 
 /* Remove a region from the PU and mark location for insertion later */
-extern WN  *REGION_remove_and_mark(WN *, REGION_CS_ITER *);
+extern WN  *REGION_remove_and_mark(PU *, WN *, REGION_CS_ITER *);
 /* Insert new region at mark left by REGION_remove_and_mark */
 extern void REGION_replace_from_mark(WN *, REGION_CS_ITER *);
 

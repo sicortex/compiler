@@ -39,6 +39,7 @@
 #include "topcode.h"
 #include "isa_bundle_gen.h"
 
+int
 main()
 {
   ISA_EXEC_UNIT_TYPE

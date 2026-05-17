@@ -40,7 +40,7 @@
 
 */
 
-#ifdef __linux
+#if defined(__linux) && !defined(_GNU_SOURCE)
 #define _GNU_SOURCE /* For *asprintf */
 #endif
 
@@ -100,8 +100,15 @@ int proc = UNDEFINED;
 static int target_supported_abi = UNDEFINED;
 static boolean target_supports_sse2 = FALSE;
 static boolean target_prefers_sse3 = FALSE;
+static boolean target_supports_ssse3 = FALSE;
 static boolean target_supports_3dnow = FALSE;
 static boolean target_supports_sse4a = FALSE;
+static boolean target_supports_sse41 = FALSE;
+static boolean target_supports_sse42 = FALSE;
+static boolean target_supports_avx = FALSE;
+static boolean target_supports_fma = FALSE;
+static boolean target_supports_xop = FALSE;
+static boolean target_supports_aes = FALSE;
 #endif
 
 extern boolean parsing_default_options;
@@ -1654,6 +1661,22 @@ print_file_path (char *fname, int exe)
   if(res)
     return;
 
+  // initialize targets before searching in runtime path
+  init_targets();
+
+  {
+    char *path;
+    asprintf(&path, "%s/%s", target_runtime_path(), fname);
+
+    if(file_exists(path)) {
+      puts(path);
+      free(path);
+      return;
+    }
+
+    free(path);
+  }
+
   if (print_phase_path(P_be, fname))
     return;
 
@@ -1982,36 +2005,54 @@ static struct
   boolean supports_sse2;	// TRUE if support SSE2
   boolean prefers_sse3;		// TRUE if target prefers code to use SSE3
   boolean supports_3dnow;       // TRUE if target supports 3dnow
+  boolean supports_ssse3;	// TRUE if support SSSE3
   boolean supports_sse4a;       // TRUE if support SSE4a
+  boolean supports_sse41;	// TRUE if support SSE4.1
+  boolean supports_sse42;	// TRUE if support SSE4.2
+  boolean supports_avx;		// TRUE if support AVX
+  boolean supports_fma;
+  boolean supports_xop;
+  boolean supports_aes;
 } supported_cpu_types[] = {
-  { "any_64bit_x86",	"anyx86",	ABI_M64,	TRUE,	FALSE, FALSE, FALSE},
-  { "any_32bit_x86",	"anyx86",	ABI_M32,	FALSE,	FALSE, FALSE, FALSE},
-  { "i386",	"anyx86",		ABI_M32,	FALSE,	FALSE, FALSE, FALSE},
-  { "i486",	"anyx86",		ABI_M32,	FALSE,	FALSE, FALSE, FALSE},
-  { "i586",	"anyx86",		ABI_M32,	FALSE,	FALSE, FALSE, FALSE},
-  { "athlon",	"athlon",		ABI_M32,	FALSE,	FALSE, TRUE, FALSE},
-  { "athlon-mp", "athlon",		ABI_M32,	FALSE,	FALSE, TRUE, FALSE},
-  { "athlon-xp", "athlon",		ABI_M32,	FALSE,	FALSE, TRUE, FALSE},
-  { "athlon64",	"athlon64",		ABI_M64,		TRUE,	FALSE, TRUE,  FALSE},
-  { "athlon64fx", "opteron",	ABI_M64,		TRUE,	FALSE, TRUE,  FALSE},
-  { "turion",	"athlon64",		ABI_M64,		TRUE,	FALSE, TRUE,  FALSE},
-  { "i686",	"pentium4",		ABI_M32,	FALSE,	FALSE, FALSE, FALSE},
-  { "ia32",	"pentium4",		ABI_M32,	TRUE,	FALSE, FALSE, FALSE},
-  { "k7",	"athlon",		ABI_M32,	FALSE,	FALSE, TRUE,  FALSE},
-  { "k8",	"opteron",		ABI_M64,	TRUE,	FALSE, TRUE,  FALSE},
-  { "opteron",	"opteron",		ABI_M64,		TRUE,	FALSE, TRUE,  FALSE},
-  { "pentium4",	"pentium4",		ABI_M32,	TRUE,	FALSE, FALSE, FALSE},
-  { "xeon",	"xeon",			ABI_M32,	TRUE,	FALSE, FALSE, FALSE},
-  { "em64t",	"em64t",		ABI_M64,		TRUE,	TRUE,  FALSE, FALSE},
-  { "core",	"core",			ABI_M64,		TRUE,	TRUE,  FALSE, FALSE},
-  { "wolfdale",	"wolfdale",		ABI_M64,		TRUE,	TRUE,  FALSE, FALSE},
-  { "harpertown", "wolfdale",		ABI_M64,		TRUE,	TRUE,  FALSE, FALSE},
-  { "barcelona","barcelona",		ABI_M64,		TRUE,	TRUE,  TRUE,  TRUE},
-  { "shanghai",	"barcelona",		ABI_M64,		TRUE,	TRUE,  TRUE,  TRUE},
-  { "istanbul",	"barcelona",		ABI_M64,		TRUE,	TRUE,  TRUE,  TRUE},
-  { "nehalem",	"wolfdale",		ABI_M64,		TRUE,	TRUE,  FALSE, FALSE},
-  { "sandy", "sandy", ABI_M64, TRUE, TRUE, TRUE, TRUE},
-  { NULL,	NULL, },
+//  CPU			Target		ABI        SSE2  SSE3  3DNow! SSSE3  SSE4a  SSE4.1 SSE4.2    AVX    FMA    XOP   AES
+//  -------------------+---------------+--------+------+------+------+------+------+------+------+-----
+  { "any_64bit_x86",	"generic",	ABI_M64,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "any_32bit_x86",	"generic",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "i386",		"generic",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "i486",		"generic",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "i586",		"generic",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "athlon",		"athlon",	ABI_M32, FALSE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "athlon-mp",	"athlon",	ABI_M32, FALSE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "athlon-xp",	"athlon",	ABI_M32, FALSE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "athlon64",		"athlon64",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "athlon64-sse3",	"athlon64",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "athlon64fx",	"opteron",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "turion",		"athlon64",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "i686",		"pentium4",	ABI_M32, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "ia32",		"pentium4",	ABI_M32,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "k7",		"athlon",	ABI_M32, FALSE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "k8",		"opteron",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "k8-sse3",		"opteron",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "opteron",		"opteron",	ABI_M64,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "opteron-sse3",	"opteron",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "pentium4",		"pentium4",	ABI_M32,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "xeon",		"xeon",		ABI_M32,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "em64t",		"em64t",	ABI_M64,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "nocona",		"em64t",	ABI_M64,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "prescott",		"em64t",	ABI_M64,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "core",		"core",		ABI_M64,  TRUE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "core2",		"wolfdale",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "wolfdale",		"wolfdale",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "harpertown",	"wolfdale",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "nehalem",		"wolfdale",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "barcelona",	"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "shanghai",		"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "istanbul",		"barcelona",	ABI_M64,  TRUE,  TRUE,  TRUE, FALSE,  TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE },
+  { "sandy",		"sandy",	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE, FALSE,  TRUE,  TRUE,  TRUE, FALSE, FALSE, FALSE },
+  { "bdver1",		"bdver1", 	ABI_M64,  TRUE,  TRUE, FALSE,  TRUE,  TRUE,  TRUE,  TRUE, FALSE, TRUE, TRUE, FALSE },
+//  -------------------+---------------+--------+------+------+------+------+------+------+------+-----
+//  CPU			Target		ABI        SSE2   SSE3 3DNow!  SSSE3  SSE4a SSE4.1 SSE4.2    AVX   FMA4    XOP   AES
+  { NULL, NULL, },
 };
   
 char *target_cpu = NULL;
@@ -2068,25 +2109,6 @@ get_platform_abi(void)
 #endif
 }
 
-// Return the numeric value after ':' in a line in /proc/cpuinfo.
-int
-get_num_after_colon (char *str)
-{
-  char *p;
-  int num;
-
-  p = strchr(str, ':');
-  if (p == NULL) {
-    error ("cannot parse /proc/cpuinfo: missing colon");
-  }
-  p++;
-  if (sscanf(p, "%d", &num) == 0) {
-    error ("cannot parse /proc/cpuinfo: missing number after colon");
-  }
-  return num;
-}
-
-
 // Return the CPU target name to default to as a last resort.
 static char *
 get_default_cpu_name (char *msg)
@@ -2095,10 +2117,10 @@ get_default_cpu_name (char *msg)
   char *abi_name = NULL;
 
   if (get_platform_abi() == ABI_M64) {
-    cpu_name = "anyx86";
+    cpu_name = "generic";
     abi_name = "64-bit";
   } else {
-    cpu_name = "anyx86";
+    cpu_name = "generic";
     abi_name = "32-bit";
   }
 
@@ -2266,6 +2288,10 @@ get_x86_auto_cpu_name ()
       case 28: // Intel Atom processor. All processors are manufactured using
                // the 45 nm process
         return "any_64bit_x86";
+	  case 30: // Intel i7
+	  case 42: // Intel i5
+	  case 45: // Intel Xeon E5
+	    return "sandy";
 
       default: return "i686";
       }
@@ -2336,6 +2362,8 @@ get_x86_auto_cpu_name ()
         }
       case 16:
         return "barcelona";     // FIXME??
+      case 21:
+	  	return "bdver1";
     default:
       return "generic";
     }
@@ -2400,11 +2428,11 @@ Get_x86_ISA ()
 
   // Get a more specific cpu name.
   if (!strcmp(target_cpu, "auto")) {		// auto
-    target_cpu = get_x86_auto_cpu_name();	// may return anyx86
+    target_cpu = get_x86_auto_cpu_name();	// may return generic
     if (target_cpu == NULL)
       return;
   }
-  if (!strcmp(target_cpu, "anyx86")) {		// anyx86
+  if (!strcmp(target_cpu, "generic")) {		// generic
     // Need ABI to select any_32bit_x86 or any_64bit_x86 ISA.
     if (abi == UNDEFINED) {
       if (get_platform_abi() == ABI_M64) {
@@ -2430,7 +2458,14 @@ Get_x86_ISA ()
       target_supports_sse2 = supported_cpu_types[i].supports_sse2;
       target_prefers_sse3 = supported_cpu_types[i].prefers_sse3;
       target_supports_3dnow = supported_cpu_types[i].supports_3dnow;
+      target_supports_ssse3 = supported_cpu_types[i].supports_ssse3;
       target_supports_sse4a = supported_cpu_types[i].supports_sse4a;
+      target_supports_sse41 = supported_cpu_types[i].supports_sse41;
+      target_supports_sse42 = supported_cpu_types[i].supports_sse42;
+      target_supports_avx = supported_cpu_types[i].supports_avx;
+	  target_supports_fma = supported_cpu_types[i].supports_fma;
+	  target_supports_xop = supported_cpu_types[i].supports_xop;
+	  target_supports_aes = supported_cpu_types[i].supports_aes;
       break;
     }
   }
@@ -2485,6 +2520,25 @@ Get_x86_ISA_extensions ()
     sse2 = TRUE;
     sse3 = TRUE;
   }
+  
+  if(ssse3 == UNDEFINED && (target_supports_ssse3))
+  	ssse3 = TRUE;
+
+  if(sse4_1 == UNDEFINED && target_supports_sse41)
+  	sse4_1 = TRUE;
+
+  if(sse4_2 == UNDEFINED && target_supports_sse42)
+  	sse4_2 = TRUE;
+
+  if(fma_enable == UNDEFINED && target_supports_fma)
+  	fma_enable = TRUE;
+
+  if(xop == UNDEFINED && target_supports_xop)
+  	xop = TRUE;
+
+  if(aes == UNDEFINED && target_supports_aes)
+  	aes = TRUE;
+
 
 #if 0 //temporarily disable it until we have assembler and linker support for
       //sse4a instructions

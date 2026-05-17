@@ -21879,4 +21879,11 @@ Error :  The ORDER array for the RESHAPE intrinsic function must contain a permu
 The ORDER array for a RESHAPE intrinsic function call must contain
 a permutation of (1, 2, ..., size(SHAPE)).
 .ME
-$ LAST NUMBER USED : 1708
+$ Error : 1709
+$msg  1709 The parent-type-name must be a non-SEQUENCE derived type name
+$nexp 1709
+Error : The parent-type-name is must be a non-SEQUENCE derived type name
+.PP
+The parent-type-name is a SEQUENCE type or is not a derived type
+.ME
+$ LAST NUMBER USED : 1709

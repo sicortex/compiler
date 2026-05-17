@@ -2130,8 +2130,19 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
          cvrt_exp_to_pdg(IR_IDX_L(ir_idx), 
                          IR_FLD_L(ir_idx));
 
-         cvrt_exp_to_pdg(IR_IDX_R(ir_idx), 
-                         IR_FLD_R(ir_idx));
+	 if (IR_FLD_R(ir_idx) != IR_Tbl_Idx ||
+	     IR_OPR(IR_IDX_R(ir_idx)) != Null_Intrinsic_Opr)
+
+	     cvrt_exp_to_pdg(IR_IDX_R(ir_idx), IR_FLD_R(ir_idx));
+
+	 else {
+	     arith_constant[0] = 0;
+	     arith_constant[1] = 0;
+
+	     basic = fei_descriptor(0, Basic, 0, CRI_Pointer, 0, DWord_Align);
+	     j = storage_bit_size_tbl[CRI_Ptr_8];
+	     fei_constant(basic, Arith_Const, (char *) arith_constant, j);
+	 }
 
 	 fei_store(pdg_type_void);
 	 break;
@@ -3382,6 +3393,8 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
    case Tan_Opr :
    case Log_E_Opr :
    case Log_10_Opr :
+   case Gamma_Opr :
+   case Log_Gamma_Opr :
    case Cosd_Opr :
    case Sind_Opr :
    case Tand_Opr :
@@ -3842,6 +3855,24 @@ static void	cvrt_exp_to_pdg(int         ir_idx,
              PDG_DBG_PRINT_END
 # ifdef _ENABLE_FEI
              fei_log10(basic);
+# endif
+             break;
+
+        case Gamma_Opr :
+             PDG_DBG_PRINT_START
+             PDG_DBG_PRINT_C("fei_gamma");
+             PDG_DBG_PRINT_END
+# ifdef _ENABLE_FEI
+             fei_gamma(basic);
+# endif
+             break;
+
+        case Log_Gamma_Opr :
+             PDG_DBG_PRINT_START
+             PDG_DBG_PRINT_C("fei_log_gamma");
+             PDG_DBG_PRINT_END
+# ifdef _ENABLE_FEI
+             fei_log_gamma(basic);
 # endif
              break;
 

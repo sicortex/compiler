@@ -51,14 +51,21 @@ LNOTARGET_Whirl_To_Top (WN* wn)
   case OPC_F8MPY:
     return TOP_mulsd;
   case OPC_F4MADD:	// (src2 * src3) + src1
+    return TOP_vfmaddss_f128_oxmm_xmm_xmm_xmm;
   case OPC_F4NMADD:	// -((src2 * src3) + src1)
+    return TOP_vfnmaddss_f128_oxmm_xmm_xmm_xmm;
   case OPC_F4MSUB:	// (src2 * src3) - src1
+    return TOP_vfmsubss_f128_oxmm_xmm_xmm_xmm;
   case OPC_F4NMSUB:	// -((src2 * src3) - src1)
+    return TOP_vfnmsubss_f128_oxmm_xmm_xmm_xmm;
   case OPC_F8MADD:	// (src2 * src3) + src1
+    return TOP_vfmsubsd_f128_oxmm_xmm_xmm_xmm;
   case OPC_F8NMADD:	// -((src2 * src3) + src1)
+    return TOP_vfnmsubsd_f128_oxmm_xmm_xmm_xmm;
   case OPC_F8MSUB:	// (src2 * src3) - src1
+    return TOP_vfmsubsd_f128_oxmm_xmm_xmm_xmm;
   case OPC_F8NMSUB:	// -((src2 * src3) - src1)
-    FmtAssert( false, ("NYI") );
+    return TOP_vfnmsubsd_f128_oxmm_xmm_xmm_xmm;
     break;
   case OPC_F4DIV:
     return TOP_divss;
@@ -1286,7 +1293,7 @@ LNOTARGET_Int_Mod_Str_Red_Res (TI_RES_COUNT* resource_count,
       if (denom_val == -1) 
 	TI_RES_COUNT_Add_Op_Resources(resource_count, 
 				      is_double ? TOP_mov64: TOP_mov32);    
-      else if ( denom_val & 0xffffffff00000000ULL == 0 ) 
+      else if ( (denom_val & 0xffffffff00000000ULL) == 0 ) 
 	TI_RES_COUNT_Add_Op_Resources(resource_count, 
 				      is_double ? TOP_andi64: TOP_andi32);
       else {
@@ -1302,7 +1309,7 @@ LNOTARGET_Int_Mod_Str_Red_Res (TI_RES_COUNT* resource_count,
 				    is_double ? TOP_neg64: TOP_neg32);
       return 3.0;
     } else {
-      if ( denom_val & 0xffffffff00000000ULL == 0 ) 
+      if ( (denom_val & 0xffffffff00000000ULL) == 0 ) 
 	TI_RES_COUNT_Add_Op_Resources(resource_count, 
 				      is_double ? TOP_andi64: TOP_andi32);
       else {
@@ -1530,7 +1537,7 @@ LNOTARGET_Int_Band_Str_Red_Res (TI_RES_COUNT* resource_count,
 				  is_64bit ? TOP_mov64: TOP_mov32);    
     return 1.0;
   }
-  else if ( val & 0xffffffff00000000ULL == 0 ) { // LC_simm32
+  else if ( (val & 0xffffffff00000000ULL) == 0 ) { // LC_simm32
     TI_RES_COUNT_Add_Op_Resources(resource_count, 
 				  is_64bit ? TOP_andi64: TOP_andi32);    
     return 1.0;
@@ -1554,7 +1561,7 @@ LNOTARGET_Int_Bior_Str_Red_Res (TI_RES_COUNT* resource_count,
 				  is_64bit ? TOP_mov64: TOP_mov32);    
     return 1.0;
   }
-  else if ( val & 0xffffffff00000000ULL == 0 ) { // LC_simm32
+  else if ( (val & 0xffffffff00000000ULL) == 0 ) { // LC_simm32
     TI_RES_COUNT_Add_Op_Resources(resource_count, 
 				  is_64bit ? TOP_ori64: TOP_ori32);    
     return 1.0;
@@ -1578,7 +1585,7 @@ LNOTARGET_Int_Bxor_Str_Red_Res (TI_RES_COUNT* resource_count,
 				  is_64bit ? TOP_mov64: TOP_mov32);    
     return 1.0;
   }
-  else if ( val & 0xffffffff00000000ULL == 0 ) { // LC_simm32
+  else if ( (val & 0xffffffff00000000ULL) == 0 ) { // LC_simm32
     TI_RES_COUNT_Add_Op_Resources(resource_count, 
 				  is_64bit ? TOP_xori64: TOP_xori32);    
     return 1.0;

@@ -1,23 +1,68 @@
 
 
 # Generates target info
-function(generate_targ_info output)
+function(generate_targ_info config_name output)
     set(TARGET_DEFINITIONS "")
     set(first true)
     foreach(targ ${PATH64_ENABLE_TARGETS})
         set(arch ${_PATH64_TARGET_ARCH_${targ}})
         set(abi_name ${_PATH64_TARGET_BITS_${targ}})
         set(abi ${_PATH64_TARGET_ABI_${targ}})
+        set(include_path ${PSC_INCLUDE_PATH_${targ}})
         set(crt_path ${PSC_CRT_PATH_${targ}})
         set(crtbegin_path ${PSC_CRTBEGIN_PATH_${targ}})
+
+        # checking CRT path
+
+        if("${crt_path}" STREQUAL "")
+            message(FATAL_ERROR "CRT path for target '${targ}' is not specified. Please set PSC_CRT_PATH_${targ} variable")
+        endif()
+
+        if(NOT IS_ABSOLUTE "${crt_path}")
+            message(FATAL_ERROR "CRT path for target '${targ}' must be absolute. Specified value: '${crt_path}'")
+        endif()
+
+        if("${include_path}" STREQUAL "")
+            message(FATAL_ERROR "Include path for target '${targ}' is not specified. Please set PSC_INCLUDE_PATH_${targ} variable")
+        endif()
+
+        if(NOT IS_ABSOLUTE "${include_path}")
+            message(FATAL_ERROR "Include path for target '${targ}' must be absolute. Specified value: '${include_path}'")
+        endif()
+
+        # check files only for native config
+        if("${config_name}" STREQUAL "")
+
+            if(NOT EXISTS "${crt_path}/crt1.o")
+                message(FATAL_ERROR "file '${crt_path}/crt1.o' does not exist. Please check CRT path for target '${targ}'")
+            endif()
+
+            if(NOT EXISTS "${crt_path}/crti.o")
+                message(FATAL_ERROR "file '${crt_path}/crti.o' does not exist. Please check CRT path for target '${targ}'")
+            endif()
+
+            if(NOT EXISTS "${crt_path}/crtn.o")
+                message(FATAL_ERROR "file '${crt_path}/crtn.o' does not exist. Please check CRT path for target '${targ}'")
+            endif()
+
+        endif()
+
     
+        # checking dynamic linker
+
         if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
             set(dyn_linker ${PSC_DYNAMIC_LINKER_${targ}})
             if(NOT dyn_linker)
-                message(FATAL_ERROR "Dynamic linker for ${targ} target is not specified. Please specify PSC_DYNAMIC_LINKER_${targ} variable")
-            else()
-                message(STATUS "Dynamic linker for ${targ} target: ${dyn_linker}")
+                if("${targ}" STREQUAL "x86_32")
+                    set(dyn_linker "/lib/ld-linux.so.2")
+                elseif("${targ}" STREQUAL "x86_64")
+                    set(dyn_linker "/lib64/ld-linux-x86-64.so.2")
+                else()
+                    message(FATAL_ERROR "Dynamic linker for ${targ} target is not specified. Please specify PSC_DYNAMIC_LINKER_${targ} variable")
+                endif()
             endif()
+
+            message(STATUS "Dynamic linker for ${targ} target: ${dyn_linker}")
         endif()
     
         if(NOT first)
@@ -26,7 +71,7 @@ function(generate_targ_info output)
             set(first false)
         endif()
     
-        set(TARGET_DEFINITIONS "${TARGET_DEFINITIONS}\t{\"${targ}\",\t\"${arch}\",\t\"${abi_name}\",\t${abi},\t\"${crt_path}\",\t\"${crtbegin_path}\"")
+        set(TARGET_DEFINITIONS "${TARGET_DEFINITIONS}\t{\"${targ}\",\t\"${arch}\",\t\"${abi_name}\",\t${abi},\t\"${include_path}\",\t\"${crt_path}\",\t\"${crtbegin_path}\"")
     
         if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
             set(TARGET_DEFINITIONS "${TARGET_DEFINITIONS},\t\"${dyn_linker}\"")
@@ -110,7 +155,7 @@ function(add_driver config_name
     
     # generating target info
     set(targ_info_source "${CMAKE_CURRENT_BINARY_DIR}/targ_info${suffix}.c")
-    generate_targ_info("${targ_info_source}")
+    generate_targ_info("${config_name}" "${targ_info_source}")
     
     add_executable(pathcc${suffix} ${PATHSCALE_DRIVER_SRCS} "${targ_info_source}")
     set_property(TARGET pathcc${suffix} PROPERTY COMPILE_FLAGS "-I${include_dir}")
@@ -181,12 +226,6 @@ if(PATH64_ENABLE_DEFAULT_PATHAS)
 endif()
 
 
-option(PATH64_ENABLE_PSCLANG "Enables using psclang front-end" ON)
-if(PATH64_ENABLE_PSCLANG)
-    list(APPEND driver_defs "-DPATH64_ENABLE_PSCLANG")
-endif()
-
-
 if(PATH64_ENABLE_GNU_FRONTEND)
     list(APPEND driver_defs "-DPATH64_ENABLE_GNU_FRONTEND")
 endif()
@@ -224,10 +263,11 @@ else()
 endif()
 
 
-string(REGEX MATCH "^[^-]+" targ_arch ${PSC_TARGET})
-path64_canonical_arch(targ_arch ${targ_arch})
-path64_get_host_target(host_arch)
-if(NOT ${host_arch} STREQUAL ${targ_arch})
+string(REGEX MATCH "^[^-]+" targ ${PSC_TARGET})
+path64_canonical_arch(targ ${targ})
+path64_get_host_arch(host_arch)
+path64_get_target_arch(targ_arch "${targ}")
+if(NOT "${host_arch}" STREQUAL "${targ_arch}")
     list(APPEND driver_defs -DPATH64_CROSS)
 endif()
 
@@ -289,17 +329,29 @@ endif()
 
 
 add_custom_command(
-        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/check_combos.c ${CMAKE_CURRENT_BINARY_DIR}/implicits.c
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/check_combos.c
+        ${CMAKE_CURRENT_BINARY_DIR}/get_option.i
+        ${CMAKE_CURRENT_BINARY_DIR}/implicits.c
+        ${CMAKE_CURRENT_BINARY_DIR}/init_options.i
+        ${CMAKE_CURRENT_BINARY_DIR}/opt_action.i
+        ${CMAKE_CURRENT_BINARY_DIR}/option_names.h
         COMMAND table < ${CMAKE_CURRENT_BINARY_DIR}/OPTIONS.P
         DEPENDS table ${CMAKE_CURRENT_BINARY_DIR}/OPTIONS.P
         )
 
+# Generate the version strings	
+if(WIN32)
+	file(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}" BUILD_ROOT)
+	string(REPLACE "\\" "\\\\" BUILD_ROOT "${BUILD_ROOT}")
+else()
+	set(BUILD_ROOT "${CMAKE_CURRENT_BINARY_DIR}")
+endif()
 
-add_custom_command(
-        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version_hg.c
-        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gen_version.${SHELL_EXT} > ${CMAKE_CURRENT_BINARY_DIR}/version_hg.c
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/gen_version.${SHELL_EXT}
-        )
+site_name(BUILD_HOST)
+mark_as_advanced(BUILD_HOST)
+set(BUILD_USER $ENV{USER})
+set(BUILD_DATE "${PATH64_BUILD_DATE}")
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version_hg.c.in ${CMAKE_CURRENT_BINARY_DIR}/version_hg.c ESCAPE_QUOTES @ONLY)
 
 add_custom_target(driver_gen_sources
                   DEPENDS
@@ -309,10 +361,100 @@ add_custom_target(driver_gen_sources
 
 # Driver for host system
 
+# detecting CRT paths for all targets
+foreach(targ ${PATH64_ENABLE_TARGETS})
+    set(crt_path_name "PSC_CRT_PATH_${targ}")
+    set(crt_path "${${crt_path_name}}")
+
+    if("${crt_path}" STREQUAL "")
+        execute_process(COMMAND "${CMAKE_C_COMPILER}" "${_PATH64_TARGET_FLAG_${targ}}" "-print-file-name=crt1.o"
+                        RESULT_VARIABLE res
+                        OUTPUT_VARIABLE crt_path)
+        string(REPLACE "\n" "" crt_path "${crt_path}")
+        if(res EQUAL 0 AND NOT "${crt_path}" STREQUAL "")
+            get_filename_component(crt_path "${crt_path}" ABSOLUTE)
+            if(EXISTS "${crt_path}")
+                get_filename_component(crt_path "${crt_path}" PATH)
+                set(${crt_path_name} "${crt_path}")
+            endif()
+        endif()
+    endif()
+endforeach()
+
+
+# setting default paths to include dirs
+foreach(targ ${PATH64_ENABLE_TARGETS})
+    set(include_path_name "PSC_INCLUDE_PATH_${targ}")
+    set(include_path "${${include_path_name}}")
+
+    if("${include_path}" STREQUAL "")
+        if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+            set(${include_path_name} "/usr/include/${targ}-linux-gnu")
+        else()
+            set(${include_path_name} "/usr/include")
+        endif()
+    endif()
+endforeach()
+
+
+# checking for --as-needed
+message(STATUS "Checking for --as-needed")
+set(as_needed_supported FALSE)
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+    set(test_dir "${CMAKE_CURRENT_BINARY_DIR}/as_needed")
+    make_directory(test_dir)
+    write_file("${test_dir}/bar.c" "void bar() {}")
+    write_file("${test_dir}/foo.c" "void foo() { bar(); }")
+    write_file("${test_dir}/test.c" "int main() { foo(); }")
+    execute_process(COMMAND ${CMAKE_C_COMPILER} -shared -o libfoo.so foo.c -fPIC
+                    WORKING_DIRECTORY "${test_dir}"
+                    RESULT_VARIABLE res)
+    if(res EQUAL 0)
+        execute_process(COMMAND ${CMAKE_C_COMPILER} -shared -o libbar.so bar.c -fPIC
+                        WORKING_DIRECTORY "${test_dir}"
+                        RESULT_VARIABLE res)
+        if(res EQUAL 0)
+            execute_process(COMMAND ${CMAKE_C_COMPILER} -fPIC -o test test.c
+                                    -L. -Wl,--as-needed -lfoo -lbar -Wl,--no-as-needed
+                            WORKING_DIRECTORY "${test_dir}"
+                            RESULT_VARIABLE res)
+            if(res EQUAL 0)
+                set(as_needed_supported TRUE)
+            endif()
+        endif()
+    endif()
+endif()
+
+if(as_needed_supported)
+    message(STATUS "--as-needed supported")
+else()
+    message(STATUS "--as-needed not supported")
+    set(NO_AS_NEEDED TRUE)
+endif()
 
 add_driver("" ${hash_style_supported})
 
+
+# Drivers for various linux distros
+
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+
+    set(NO_AS_NEEDED FALSE)
+
+    # deb configuration - for debian multiarch distros with multiarch includes
+    set(PSC_INCLUDE_PATH_x86_64 "/usr/include/x86_64-linux-gnu")
+    set(PSC_INCLUDE_PATH_x86_32 "/usr/include")
+    set(PSC_CRT_PATH_x86_64 "/usr/lib/x86_64-linux-gnu")
+    set(PSC_CRT_PATH_x86_32 "/usr/lib32")
+    add_driver("deb_multiarch_includes" "TRUE")
+
+    set(PSC_INCLUDE_PATH_x86_64 "/usr/include")
+    set(PSC_INCLUDE_PATH_x86_32 "/usr/include")
+
+    # deb configuration - for debian multiarch distros
+    set(PSC_CRT_PATH_x86_64 "/usr/lib/x86_64-linux-gnu")
+    set(PSC_CRT_PATH_x86_32 "/usr/lib32")
+    add_driver("deb_multiarch" "TRUE")
 
     # deb configuration - for debian based distros
     set(PSC_CRT_PATH_x86_64 "/usr/lib")
@@ -333,6 +475,12 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
     set(PSC_CRT_PATH_x86_64 "/usr/lib64")
     set(PSC_CRT_PATH_x86_32 "/usr/lib")
     add_driver("rpm_no_hash_style" "FALSE")
+
+    # rpm configuration without --hash-style ld option support
+    set(NO_AS_NEEDED TRUE)
+    set(PSC_CRT_PATH_x86_64 "/usr/lib64")
+    set(PSC_CRT_PATH_x86_32 "/usr/lib")
+    add_driver("rpm_no_hash_style_no_as_needed" "FALSE")
 endif()
 
 
@@ -354,7 +502,8 @@ if(PATH64_ENABLE_CXX)
         OUTPUT ${Path64_BINARY_DIR}/bin/pathCC ${Path64_BINARY_DIR}/lib/${PSC_FULL_VERSION}
         DEPENDS pathcc
         # Paths in symbolic links should be relative. Otherwise bootstrap will not work
-        COMMAND ${CMAKE_COMMAND} -E create_symlink pathcc ${Path64_BINARY_DIR}/bin/pathCC
+		# TODO does this work with LINK_COPY on windows?
+        COMMAND ${CMAKE_COMMAND} -E ${LINK_COPY} pathcc ${Path64_BINARY_DIR}/bin/pathCC
     )
 
     add_custom_target(
@@ -365,19 +514,19 @@ if(PATH64_ENABLE_CXX)
     add_dependencies(compiler-stage stageit-driver)
 
 
-    install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"pathcc${CMAKE_EXECUTABLE_SUFFIX}\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/pathCC${CMAKE_EXECUTABLE_SUFFIX}\")")
-    install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"pathCC${CMAKE_EXECUTABLE_SUFFIX}\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/pathCC-${PSC_FULL_VERSION}${CMAKE_EXECUTABLE_SUFFIX}\")")
+    install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E ${LINK_COPY} \"pathcc${CMAKE_EXECUTABLE_SUFFIX}\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/pathCC${CMAKE_EXECUTABLE_SUFFIX}\")")
+    install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E ${LINK_COPY} \"pathCC${CMAKE_EXECUTABLE_SUFFIX}\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/pathCC-${PSC_FULL_VERSION}${CMAKE_EXECUTABLE_SUFFIX}\")")
 endif()
 
 endif()
 
 if(PATH64_ENABLE_FORTRAN)
-install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"pathcc${CMAKE_EXECUTABLE_SUFFIX}\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/pathf95${CMAKE_EXECUTABLE_SUFFIX}\")")
-install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"pathcc${CMAKE_EXECUTABLE_SUFFIX}\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/pathf90${CMAKE_EXECUTABLE_SUFFIX}\")")
+install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E ${LINK_COPY} \"pathcc${CMAKE_EXECUTABLE_SUFFIX}\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/pathf95${CMAKE_EXECUTABLE_SUFFIX}\")")
+install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E ${LINK_COPY} \"pathcc${CMAKE_EXECUTABLE_SUFFIX}\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/pathf90${CMAKE_EXECUTABLE_SUFFIX}\")")
 endif()
-install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"pathcc${CMAKE_EXECUTABLE_SUFFIX}\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/pathcc-${PSC_FULL_VERSION}${CMAKE_EXECUTABLE_SUFFIX}\")")
+install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E ${LINK_COPY} \"pathcc${CMAKE_EXECUTABLE_SUFFIX}\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/pathcc-${PSC_FULL_VERSION}${CMAKE_EXECUTABLE_SUFFIX}\")")
 
 if(PATH64_ENABLE_FORTRAN)
-install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"pathf95${CMAKE_EXECUTABLE_SUFFIX}\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/pathf95-${PSC_FULL_VERSION}${CMAKE_EXECUTABLE_SUFFIX}\")")
-install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"pathf90${CMAKE_EXECUTABLE_SUFFIX}\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/pathf90-${PSC_FULL_VERSION}${CMAKE_EXECUTABLE_SUFFIX}\")")
+install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E ${LINK_COPY} \"pathf95${CMAKE_EXECUTABLE_SUFFIX}\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/pathf95-${PSC_FULL_VERSION}${CMAKE_EXECUTABLE_SUFFIX}\")")
+install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E ${LINK_COPY} \"pathf90${CMAKE_EXECUTABLE_SUFFIX}\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/pathf90-${PSC_FULL_VERSION}${CMAKE_EXECUTABLE_SUFFIX}\")")
 endif()

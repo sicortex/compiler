@@ -2455,6 +2455,16 @@ vho_lower_rcomma ( WN * wn, WN *block, BOOL_INFO * bool_info )
     WN_INSERT_BlockLast ( block, rcomma_block );
   rcomma_block = vho_lower_block ( WN_kid1(wn));
 
+  if (preg_mtype == MTYPE_M) {
+    TY_IDX ty_idx = WN_ty(wn);
+    ST* st = Gen_Temp_Symbol (ty_idx, ".rcomma_m_expansion");
+    wn = WN_CreateStid (OPC_MSTID, 0, st, ty_idx, test);
+    WN_Set_Linenum ( wn, VHO_Srcpos );
+    WN_INSERT_BlockLast (rcomma_block, wn);
+    WN_INSERT_BlockLast ( block, rcomma_block );
+    return WN_CreateLdid (OPC_MMLDID, 0, st, ty_idx);
+  }
+
   preg = Create_Preg (preg_mtype, vho_lower_rcomma_name);
 
   preg_st      = MTYPE_To_PREG ( preg_mtype );
@@ -4094,7 +4104,9 @@ vho_lower_mparm (WN * wn)
 
     // bugs 9989, 10139
     INT field_id;
-    Is_True (WN_field_id(kid) == 0,("vho_lower_mparm: Expected field-id zero"));
+
+    // WN_field_id(kid) can be non zero if loading struct from field of other struct
+
     if ((TY_kind(ty) == KIND_STRUCT) &&
         (field_id /* assign */ = single_field_in_struct (ty)))
       WN_set_field_id (kid, field_id);
@@ -8257,8 +8269,9 @@ VHO_Lower ( WN * wn )
  * ============================================================================
  */
 
-WN * VHO_Lower_Driver (PU_Info* pu_info, 
-		       WN *wn) {
+WN * VHO_Lower_Driver (PU_Info* pu_info,
+                       PU *pu,
+                       WN *wn) {
 
    if (Get_Trace ( TKIND_IR, TP_VHO_LOWER )) {
 
@@ -8299,11 +8312,11 @@ WN * VHO_Lower_Driver (PU_Info* pu_info,
    if (Inline_Intrinsics_Early) {
       /* Lower intrinsics and reduce tree height if running at high
        * optimization levels */
-      wn = WN_Lower(wn, LOWER_TREEHEIGHT | LOWER_INLINE_INTRINSIC, NULL,
+      wn = WN_Lower(pu, wn, LOWER_TREEHEIGHT | LOWER_INLINE_INTRINSIC, NULL,
 		    "Intrinsic lowering");
    }
 #if defined( KEY) // bug 6938
-   else wn = WN_Lower(wn, LOWER_FAST_EXP, NULL,
+   else wn = WN_Lower(pu, wn, LOWER_FAST_EXP, NULL,
 		    "Fast exponents lowering");
 #endif
 

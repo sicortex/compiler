@@ -52,9 +52,9 @@ extern void Wopt_Init (void);
 
 extern void Wopt_Fini (void);
 
-extern WN *Perform_Preopt_Optimization (WN *, WN *);
+extern WN *Perform_Preopt_Optimization (PU *, WN *);
 
-extern WN *Perform_Global_Optimization (WN *, WN *, struct ALIAS_MANAGER *);
+extern WN *Perform_Global_Optimization (PU *, WN *, struct ALIAS_MANAGER *);
 
 #ifdef __cplusplus
 }

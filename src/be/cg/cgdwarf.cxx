@@ -1124,13 +1124,6 @@ put_inlined_subroutine(DST_INLINED_SUBROUTINE *attr, Dwarf_P_Die die)
 	put_decl (DST_INLINED_SUBROUTINE_decl(attr), die);
    }
    else {
-        USRCPOS srcpos = DST_INLINED_SUBROUTINE_srcpos(attr);
-        if (USRCPOS_filenum(srcpos) != 0)
-          dwarf_add_AT_unsigned_const (dw_dbg, die, DW_AT_call_file, 
-			   (UINT32)USRCPOS_filenum(srcpos), &dw_error);
-        if (USRCPOS_linenum(srcpos) != 0)
-          dwarf_add_AT_unsigned_const (dw_dbg, die, DW_AT_call_line, 
-			   (UINT32)USRCPOS_linenum(srcpos), &dw_error);
 	/* same-file inlining */
 	put_reference(
 		DST_INLINED_SUBROUTINE_abstract_origin(attr),
@@ -1738,6 +1731,11 @@ put_string_type (DST_flag flag, DST_STRING_TYPE *attr, Dwarf_P_Die die)
   }
 }
 
+static void
+put_namespace(DST_NAMESPACE *attr, Dwarf_P_Die die) {
+  put_name (DST_NAMESPACE_name(attr), die, pb_none);
+}
+
 #ifdef KEY
 static void
 put_namelist (DST_NAMELIST *attr, Dwarf_P_Die die)
@@ -1891,6 +1889,9 @@ Write_Attributes (
       break;
     case DW_TAG_namelist_item:
       put_namelist_item (DST_ATTR_IDX_TO_PTR(iattr, DST_NAMELIST_ITEM), die);
+      break;
+    case DW_TAG_namespace:
+      put_namespace(DST_ATTR_IDX_TO_PTR(iattr, DST_NAMESPACE), die);
       break;
 #ifdef KEY /* Bug 3507 */
     case DW_TAG_imported_declaration:
@@ -2062,6 +2063,9 @@ preorder_visit_mark_emit (
 }
 #endif
 
+extern "C" {
+int dwarf_die_linked(Dwarf_P_Die die);
+}
 
 /* Do a preorder traversal of the DST node 'idx' and all its children. The
  * 'parent' and/or 'left_sibling' parameters indicate where in the 
@@ -2102,7 +2106,7 @@ preorder_visit (
     }
   }
   #ifdef KEY /* Bug 15029 */
-  else if (DST_INFO_tag(info) == DW_TAG_base_type && 0) {
+  else if (DST_INFO_tag(info) == DW_TAG_base_type && dwarf_die_linked(die)) {
     /* What a mess. Function Traverse_Global_DST() calls
      * DST_SET_info_mark() to indicate that it has already linked a DIE
      * into the Dwarf output tree, preventing it from being linked a second

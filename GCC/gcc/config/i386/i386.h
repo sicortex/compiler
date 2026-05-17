@@ -425,6 +425,8 @@ extern const char *host_detect_local_cpu (int argc, const char **argv);
        builtin_define ("__SSE4_1__");                            \
       if (TARGET_SSE4_2)                                         \
        builtin_define ("__SSE4_2__");                            \
+      if (TARGET_AVX)                       \
+	   builtin_define ("__AVX__");          \
       if (TARGET_SSE_MATH && TARGET_SSE)			\
 	builtin_define ("__SSE_MATH__");			\
       if (TARGET_SSE_MATH && TARGET_SSE2)			\
@@ -2264,6 +2266,9 @@ enum ix86_builtins
 	//IX86_BUILTIN_ADDPD256,
 
 	/* SSSE3*/
+    IX86_BUILTIN_SETREPI32,
+	IX86_BUILTIN_SETREPI16,
+	IX86_BUILTIN_SETREPI8,
 	IX86_BUILTIN_PHADDW128,
 	IX86_BUILTIN_PHADDD128,
 	IX86_BUILTIN_PHADDSW128,
@@ -2290,6 +2295,13 @@ enum ix86_builtins
 	IX86_BUILTIN_PALIGNR,
 	IX86_BUILTIN_PSHUFB128,
 	IX86_BUILTIN_PSHUFB,
+	IX86_BUILTIN_AESDEC,
+	IX86_BUILTIN_AESENC,
+	IX86_BUILTIN_AESDECLAST,
+	IX86_BUILTIN_AESENCLAST,
+	IX86_BUILTIN_AESIMC,
+	IX86_BUILTIN_AESKEYGENASSIST,
+	IX86_BUILTIN_PCLMULDQD,
   IX86_BUILTIN_MAX
 };
 #endif

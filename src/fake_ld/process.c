@@ -158,9 +158,6 @@ do_compile (string *argv)
     int pid;
     
     if (toolroot == 0) {
-	if ((toolroot = getenv ("TOOLROOT")) == 0)
-	    toolroot = "/usr/bin/";
-	else
 	    toolroot = concat_names (toolroot, "/usr/bin/");
     }
 

@@ -54,7 +54,6 @@
 #endif
 #include "be_symtab.h"                  // BE_ST
 #include "config.h"                     // Run_preopt, Run_ipl
-#include "dso.h"                        // dso_load
 #include "erglob.h"                     // ErrMsg
 #include "glob.h"                       // Show_Progress
 #include "ir_reader.h"                  // fdump_tree
@@ -73,19 +72,6 @@
 #include "optimizer.h"                  // Pre_Optimizer
 #include "region_main.h"                // REGION_Initialize
 #include "ipa_main.h"
-
-// --- from wopt.so
-#pragma weak Create_Du_Manager
-#pragma weak Delete_Du_Manager
-#pragma weak Pre_Optimizer
-
-// --- from ipl.so
-#pragma weak Array_Summary_Output
-#pragma weak Do_Par
-#pragma weak Ipl_Init_From_Ipa
-#pragma weak Summary
-#pragma weak Trace__20ARRAY_SUMMARY_OUTPUTGP8__file_s
-#pragma weak Trace__31SUMMARIZE__pt__14_XC7PROGRAML10GP8__file_s
 
 
 class ST_IDX_PAIR_TO_INT32_HASH_TABLE
@@ -537,9 +523,6 @@ IPA_update_procedure (IPA_NODE* node,
 static void
 IPA_preopt_initialize ()
 {
-  dso_load_simply ("wopt", WOPT_Path, Show_Progress);
-  dso_load_simply ("ipl", Ipl_Path, Show_Progress);
-
   MEM_POOL_Initialize (&IPA_preopt_pool, "IPA preopt pool", FALSE);
   MEM_POOL_Push (&IPA_preopt_pool);
 
@@ -707,7 +690,7 @@ IPA_Preoptimize (IPA_NODE* node)
   ALIAS_MANAGER* alias_mgr = Create_Alias_Manager (MEM_pu_nz_pool_ptr);
 
   // call the preopt, which then calls Perform_Procedure_Summary_Phase
-  WN* opt_wn = Pre_Optimizer (PREOPT_IPA1_PHASE, wn, du_mgr, alias_mgr);
+  WN* opt_wn = Pre_Optimizer (PREOPT_IPA1_PHASE, &node->Get_PU(), wn, du_mgr, alias_mgr);
 
   Delete_Du_Manager (du_mgr, MEM_pu_nz_pool_ptr);
   Delete_Alias_Manager (alias_mgr, MEM_pu_nz_pool_ptr);
@@ -734,7 +717,7 @@ IPA_Preoptimize (IPA_NODE* node)
   }
 
 #if Is_True_On
-  WN_verifier(opt_wn);
+  WN_verifier(&node->Get_PU(), opt_wn);
 #endif
 
   if (Summary->Has_symbol_entry()) {

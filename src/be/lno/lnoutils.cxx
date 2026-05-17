@@ -88,8 +88,6 @@
 #include "be_symtab.h" // for Be_preg_tab
 #endif
 
-#pragma weak New_Construct_Id
-
 extern void LWN_Parentize_One_Level(const WN* wn);
 
 extern WN* LWN_Make_Icon(TYPE_ID wtype, INT64 i)
@@ -2111,9 +2109,53 @@ static void Flip_Le_And_Ge(WN* wn)
   WN_set_opcode(wn, OPCODE_make_op(opr, OPCODE_rtype(opc), OPCODE_desc(opc)));
 }
 
+static WN*
+Lower_Re_IMadd(WN* parent, WN * wn){
+  if( WN_opcode(wn) != OPC_I4MADD){
+  	for(INT i= 0; i < WN_kid_count(wn); i++){
+	  WN_kid(wn, i) = Lower_Re_IMadd(wn, WN_kid(wn, i));
+  	}
+  }else{
+  //FmtAssert(WN_opcode(wn) == OPC_I4MADD, ("error, RE imadd is no i4madd"));
+    INT kid = 0;
+    for(kid = 0; kid < WN_kid_count(parent); kid++){
+	  if(WN_kid(parent, kid) == wn)
+	  	break;
+    }
+    //FmtAssert(kid < WN_kid_count(parent); ("parent is not really parent of wn in Lower_Re_IMadd"));
+    TYPE_ID ty = WN_rtype(wn);
+    WN *madd_kid0 = WN_COPY_Tree(WN_kid0(wn));
+    LWN_Copy_Def_Use(WN_kid0(wn), madd_kid0, Du_Mgr);
+    WN *madd_kid1 = WN_COPY_Tree(WN_kid1(wn));
+    LWN_Copy_Def_Use(WN_kid1(wn), madd_kid1, Du_Mgr);
+    WN *madd_kid2 = WN_COPY_Tree(WN_kid2(wn));
+    LWN_Copy_Def_Use(WN_kid2(wn), madd_kid2, Du_Mgr);
+    WN *new_mul = WN_Mpy(ty, madd_kid1, madd_kid2);
+    WN *new_add = WN_Add(ty , new_mul, madd_kid0);
+    WN_DELETE_Tree(wn);
+    WN_kid(parent, kid) = new_add;
+    LWN_Parentize(parent);
+    for(INT i =0; i < WN_kid_count(new_add); i++)
+	WN_kid(new_add, i) = Lower_Re_IMadd(new_add, WN_kid(new_add,i));
+    return new_add;
+  }
+  return wn;
+}
+
+
 BOOL Solve_For(WN* wn_top, const SYMBOL& sym)
 {
   BOOL       ok = FALSE;
+
+  wn_top = Lower_Re_IMadd(LWN_Get_Parent(wn_top), wn_top);
+  
+	
+  WN*		 l = WN_kid0(wn_top);
+  WN*		 r = WN_kid1(wn_top);
+
+  FmtAssert(WN_operator(l)!= OPR_MADD,("MADD should be handled in Lower_Re_IMadd"));
+  FmtAssert(WN_operator(r)!= OPR_MADD,("MADD should be handled in Lower_Re_IMadd"));
+
 
   INT        lcount = Symbol_Count(WN_kid0(wn_top), sym);
   INT        rcount = Symbol_Count(WN_kid1(wn_top), sym);
@@ -2134,8 +2176,8 @@ BOOL Solve_For(WN* wn_top, const SYMBOL& sym)
     WN_kid1(wn_top) = wn0;
   }
 
-  WN*        l = WN_kid0(wn_top);
-  WN*        r = WN_kid1(wn_top);
+  l = WN_kid0(wn_top);
+  r = WN_kid1(wn_top);
 
   while (1) {
     // invariant at this location: the index is somewhere on the left (l))
@@ -2143,6 +2185,8 @@ BOOL Solve_For(WN* wn_top, const SYMBOL& sym)
 
     OPCODE     lopc = WN_opcode(l);
     OPERATOR   lopr = OPCODE_operator(lopc);
+
+	FmtAssert(WN_operator(l)!= OPR_MADD,("MADD should be handled in Lower_Re_IMadd"));
 
     // have we successfully solved for the index variable?
     if (OPCODE_is_load(lopc)) {
@@ -2255,8 +2299,14 @@ BOOL Solve_For(WN* wn_top, const SYMBOL& sym)
   (void) WN_Simplifier_Enable(simp_state_save);
 #endif
 
+  /*it would be better for alignment in SIMD if foding two constant ADD or SUB*/
+  if((WN_operator(r) == OPR_ADD || WN_operator(r) == OPR_SUB) &&
+  	WN_operator(WN_kid0(r)) == OPR_INTCONST && 
+  	WN_operator(WN_kid1(r)) == OPR_INTCONST)
+  	r = WN_SimplifyExp2(WN_opcode(r), WN_kid0(r), WN_kid1(r));
   WN_kid0(wn_top) = l;
   WN_kid1(wn_top) = r;
+  
   LWN_Parentize(wn_top);
 
   return ok;
@@ -2847,11 +2897,11 @@ static BOOL LNO_Check_Du_Check(HASH_TABLE<WN*,WN*>* ht)
   return rval;
 }
 
-void LNO_Check_Du(WN* orig)
+void LNO_Check_Du(PU *pu, WN* orig)
 {
   WN* copy = LWN_Copy_Tree(orig);
   Set_Error_Phase ( "Pre-Optimizer DU" );
-  copy = Pre_Optimizer(PREOPT_DUONLY_PHASE, copy, Du_Mgr, Alias_Mgr);
+  copy = Pre_Optimizer(PREOPT_DUONLY_PHASE, pu, copy, Du_Mgr, Alias_Mgr);
   Set_Error_Phase ( "Loop nest optimizer Post-DU" );
   LWN_Parentize(copy);
   Mark_Code(copy, FALSE, TRUE);
@@ -3657,7 +3707,7 @@ void LS_IN_LOOP::Lexorder(WN* wn, ARRAY_DIRECTED_GRAPH16* dg, INT* lex,
       || OPCODE_is_store(op) 
 	&& (opr != OPR_STID || dg->Get_Vertex(wn) || use_scalars) 
       || OPCODE_is_call(op)) {
-    ++(*lex);
+  ++(*lex);
     _ht.Enter(wn, *lex);
   }
 }

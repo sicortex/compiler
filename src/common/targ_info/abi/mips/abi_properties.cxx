@@ -250,6 +250,7 @@ static void n64_abi(void)
 	       -1);
 }
 
+int
 main()
 {
   ABI_Properties_Begin("MIPS");
@@ -274,4 +275,5 @@ main()
   n64_abi();
 
   ABI_Properties_End();
+  return 0;
 }

@@ -275,9 +275,12 @@ CGEMIT_Prn_Scn_In_Asm (FILE       *asm_file,
         *p++ = 'w';
 
 #ifdef __sun
-      // .eh_frame section should be writable on solaris
+      // .eh_frame, .ctors, .dtors sections should be writable on solaris
       // FIXME: check target os, not host
-      if (!(scn_flags & SHF_WRITE) && strcmp(scn_name, ".eh_frame") == 0) {
+      if (!(scn_flags & SHF_WRITE) && 
+              (strcmp(scn_name, ".eh_frame") == 0 || 
+               strcmp(scn_name, ".ctors") == 0 ||
+               strcmp(scn_name, ".dtors") == 0)) {
         *p++ = 'w';
       }
 #endif // __sun
@@ -296,12 +299,9 @@ CGEMIT_Prn_Scn_In_Asm (FILE       *asm_file,
       *p = '\0'; // null terminate the string.
       fprintf (asm_file, ", \"%s\"", scn_flags_string);
 #ifndef _WIN32
-#ifndef __FreeBSD__ // FIXME: target os should be checked
       if (Is_Target_64bit() && strcmp (scn_name, ".eh_frame") == 0)
         fprintf (asm_file, ",@unwind");
-      else 
-#endif // __FreeBSD__
-      if (scn_type == SHT_PROGBITS)
+      else if (scn_type == SHT_PROGBITS)
         fprintf (asm_file, ",@progbits");
       else if (scn_type == SHT_NOBITS)
         fprintf (asm_file, ",@nobits");
@@ -465,7 +465,8 @@ CGEMIT_Relocs_In_Asm (TN *t, ST *st, vstring *buf, INT64 *val)
 	    char* str = NULL;
 	    if (Is_Target_EM64T()    ||
                 Is_Target_Wolfdale() ||
-		Is_Target_Core())
+		Is_Target_Core() ||
+		Is_Target_Sandy_Bridge())
 	      asprintf( &str, "$_GLOBAL_OFFSET_TABLE_+[.-%s]",
                     EMT_Get_Qualified_Name(st).c_str() );
 	    else
@@ -644,6 +645,7 @@ static void Init_OP_Name()
   OP_Name[TOP_addx128v8] = "paddb";
   OP_Name[TOP_addxx128v8] = "paddb";
   OP_Name[TOP_addxxx128v8] = "paddb";
+  OP_Name[TOP_pmuludq128] = "pmuludq";
   OP_Name[TOP_mul128v16] = "pmullw";
   OP_Name[TOP_mulhw128v16] = "pmulhw";
 	OP_Name[TOP_pmulhuw128] = "pmulhuw";
@@ -1277,18 +1279,18 @@ static void Init_OP_Name()
   OP_Name[TOP_ldlps_n32] = "movlps";
   OP_Name[TOP_stlps] = "movlps";
   OP_Name[TOP_stlps_n32] = "movlps";
-  OP_Name[TOP_ldlpd] = "movsd";
-  OP_Name[TOP_ldlpd_n32] = "movsd";
-  OP_Name[TOP_stlpd] = "movsd";
-  OP_Name[TOP_stlpd_n32] = "movsd";
+  OP_Name[TOP_ldlpd] = "movlpd";
+  OP_Name[TOP_ldlpd_n32] = "movlpd";
+  OP_Name[TOP_stlpd] = "movlpd";
+  OP_Name[TOP_stlpd_n32] = "movlpd";
   OP_Name[TOP_ldlpsx] = "movlps";
   OP_Name[TOP_stlpsx] = "movlps";
-  OP_Name[TOP_ldlpdx] = "movsd";
-  OP_Name[TOP_stlpdx] = "movsd";
+  OP_Name[TOP_ldlpdx] = "movlpd";
+  OP_Name[TOP_stlpdx] = "movlpd";
   OP_Name[TOP_ldlpsxx] = "movlps";
   OP_Name[TOP_stlpsxx] = "movlps";
-  OP_Name[TOP_ldlpdxx] = "movsd";
-  OP_Name[TOP_stlpdxx] = "movsd";
+  OP_Name[TOP_ldlpdxx] = "movlpd";
+  OP_Name[TOP_stlpdxx] = "movlpd";
   OP_Name[TOP_ldhps] = "movhps";
   OP_Name[TOP_ldhps_n32] = "movhps";
   OP_Name[TOP_sthps] = "movhps";
@@ -1347,6 +1349,13 @@ static void Init_OP_Name()
   OP_Name[TOP_ldups_n32] = "movups";
   OP_Name[TOP_movss] = "movaps";
   OP_Name[TOP_movdq] = "movdqa";
+  OP_Name[TOP_aesmov] = "movdqa";
+  /*AVX can't not be deleted by EBO*/
+  OP_Name[TOP_sivmovdqa] = "vmovdqa";
+  OP_Name[TOP_sivmovdqu] = "vmovdqu",
+  OP_Name[TOP_sivmovups] = "vmovups",
+  OP_Name[TOP_sivmovupd] = "vmovupd",
+  OP_Name[TOP_sivmovapd] = "vmovapd",
   OP_Name[TOP_movg2x] = "movd";
   OP_Name[TOP_movg2x64] = "movd";
   OP_Name[TOP_movx2g] = "movd";
@@ -1468,12 +1477,195 @@ static void Init_OP_Name()
   OP_Name[TOP_pcmpistrm] = "pcmpistrm";
   OP_Name[TOP_pcmpestri] = "pcmpestri";
   OP_Name[TOP_pcmpestrm] = "pcmpestrm";
+  OP_Name[TOP_pcmpistriintr] = "pcmpistri";
+  OP_Name[TOP_pcmpistrmintr] = "pcmpistrm";
+  OP_Name[TOP_pcmpestriintr] = "pcmpestri";
+  OP_Name[TOP_pcmpestrmintr] = "pcmpestrm";
   OP_Name[TOP_crc32b] = "crc32b";
   OP_Name[TOP_crc32w] = "crc32w";
   OP_Name[TOP_crc32l] = "crc32l";
   OP_Name[TOP_crc32q] = "crc32q";
-  OP_Name[TOP_popcntl] = "popcntl";
-  OP_Name[TOP_popcntq] = "popcntq";
+  OP_Name[TOP_popcntl] = "popcnt";
+  OP_Name[TOP_popcntq] = "popcnt";
+
+  /*SSE4 load_exe*/
+  
+  OP_Name[TOP_blendpdx] = "blendpd",
+		OP_Name[TOP_blendpdxx] = "blendpd",
+		OP_Name[TOP_blendpdxxx] = "blendpd",
+		OP_Name[TOP_blendpsx] = "blendps",
+		OP_Name[TOP_blendpsxx] = "blendps",
+		OP_Name[TOP_blendpsxxx] = "blendps",
+		OP_Name[TOP_blendvpdx] = "blendvpd",
+		OP_Name[TOP_blendvpdxx] = "blendvpd",
+		OP_Name[TOP_blendvpdxxx] = "blendvpd",
+		OP_Name[TOP_blendvpsx] = "blendvps",
+		OP_Name[TOP_blendvpsxx] = "blendvps",
+		OP_Name[TOP_blendvpsxxx] = "blendvps",
+		OP_Name[TOP_crc32] = "crc32",
+		OP_Name[TOP_crc32x] = "crc32",
+		OP_Name[TOP_crc32xx] = "crc32",
+		OP_Name[TOP_crc32xxx] = "crc32",
+		OP_Name[TOP_crc32_64] = "crc32",
+		OP_Name[TOP_crc32_64x] = "crc32",
+		OP_Name[TOP_crc32_64xx] = "crc32",
+		OP_Name[TOP_crc32_64xxx] = "crc32",
+		OP_Name[TOP_dppdx] = "dppd",
+		OP_Name[TOP_dppdxx] = "dppd",
+		OP_Name[TOP_dppdxxx] = "dppd",
+		OP_Name[TOP_dppsx] = "dpps",
+		OP_Name[TOP_dppsxx] = "dpps",
+		OP_Name[TOP_dppsxxx] = "dpps",
+		OP_Name[TOP_extractpsx] = "extractps",
+		OP_Name[TOP_extractpsxx] = "extractps",
+		OP_Name[TOP_extractpsxxx] = "extractps",
+		OP_Name[TOP_insertpsx] = "insertps",
+		OP_Name[TOP_insertpsxx] = "insertps",
+		OP_Name[TOP_insertpsxxx] = "insertps",
+		OP_Name[TOP_mpsadbwx] = "mpsadbw",
+		OP_Name[TOP_mpsadbwxx] = "mpsadbw",
+		OP_Name[TOP_mpsadbwxxx] = "mpsadbw",
+		OP_Name[TOP_packusdwx] = "packusdw",
+		OP_Name[TOP_packusdwxx] = "packusdw",
+		OP_Name[TOP_packusdwxxx] = "packusdw",
+		OP_Name[TOP_pblendvbx] = "pblendvb",
+		OP_Name[TOP_pblendvbxx] = "pblendvb",
+		OP_Name[TOP_pblendvbxxx] = "pblendvb",
+		OP_Name[TOP_pblendwx] = "pblendw",
+		OP_Name[TOP_pblendwxx] = "pblendw",
+		OP_Name[TOP_pblendwxxx] = "pblendw",
+		OP_Name[TOP_pcmpeqqx] = "pcmpeqq",
+		OP_Name[TOP_pcmpeqqxx] = "pcmpeqq",
+		OP_Name[TOP_pcmpeqqxxx] = "pcmpeqq",
+		OP_Name[TOP_pcmpestrix] = "pcmpestri",
+		OP_Name[TOP_pcmpestrixx] = "pcmpestri",
+		OP_Name[TOP_pcmpestrixxx] = "pcmpestri",
+		OP_Name[TOP_pcmpestrmx] = "pcmpestrm",
+		OP_Name[TOP_pcmpestrmxx] = "pcmpestrm",
+		OP_Name[TOP_pcmpestrmxxx] = "pcmpestrm",
+		OP_Name[TOP_pcmpistrix] = "pcmpistri",
+		OP_Name[TOP_pcmpistrixx] = "pcmpistri",
+		OP_Name[TOP_pcmpistrixxx] = "pcmpistri",
+		OP_Name[TOP_pcmpistrmx] = "pcmpistrm",
+		OP_Name[TOP_pcmpistrmxx] = "pcmpistrm",
+		OP_Name[TOP_pcmpistrmxxx] = "pcmpistrm",
+		OP_Name[TOP_pcmpgtqx] = "pcmpgtq",
+		OP_Name[TOP_pcmpgtqxx] = "pcmpgtq",
+		OP_Name[TOP_pcmpgtqxxx] = "pcmpgtq",
+		OP_Name[TOP_pextrbx] = "pextrb",
+		OP_Name[TOP_pextrbxx] = "pextrb",
+		OP_Name[TOP_pextrbxxx] = "pextrb",
+		OP_Name[TOP_pextrdx] = "pextrd",
+		OP_Name[TOP_pextrdxx] = "pextrd",
+		OP_Name[TOP_pextrdxxx] = "pextrd",
+		OP_Name[TOP_pextrqx] = "pextrq",
+		OP_Name[TOP_pextrqxx] = "pextrq",
+		OP_Name[TOP_pextrqxxx] = "pextrq",
+		OP_Name[TOP_pextrwx] = "pextrw",
+		OP_Name[TOP_pextrwxx] = "pextrw",
+		OP_Name[TOP_pextrwxxx] = "pextrw",
+		OP_Name[TOP_phminposuwx] = "phminposuw",
+		OP_Name[TOP_phminposuwxx] = "phminposuw",
+		OP_Name[TOP_phminposuwxxx] = "phminposuw",
+		OP_Name[TOP_pinsrbx] = "pinsrb",
+		OP_Name[TOP_pinsrbxx] = "pinsrb",
+		OP_Name[TOP_pinsrbxxx] = "pinsrb",
+		OP_Name[TOP_pinsrdx] = "pinsrd",
+		OP_Name[TOP_pinsrdxx] = "pinsrd",
+		OP_Name[TOP_pinsrdxxx] = "pinsrd",
+		OP_Name[TOP_pinsrqx] = "pinsrq",
+		OP_Name[TOP_pinsrqxx] = "pinsrq",
+		OP_Name[TOP_pinsrqxxx] = "pinsrq",
+		OP_Name[TOP_pmaxsbx] = "pmaxsb",
+		OP_Name[TOP_pmaxsbxx] = "pmaxsb",
+		OP_Name[TOP_pmaxsbxxx] = "pmaxsb",
+		OP_Name[TOP_pmaxsdx] = "pmaxsd",
+		OP_Name[TOP_pmaxsdxx] = "pmaxsd",
+		OP_Name[TOP_pmaxsdxxx] = "pmaxsd",
+		OP_Name[TOP_pmaxudx] = "pmaxud",
+		OP_Name[TOP_pmaxudxx] = "pmaxud",
+		OP_Name[TOP_pmaxudxxx] = "pmaxud",
+		OP_Name[TOP_pmaxuwx] = "pmaxuw",
+		OP_Name[TOP_pmaxuwxx] = "pmaxuw",
+		OP_Name[TOP_pmaxuwxxx] = "pmaxuw",
+		OP_Name[TOP_pminsbx] = "pminsb",
+		OP_Name[TOP_pminsbxx] = "pminsb",
+		OP_Name[TOP_pminsbxxx] = "pminsb",
+		OP_Name[TOP_pminsdx] = "pminsd",
+		OP_Name[TOP_pminsdxx] = "pminsd",
+		OP_Name[TOP_pminsdxxx] = "pminsd",
+		OP_Name[TOP_pminudx] = "pminud",
+		OP_Name[TOP_pminudxx] = "pminud",
+		OP_Name[TOP_pminudxxx] = "pminud",
+		OP_Name[TOP_pminuwx] = "pminuw",
+		OP_Name[TOP_pminuwxx] = "pminuw",
+		OP_Name[TOP_pminuwxxx] = "pminuw",
+		OP_Name[TOP_pmovsxbwx] = "pmovsxbw",
+		OP_Name[TOP_pmovsxbdx] = "pmovsxbd",
+		OP_Name[TOP_pmovsxbqx] = "pmovsxbq",
+		OP_Name[TOP_pmovsxwdx] = "pmovsxwd",
+		OP_Name[TOP_pmovsxwqx] = "pmovsxwq",
+		OP_Name[TOP_pmovsxdqx] = "pmovsxdq",
+		OP_Name[TOP_pmovzxbwx] = "pmovzxbw",
+		OP_Name[TOP_pmovzxbdx] = "pmovzxbd",
+		OP_Name[TOP_pmovzxbqx] = "pmovzxbq",
+		OP_Name[TOP_pmovzxwdx] = "pmovzxwd",
+		OP_Name[TOP_pmovzxwqx] = "pmovzxwq",
+		OP_Name[TOP_pmovzxdqx] = "pmovzxdq",
+		OP_Name[TOP_pmovsxbwxx] = "pmovsxbw",
+		OP_Name[TOP_pmovsxbdxx] = "pmovsxbd",
+		OP_Name[TOP_pmovsxbqxx] = "pmovsxbq",
+		OP_Name[TOP_pmovsxwdxx] = "pmovsxwd",
+		OP_Name[TOP_pmovsxwqxx] = "pmovsxwq",
+		OP_Name[TOP_pmovsxdqxx] = "pmovsxdq",
+		OP_Name[TOP_pmovzxbwxx] = "pmovzxbw",
+		OP_Name[TOP_pmovzxbdxx] = "pmovzxbd",
+		OP_Name[TOP_pmovzxbqxx] = "pmovzxbq",
+		OP_Name[TOP_pmovzxwdxx] = "pmovzxwd",
+		OP_Name[TOP_pmovzxwqxx] = "pmovzxwq",
+		OP_Name[TOP_pmovzxdqxx] = "pmovzxdq",
+		OP_Name[TOP_pmovsxbwxxx] = "pmovsxbw",
+		OP_Name[TOP_pmovsxbdxxx] = "pmovsxbd",
+		OP_Name[TOP_pmovsxbqxxx] = "pmovsxbq",
+		OP_Name[TOP_pmovsxwdxxx] = "pmovsxwd",
+		OP_Name[TOP_pmovsxwqxxx] = "pmovsxwq",
+		OP_Name[TOP_pmovsxdqxxx] = "pmovsxdq",
+		OP_Name[TOP_pmovzxbwxxx] = "pmovzxbw",
+		OP_Name[TOP_pmovzxbdxxx] = "pmovzxbd",
+		OP_Name[TOP_pmovzxbqxxx] = "pmovzxbq",
+		OP_Name[TOP_pmovzxwdxxx] = "pmovzxwd",
+		OP_Name[TOP_pmovzxwqxxx] = "pmovzxwq",
+		OP_Name[TOP_pmovzxdqxxx] = "pmovzxdq",
+		OP_Name[TOP_pmuldqx] = "pmuldq",
+		OP_Name[TOP_pmuldqxx] = "pmuldq",
+		OP_Name[TOP_pmuldqxxx] = "pmuldq",
+		OP_Name[TOP_pmulldx] = "pmulld",
+		OP_Name[TOP_pmulldxx] = "pmulld",
+		OP_Name[TOP_pmulldxxx] = "pmulld",
+		OP_Name[TOP_popcnt16x] = "popcnt",
+		OP_Name[TOP_popcnt16xx] = "popcnt",
+		OP_Name[TOP_popcnt16xxx] = "popcnt",
+		OP_Name[TOP_popcnt32x] = "popcnt",
+		OP_Name[TOP_popcnt32xx] = "popcnt",
+		OP_Name[TOP_popcnt32xxx] = "popcnt",
+		OP_Name[TOP_popcnt64x] = "popcnt",
+		OP_Name[TOP_popcnt64xx] = "popcnt",
+		OP_Name[TOP_popcnt64xxx] = "popcnt",
+		OP_Name[TOP_ptestx] = "ptest",
+		OP_Name[TOP_ptestxx] = "ptest",
+		OP_Name[TOP_ptestxxx] = "ptest",
+		OP_Name[TOP_roundpdx] = "roundpd",
+		OP_Name[TOP_roundpdxx] = "roundpd",
+		OP_Name[TOP_roundpdxxx] = "roundpd",
+		OP_Name[TOP_roundpsx] = "roundps",
+		OP_Name[TOP_roundpsxx] = "roundps",
+		OP_Name[TOP_roundpsxxx] = "roundps",
+		OP_Name[TOP_roundsdx] = "roundsd",
+		OP_Name[TOP_roundsdxx] = "roundsd",
+		OP_Name[TOP_roundsdxxx] = "roundsd",
+		OP_Name[TOP_roundssx] = "roundss",
+		OP_Name[TOP_roundssxx] = "roundss",
+		OP_Name[TOP_roundssxxx] = "roundss",
 
 	/* SSSE3*/
 	OP_Name[TOP_phaddw128] = "phaddw";
@@ -1502,29 +1694,112 @@ static void Init_OP_Name()
 	OP_Name[TOP_palignr] = "palignr";
 	OP_Name[TOP_pshufb128] = "pshufb";
 	OP_Name[TOP_pshufb] = "pshufb";
-/*AVX*/
-	OP_Name[TOP_vaddpd] = "vaddpd";
-	OP_Name[TOP_vldapd] = "vmovapd";
-    OP_Name[TOP_vldapdx] = "vmovapd";
-    OP_Name[TOP_vldapdxx] = "vmovapd";
-    OP_Name[TOP_vldapd_n32] = "vmovapd";
-	OP_Name[TOP_vstapd] = "vmovapd";
-    OP_Name[TOP_vstapdx] = "vmovapd";
-    OP_Name[TOP_vstapdxx] = "vmovapd";
-    OP_Name[TOP_vstapd_n32] = "vmovapd";
-	OP_Name[TOP_vldaps] = "vmovaps";
-    OP_Name[TOP_vldapsx] = "vmovaps";
-    OP_Name[TOP_vldapsxx] = "vmovaps";
-    OP_Name[TOP_vldaps_n32] = "vmovaps";
-    OP_Name[TOP_vstaps] = "vmovaps";
-    OP_Name[TOP_vstapsx] = "vmovaps";
-    OP_Name[TOP_vstapsxx] = "vmovaps";
-    OP_Name[TOP_vstaps_n32] = "vmovaps";
-	OP_Name[TOP_vstdqa] = "vmovdqa";
-    OP_Name[TOP_vstdqax] = "vmovdqa";
-    OP_Name[TOP_vstdqaxx] = "vmovdqa";
-    OP_Name[TOP_vstdqa_n32] = "vmovdqa";
+	OP_Name[TOP_phaddwx128] = "phaddw";
+	OP_Name[TOP_phadddx128] = "phaddd";
+	OP_Name[TOP_phaddswx128] = "phaddsw";
+	OP_Name[TOP_phaddwx] = "phaddw";
+	OP_Name[TOP_phadddx] = "phaddd";
+	OP_Name[TOP_phaddswx] = "phaddsw";
+	OP_Name[TOP_phsubwx128] = "phsubw";
+	OP_Name[TOP_phsubdx128] = "phsubd";
+	OP_Name[TOP_phsubswx128] = "phsubsw";
+	OP_Name[TOP_phsubwx] = "phsubw";
+	OP_Name[TOP_phsubdx] = "phsubd";
+	OP_Name[TOP_phsubswx] = "phsubsw";
+	OP_Name[TOP_pabsbx128] = "pabsb";
+	OP_Name[TOP_pabswx128] = "pabsw";
+	OP_Name[TOP_pabsdx128] = "pabsd";
+	OP_Name[TOP_pabsbx] = "pabsb";
+	OP_Name[TOP_pabswx] = "pabsw";
+	OP_Name[TOP_pabsdx] = "pabsd";
+	OP_Name[TOP_pmaddubswx128] = "pmaddubsw";
+	OP_Name[TOP_pmaddubswx] = "pmaddubsw";
+	OP_Name[TOP_pmulhrswx128] = "pmulhrsw";
+	OP_Name[TOP_pmulhrswx] = "pmulhrsw";
+	OP_Name[TOP_palignrx128] = "palignr";
+	OP_Name[TOP_palignrx] = "palignr";
+	OP_Name[TOP_pshufbx128] = "pshufb";
+	OP_Name[TOP_pshufbx] = "pshufb";
+	OP_Name[TOP_phaddwxx128] = "phaddw";
+	OP_Name[TOP_phadddxx128] = "phaddd";
+	OP_Name[TOP_phaddswxx128] = "phaddsw";
+	OP_Name[TOP_phaddwxx] = "phaddw";
+	OP_Name[TOP_phadddxx] = "phaddd";
+	OP_Name[TOP_phaddswxx] = "phaddsw";
+	OP_Name[TOP_phsubwxx128] = "phsubw";
+	OP_Name[TOP_phsubdxx128] = "phsubd";
+	OP_Name[TOP_phsubswxx128] = "phsubsw";
+	OP_Name[TOP_phsubwxx] = "phsubw";
+	OP_Name[TOP_phsubdxx] = "phsubd";
+	OP_Name[TOP_phsubswxx] = "phsubsw";
+	OP_Name[TOP_pabsbxx128] = "pabsb";
+	OP_Name[TOP_pabswxx128] = "pabsw";
+	OP_Name[TOP_pabsdxx128] = "pabsd";
+	OP_Name[TOP_pabsbxx] = "pabsb";
+	OP_Name[TOP_pabswxx] = "pabsw";
+	OP_Name[TOP_pabsdxx] = "pabsd";
+	OP_Name[TOP_pmaddubswxx128] = "pmaddubsw";
+	OP_Name[TOP_pmaddubswxx] = "pmaddubsw";
+	OP_Name[TOP_pmulhrswxx128] = "pmulhrsw";
+	OP_Name[TOP_pmulhrswxx] = "pmulhrsw";
+	OP_Name[TOP_palignrxx128] = "palignr";
+	OP_Name[TOP_palignrxx] = "palignr";
+	OP_Name[TOP_pshufbxx128] = "pshufb";
+	OP_Name[TOP_pshufbxx] = "pshufb";
+	OP_Name[TOP_phaddwxxx128] = "phaddw";
+	OP_Name[TOP_phadddxxx128] = "phaddd";
+	OP_Name[TOP_phaddswxxx128] = "phaddsw";
+	OP_Name[TOP_phaddwxxx] = "phaddw";
+	OP_Name[TOP_phadddxxx] = "phaddd";
+	OP_Name[TOP_phaddswxxx] = "phaddsw";
+	OP_Name[TOP_phsubwxxx128] = "phsubw";
+	OP_Name[TOP_phsubdxxx128] = "phsubd";
+	OP_Name[TOP_phsubswxxx128] = "phsubsw";
+	OP_Name[TOP_phsubwxxx] = "phsubw";
+	OP_Name[TOP_phsubdxxx] = "phsubd";
+	OP_Name[TOP_phsubswxxx] = "phsubsw";
+	OP_Name[TOP_pabsbxxx128] = "pabsb";
+	OP_Name[TOP_pabswxxx128] = "pabsw";
+	OP_Name[TOP_pabsdxxx128] = "pabsd";
+	OP_Name[TOP_pabsbxxx] = "pabsb";
+	OP_Name[TOP_pabswxxx] = "pabsw";
+	OP_Name[TOP_pabsdxxx] = "pabsd";
+	OP_Name[TOP_pmaddubswxxx128] = "pmaddubsw";
+	OP_Name[TOP_pmaddubswxxx] = "pmaddubsw";
+	OP_Name[TOP_pmulhrswxxx128] = "pmulhrsw";
+	OP_Name[TOP_pmulhrswxxx] = "pmulhrsw";
+	OP_Name[TOP_palignrxxx128] = "palignr";
+	OP_Name[TOP_palignrxxx] = "palignr";
+	OP_Name[TOP_pshufbxxx128] = "pshufb";
+	OP_Name[TOP_pshufbxxx] = "pshufb";
+	OP_Name[TOP_psignbx] = "psignb";
+	OP_Name[TOP_psignwx] = "psignw";
+	OP_Name[TOP_psigndx] = "psignd";
+	OP_Name[TOP_psignbxx] = "psignb";
+	OP_Name[TOP_psignwxx] = "psignw";
+	OP_Name[TOP_psigndxx] = "psignd";
+	OP_Name[TOP_psignbxxx] = "psignb";
+	OP_Name[TOP_psignwxxx] = "psignw";
+	OP_Name[TOP_psigndxxx] = "psignd";
+	OP_Name[TOP_psignb128] = "psignb";
+	OP_Name[TOP_psignw128] = "psignw";
+	OP_Name[TOP_psignd128] = "psignd";
+	OP_Name[TOP_psignbx128] = "psignb";
+	OP_Name[TOP_psignwx128] = "psignw";
+	OP_Name[TOP_psigndx128] = "psignd";
+	OP_Name[TOP_psignbxx128] = "psignb";
+	OP_Name[TOP_psignwxx128] = "psignw";
+	OP_Name[TOP_psigndxx128] = "psignd";
+	OP_Name[TOP_psignbxxx128] = "psignb";
+	OP_Name[TOP_psignwxxx128] = "psignw";
+	OP_Name[TOP_psigndxxx128] = "psignd";
+	/*avx added by hand*/
+	OP_Name[TOP_vxzero128v64] = "vxorpd";
+	OP_Name[TOP_vxzero128v32] = "vxorps";
+	OP_Name[TOP_vxzero256v64] = "vxorpd";
+	OP_Name[TOP_vxzero256v32] = "vxorps";
 #include "cgemit_targ_avx.cxx"
+#include "cgemit_targ_xop_fma.cxx"
 
 
 //**********************************************************
@@ -1540,7 +1815,9 @@ static void Init_OP_Name()
       !Is_Target_EM64T() &&
       !Is_Target_Core() &&
       !Is_Target_Wolfdale() &&
-      !Is_Target_Barcelona()){// bug 10295
+      !Is_Target_Barcelona() &&
+      !Is_Target_Orochi()&&
+      !Is_Target_Sandy_Bridge()){// bug 10295
     // Use movlpd only for loads.  Bug 5809.
     OP_Name[TOP_ldsd] = "movlpd";
     OP_Name[TOP_ldsd_n32] = "movlpd";
@@ -1566,7 +1843,9 @@ static void Init_OP_Name()
     if (Is_Target_Barcelona() ||
 	Is_Target_EM64T()     || // em64t
         Is_Target_Wolfdale()  ||
-	Is_Target_Core()) {	 // use movapd for woodcrest for bug 11548
+	Is_Target_Core() ||
+	Is_Target_Orochi() ||
+	Is_Target_Sandy_Bridge()) {	 // use movapd for woodcrest for bug 11548
       OP_Name[TOP_movsd] = "movapd";  
     }
   }

@@ -158,7 +158,46 @@ UINT32 CGTARG_Mem_Ref_Bytes(const OP *memop)
       case TOP_ldhpdx:
       case TOP_ldhpdxx:
       case TOP_ldhpd_n32:
+	  case TOP_pmovsxbwx:
+	  case TOP_pmovsxbwxx:
+	  case TOP_pmovsxbwxxx:
+	  case TOP_pmovsxwdx:
+	  case TOP_pmovsxwdxx:
+	  case TOP_pmovsxwdxxx:
+	  case TOP_pmovsxdqx:
+	  case TOP_pmovsxdqxx:
+	  case TOP_pmovsxdqxxx:
+	  case TOP_pmovzxbwx:
+	  case TOP_pmovzxbwxx:
+	  case TOP_pmovzxbwxxx:
+	  case TOP_pmovzxwdx:
+	  case TOP_pmovzxwdxx:
+	  case TOP_pmovzxwdxxx:
+	  case TOP_pmovzxdqx:
+	  case TOP_pmovzxdqxx:
+	  case TOP_pmovzxdqxxx:
         return 8;
+	  case TOP_pmovsxbdx:
+	  case TOP_pmovsxbdxx:
+	  case TOP_pmovsxbdxxx:
+	  case TOP_pmovsxwqx:
+	  case TOP_pmovsxwqxx:
+	  case TOP_pmovsxwqxxx:
+	  case TOP_pmovzxbdx:
+	  case TOP_pmovzxbdxx:
+	  case TOP_pmovzxbdxxx:
+	  case TOP_pmovzxwqx:
+	  case TOP_pmovzxwqxx:
+	  case TOP_pmovzxwqxxx:
+	  	return 4;
+	  case TOP_pmovsxbqx:
+	  case TOP_pmovsxbqxx:
+	  case TOP_pmovsxbqxxx:
+	  case TOP_pmovzxbqx:
+	  case TOP_pmovzxbqxx:
+	  case TOP_pmovzxbqxxx:
+	  	return 2;
+	  
       default:
         return 16;
     }
@@ -200,6 +239,34 @@ UINT32 CGTARG_Mem_Ref_Bytes(const OP *memop)
       case TOP_cvtsi2ss_x:
       case TOP_cvtsi2ss_xx:
       case TOP_cvtsi2ss_xxx:
+    /*fma and xop load execute */
+	  case TOP_vfrczss_f128_oxmm_mem1:
+	  case TOP_vfrczss_f128_oxmm_mem2:
+	  case TOP_vfrczss_f128_oxmm_mem3:
+	  case TOP_vfmaddss_f128_oxmm_xmm_mem1_xmm:
+	  case TOP_vfmaddss_f128_oxmm_xmm_mem2_xmm:
+	  case TOP_vfmaddss_f128_oxmm_xmm_mem3_xmm:
+	  case TOP_vfmaddss_f128_oxmm_xmm_xmm_mem1:
+	  case TOP_vfmaddss_f128_oxmm_xmm_xmm_mem2:
+	  case TOP_vfmaddss_f128_oxmm_xmm_xmm_mem3:
+	  case TOP_vfmsubss_f128_oxmm_xmm_mem1_xmm:
+	  case TOP_vfmsubss_f128_oxmm_xmm_mem2_xmm:
+	  case TOP_vfmsubss_f128_oxmm_xmm_mem3_xmm:
+	  case TOP_vfmsubss_f128_oxmm_xmm_xmm_mem1:
+	  case TOP_vfmsubss_f128_oxmm_xmm_xmm_mem2:
+	  case TOP_vfmsubss_f128_oxmm_xmm_xmm_mem3:
+	  case TOP_vfnmaddss_f128_oxmm_xmm_mem1_xmm:
+	  case TOP_vfnmaddss_f128_oxmm_xmm_mem2_xmm:
+	  case TOP_vfnmaddss_f128_oxmm_xmm_mem3_xmm:
+			case TOP_vfnmaddss_f128_oxmm_xmm_xmm_mem1:
+			case TOP_vfnmaddss_f128_oxmm_xmm_xmm_mem2:
+			case TOP_vfnmaddss_f128_oxmm_xmm_xmm_mem3:
+	  case TOP_vfnmsubss_f128_oxmm_xmm_mem1_xmm:
+	  case TOP_vfnmsubss_f128_oxmm_xmm_mem2_xmm:
+	  case TOP_vfnmsubss_f128_oxmm_xmm_mem3_xmm:
+			case TOP_vfnmsubss_f128_oxmm_xmm_xmm_mem1:
+			case TOP_vfnmsubss_f128_oxmm_xmm_xmm_mem2:
+			case TOP_vfnmsubss_f128_oxmm_xmm_xmm_mem3:
 	return 4;
 
       case TOP_ldsd:		// 64 bit
@@ -241,6 +308,34 @@ UINT32 CGTARG_Mem_Ref_Bytes(const OP *memop)
       case TOP_cvtsi2ssq_x:
       case TOP_cvtsi2ssq_xx:
       case TOP_cvtsi2ssq_xxx:
+	  /*FMA XOP load excute*/
+	  case TOP_vfrczsd_f128_oxmm_mem1:
+	  case TOP_vfrczsd_f128_oxmm_mem2:
+	  case TOP_vfrczsd_f128_oxmm_mem3:
+	  case TOP_vfmaddsd_f128_oxmm_xmm_mem1_xmm:
+	  case TOP_vfmaddsd_f128_oxmm_xmm_mem2_xmm:
+	  case TOP_vfmaddsd_f128_oxmm_xmm_mem3_xmm:
+	  case TOP_vfmaddsd_f128_oxmm_xmm_xmm_mem1:
+	  case TOP_vfmaddsd_f128_oxmm_xmm_xmm_mem2:
+	  case TOP_vfmaddsd_f128_oxmm_xmm_xmm_mem3:
+	  case TOP_vfmsubsd_f128_oxmm_xmm_mem1_xmm:
+	  case TOP_vfmsubsd_f128_oxmm_xmm_mem2_xmm:
+	  case TOP_vfmsubsd_f128_oxmm_xmm_mem3_xmm:
+	  case TOP_vfmsubsd_f128_oxmm_xmm_xmm_mem1:
+	  case TOP_vfmsubsd_f128_oxmm_xmm_xmm_mem2:
+	  case TOP_vfmsubsd_f128_oxmm_xmm_xmm_mem3:
+	  case TOP_vfnmaddsd_f128_oxmm_xmm_mem1_xmm:
+	  case TOP_vfnmaddsd_f128_oxmm_xmm_mem2_xmm:
+	  case TOP_vfnmaddsd_f128_oxmm_xmm_mem3_xmm:
+			case TOP_vfnmaddsd_f128_oxmm_xmm_xmm_mem1:
+			case TOP_vfnmaddsd_f128_oxmm_xmm_xmm_mem2:
+			case TOP_vfnmaddsd_f128_oxmm_xmm_xmm_mem3:
+	  case TOP_vfnmsubsd_f128_oxmm_xmm_mem1_xmm:
+	  case TOP_vfnmsubsd_f128_oxmm_xmm_mem2_xmm:
+	  case TOP_vfnmsubsd_f128_oxmm_xmm_mem3_xmm:
+			case TOP_vfnmsubsd_f128_oxmm_xmm_xmm_mem1:
+			case TOP_vfnmsubsd_f128_oxmm_xmm_xmm_mem2:
+			case TOP_vfnmsubsd_f128_oxmm_xmm_xmm_mem3:
 	return 8;
 
       case TOP_lddqa:		// 128 bit
@@ -392,6 +487,11 @@ UINT32 CGTARG_Mem_Ref_Bytes(const OP *memop)
   case TOP_ld16_abs:
   case TOP_lock_xadd16:
   case TOP_xchgx16:
+  /*sse4*/
+  case TOP_popcnt16x:
+  case TOP_popcnt16xx:
+  case TOP_popcnt16xxx:
+  
     return 2;
 
   case TOP_xorx32:
@@ -465,6 +565,37 @@ UINT32 CGTARG_Mem_Ref_Bytes(const OP *memop)
   case TOP_lock_sub32:
   case TOP_lock_xadd32:
   case TOP_xchgx32:
+  /*ssse4*/
+  case TOP_extractpsx:
+  case TOP_extractpsxx:
+  case TOP_extractpsxxx:
+  case TOP_insertpsx:
+  case TOP_insertpsxx:
+  case TOP_insertpsxxx:
+  case TOP_pextrbx:
+  case TOP_pextrbxx:
+  case TOP_pextrbxxx:
+  case TOP_pextrdx:
+  case TOP_pextrdxx:
+  case TOP_pextrdxxx:
+  case TOP_pextrqx:
+  case TOP_pextrqxx:
+  case TOP_pextrqxxx:
+  case TOP_pextrwx:
+  case TOP_pextrwxx:
+  case TOP_pextrwxxx:
+  case TOP_pinsrbx:
+  case TOP_pinsrbxx:
+  case TOP_pinsrbxxx:
+  case TOP_pinsrdx:
+  case TOP_pinsrdxx:
+  case TOP_pinsrdxxx:
+  case TOP_pinsrqx:
+  case TOP_pinsrqxx:
+  case TOP_pinsrqxxx:
+  case TOP_popcnt32x:
+  case TOP_popcnt32xx:
+  case TOP_popcnt32xxx:
     return 4;
 
   case TOP_xorx64:
@@ -554,6 +685,69 @@ UINT32 CGTARG_Mem_Ref_Bytes(const OP *memop)
   case TOP_fmovshdupxxx:
   case TOP_fmovddupxxx:
   case TOP_xchgx64:
+  //SSSE3
+  case TOP_phaddwx:
+  case TOP_phaddwxx:
+  case TOP_phaddwxxx:
+  case TOP_phadddx:
+  case TOP_phadddxx:
+  case TOP_phadddxxx:
+  case TOP_phaddswx:
+  case TOP_phaddswxx:
+  case TOP_phaddswxxx:
+  case TOP_phsubwx:
+  case TOP_phsubwxx:
+  case TOP_phsubwxxx:
+  case TOP_phsubdx:
+  case TOP_phsubdxx:
+  case TOP_phsubdxxx:
+  case TOP_phsubswx:
+  case TOP_phsubswxx:
+  case TOP_phsubswxxx:
+  case TOP_pabsb:
+  case TOP_pabsw:
+  case TOP_pabsd:
+  case TOP_pmaddubsw:
+  case TOP_pmulhrsw:
+  case TOP_palignr:
+  case TOP_pshufb:
+  case TOP_psignb:
+  case TOP_psignw:
+  case TOP_psignd:
+  case TOP_pabsbx:
+  case TOP_pabswx:
+  case TOP_pabsdx:
+  case TOP_pmaddubswx:
+  case TOP_pmulhrswx:
+  case TOP_palignrx:
+  case TOP_pshufbx:
+  case TOP_psignbx:
+  case TOP_psignwx:
+  case TOP_psigndx:
+  case TOP_pabsbxx:
+  case TOP_pabswxx:
+  case TOP_pabsdxx:
+  case TOP_pmaddubswxx:
+  case TOP_pmulhrswxx:
+  case TOP_palignrxx:
+  case TOP_pshufbxx:
+  case TOP_psignbxx:
+  case TOP_psignwxx:
+  case TOP_psigndxx:
+  case TOP_pabsbxxx:
+  case TOP_pabswxxx:
+  case TOP_pabsdxxx:
+  case TOP_pmaddubswxxx:
+  case TOP_pmulhrswxxx:
+  case TOP_palignrxxx:
+  case TOP_pshufbxxx:
+  case TOP_psignbxxx:
+  case TOP_psignwxxx:
+  case TOP_psigndxxx:
+  /*sse4*/
+  case TOP_popcnt64x:
+  case TOP_popcnt64xx:
+  case TOP_popcnt64xxx:
     return 8;
 
   case TOP_fldt:
@@ -1918,6 +2112,7 @@ INT CGTARG_Copy_Operand(OP *op)
   case TOP_movsd:
   case TOP_movss:
   case TOP_movdq:
+  case TOP_aesmov:
   case TOP_movapd:
   case TOP_movaps:
   case TOP_fmov:
@@ -1926,6 +2121,20 @@ INT CGTARG_Copy_Operand(OP *op)
   case TOP_movm_2i64:
   case TOP_movi32_2m:
   case TOP_movi64_2m:
+  case TOP_vmovapd_f128_ofloat_float:
+  case TOP_vmovaps_f128_ofloat_float:
+  case TOP_vmovdqu_f128_ofloat_float:
+  case TOP_vmovupd_f128_ofloat_float:
+  case TOP_vmovups_f128_ofloat_float:
+  case TOP_vmovdqa_f128_ofloat_float:
+  case TOP_vmovapd_f256_ofloat_float:
+  case TOP_vmovaps_f256_ofloat_float:
+  case TOP_vmovdqu_f256_ofloat_float:
+  case TOP_vmovupd_f256_ofloat_float:
+  case TOP_vmovups_f256_ofloat_float:
+  case TOP_vmovdqa_f256_ofloat_float:
+  case TOP_vmovss_f128_ofloat_float:
+  case TOP_vmovsd_f128_ofloat_float:
     return 0;
 
   case TOP_mov32:
@@ -2801,6 +3010,8 @@ void CGTARG_LOOP_Optimize( LOOP_DESCR* loop )
         continue;
     }
 #endif
+ //temporarily disable bug12036
+   if(0){
     TOP new_top = TOP_UNDEFINED;
     switch( OP_code(op) ){
     //SSE support
@@ -2844,6 +3055,7 @@ void CGTARG_LOOP_Optimize( LOOP_DESCR* loop )
    if( new_top != TOP_UNDEFINED )
       OP_Change_Opcode( op, new_top );
   }
+ }
 #if 0 //temporarily disable the changeset of bug 11853 for bug 12036
   if (dep_graph_computed == TRUE)
     CG_DEP_Delete_Graph(body);

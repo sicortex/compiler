@@ -693,6 +693,31 @@ int idx;
 }
 
 
+
+/******************************************************************************\
+|*                                                                            *|
+|* Description:                                                               *|
+|*      Search for a component through extension types			      *|
+|*                                                                            *|
+|* Input parameters:                                                          *|
+|*      Name of target component					      *|
+|*                                                                            *|
+|* Returns:                                                                   *|
+|*      								      *|
+|* On success, creates a linked list of references to the component through   *|
+|* the explicit subtypes.						      *|
+
+
+|*                                                                            *|
+\******************************************************************************/
+
+
+
+
+
+
+
+
 
 /******************************************************************************\
 |*                                                                            *|
@@ -725,6 +750,7 @@ boolean parse_deref (opnd_type *result_opnd,
    int           array_idx;
    int           attr_idx;
    token_type    attr_name;
+   int           base_idx;
    int           check_attr;
    int           col;
    int           host_attr_idx;
@@ -758,17 +784,44 @@ boolean parse_deref (opnd_type *result_opnd,
    attr_name = token;
    
    if (struct_type_idx) {		/* test for valid structure component */
-      sn_idx	= ATT_FIRST_CPNT_IDX(struct_type_idx);
-      attr_idx	= srch_linked_sn(TOKEN_STR(token),
-                                 TOKEN_LEN(token),
-                                 &sn_idx);
+      base_idx = struct_type_idx;
+
+      for(;;) {
+	  sn_idx   = ATT_FIRST_CPNT_IDX(struct_type_idx);
+	  attr_idx = srch_linked_sn(TOKEN_STR(token), TOKEN_LEN(token),
+				    &sn_idx);
+
+	  if (ATT_PARENT_TYPE(struct_type_idx) == NULL_IDX ||
+	      attr_idx != NULL_IDX)
+	      break;
+
+	  ir_idx = result_opnd->idx;
+
+	  IR_FLD_R(ir_idx) = AT_Tbl_Idx;
+	  IR_IDX_R(ir_idx) = SN_ATTR_IDX(ATT_FIRST_CPNT_IDX(struct_type_idx));
+
+	  IR_LINE_NUM_R(ir_idx) = TOKEN_LINE(token);
+	  IR_COL_NUM_R(ir_idx)  = TOKEN_COLUMN(token);
+
+	  NTR_IR_TBL(ir_idx);
+
+	  IR_OPR(ir_idx)      = Struct_Opr;
+	  IR_LINE_NUM(ir_idx) = TOKEN_LINE(token);
+	  IR_COL_NUM(ir_idx)  = TOKEN_COLUMN(token);
+
+	  COPY_OPND(IR_OPND_L(ir_idx), *result_opnd);
+
+	  result_opnd->fld = IR_Tbl_Idx;
+	  result_opnd->idx = ir_idx;
+
+	  struct_type_idx = ATT_PARENT_TYPE(struct_type_idx);
+      }
 
       if (attr_idx == NULL_IDX) {
-
-         if (!AT_DCL_ERR(struct_type_idx)) {
+         if (!AT_DCL_ERR(base_idx)) {
             PRINTMSG(TOKEN_LINE(token), 213, Error,
                      TOKEN_COLUMN(token), TOKEN_STR(token),
-                     AT_OBJ_NAME_PTR(struct_type_idx));
+                     AT_OBJ_NAME_PTR(base_idx));
          }
          else {
             SH_ERR_FLG(curr_stmt_sh_idx) = TRUE;

@@ -45,7 +45,10 @@
 #include "dwarf_DST_dump.h"
 #include "erglob.h"
 #include "errors.h"
+
+#define MODULE_NAME a2b
 #include "err_host.tab"
+
 #include "config.h"
 #include "config_opt.h"
 #include "tracing.h"
@@ -338,7 +341,7 @@ usage (char *progname)
   exit (1);
 }
 
-main (INT argc, char *argv[])
+int main (INT argc, char *argv[])
 {
     register char *progname;
     register INT a2b, b2a, sel, all;
@@ -350,7 +353,7 @@ main (INT argc, char *argv[])
 
     
     MEM_Initialize();
-    Set_Error_Tables (Phases, host_errlist);
+    Set_Error_Tables (PHASES_NAME, ERRLIST_NAME);
     Init_Error_Handler (10);
     Set_Error_File(NULL);
     Set_Error_Line(ERROR_LINE_UNKNOWN);
@@ -359,10 +362,10 @@ main (INT argc, char *argv[])
     progname = basename (argv[0]);
     // weird linux bug with basename where it doesn't strip the leading /
     if (*progname == '/') ++progname;
-    a2b = (strcmp (progname, "ir_a2b") == 0);
-    b2a = (strcmp (progname, "ir_b2a") == 0);
-    sel = (strcmp (progname, "ir_sel") == 0);
-    all = (strcmp (progname, "ir_all") == 0);
+    a2b = (strncmp (progname, "ir_a2b", 6) == 0);
+    b2a = (strncmp (progname, "ir_b2a", 6) == 0);
+    sel = (strncmp (progname, "ir_sel", 6) == 0);
+    all = (strncmp (progname, "ir_all", 6) == 0);
 
     if (sizeof(EXT_EXE) > 1) {
         a2b = a2b || (strcmp (progname, FN_EXE("ir_a2b")) == 0);
@@ -462,18 +465,5 @@ main (INT argc, char *argv[])
     exit (0);
 } /* main */
 
-
-/* Dummy definitions to satisify references from routines that got pulled
- * in by the header files but are never called
- */
-void
-Signal_Cleanup (INT sig) { }
-
-const char *
-Host_Format_Parm (INT kind, MEM_PTR parm)
-{
-    fprintf (stderr, "Internal: Host_Format_Parm () not implemented\n");
-    return "";
-}
 
 INT8 Debug_Level = 0;

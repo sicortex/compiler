@@ -1222,7 +1222,7 @@ Perform_reassoc(WN *tree)
  * tree represents the region (scope) over which reassociation is performed
  * ==================================================================== */
 void
-WN_reassoc(WN *tree)
+WN_reassoc(PU *pu, WN *tree)
 { 
   // disable WHIRL simplifier which may do its own reassociation
   Enable_WN_Simp = FALSE;
@@ -1242,7 +1242,7 @@ WN_reassoc(WN *tree)
 
   WN_Lower_Checkdump("After wn_reassoc", tree, 0);   
 
-  WN_verifier(tree);
+  WN_verifier(pu, tree);
 
   return;
 }
@@ -1253,7 +1253,7 @@ WN_reassoc(WN *tree)
  * a BLOCK, call WN_reassoc() for the block
  * ==================================================================== */
 BOOL
-WN_reassoc_deepest_blocks(WN *tree)
+WN_reassoc_deepest_blocks(PU *pu, WN *tree)
 {
   OPERATOR opr = WN_operator(tree);
   INT i;
@@ -1307,7 +1307,7 @@ WN_reassoc_deepest_blocks(WN *tree)
   // structured control flow statements
   
   case OPR_FUNC_ENTRY:
-    WN_reassoc_deepest_blocks(WN_func_body(tree));
+    WN_reassoc_deepest_blocks(pu, WN_func_body(tree));
     return FALSE;
 
   case OPR_BLOCK: {
@@ -1316,31 +1316,31 @@ WN_reassoc_deepest_blocks(WN *tree)
     for (stmt = WN_first(tree); stmt; stmt = WN_next(stmt)) {
       Is_True(OPERATOR_is_stmt(WN_operator(stmt)) || OPERATOR_is_scf(WN_operator(stmt)),
 	      ("statement operator expected"));
-      if (! WN_reassoc_deepest_blocks(stmt))
+      if (! WN_reassoc_deepest_blocks(pu, stmt))
 	deepest = FALSE;
     }
     if (deepest)
-      WN_reassoc(tree);
+      WN_reassoc(pu, tree);
     return FALSE;
     }
 
   case OPR_DO_LOOP:
-    WN_reassoc_deepest_blocks(WN_kid(tree, 4)); // the block
+    WN_reassoc_deepest_blocks(pu, WN_kid(tree, 4)); // the block
     return FALSE;
 
   case OPR_DO_WHILE:
   case OPR_WHILE_DO:
-    WN_reassoc_deepest_blocks(WN_kid(tree, 1));
+    WN_reassoc_deepest_blocks(pu, WN_kid(tree, 1));
     return FALSE;
 
   case OPR_IF: {
-      BOOL res1 = WN_reassoc_deepest_blocks(WN_kid(tree, 1));
-      BOOL res2 = WN_reassoc_deepest_blocks(WN_kid(tree, 2));
+      BOOL res1 = WN_reassoc_deepest_blocks(pu, WN_kid(tree, 1));
+      BOOL res2 = WN_reassoc_deepest_blocks(pu, WN_kid(tree, 2));
       return res1 & res2;
     }
 
   case OPR_REGION:
-    WN_reassoc_deepest_blocks(WN_region_body(tree));
+    WN_reassoc_deepest_blocks(pu, WN_region_body(tree));
     return FALSE;
 
   case OPR_IO:

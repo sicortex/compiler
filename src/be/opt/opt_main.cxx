@@ -351,20 +351,13 @@ extern "C" void
 Perform_Procedure_Summary_Phase (WN* w, struct DU_MANAGER *du_mgr,
 				 struct ALIAS_MANAGER *alias_mgr,
 				 EMITTER *emitter);
-#ifndef USE_WEAK_REFERENCES
-extern void (*Perform_Procedure_Summary_Phase_p) (WN*, DU_MANAGER*,
-						  ALIAS_MANAGER*, void*);
-#define Perform_Procedure_Summary_Phase (*Perform_Procedure_Summary_Phase_p)
-#else
-#pragma weak Perform_Procedure_Summary_Phase
-#endif // USE_WEAK_REFERENCES
 
 extern BOOL Enable_WN_Simp;
 extern void Simplify_bool_expr(COMP_UNIT *);
 #ifdef KEY
-extern void WN_unroll(WN *);
-extern void WN_reassoc(WN *);
-extern BOOL WN_reassoc_deepest_blocks(WN *);
+extern void WN_unroll(PU*, WN *);
+extern void WN_reassoc(PU*, WN *);
+extern BOOL WN_reassoc_deepest_blocks(PU*, WN *);
 #endif
 
 static MEM_POOL  Opt_global_pool;
@@ -1117,8 +1110,8 @@ Do_Pre_Before_Ivr(COMP_UNIT *comp_unit)
 
 
 WN *
-Pre_Optimizer(INT32 phase, WN *wn_tree, DU_MANAGER *du_mgr,
-	      ALIAS_MANAGER *alias_mgr)
+Pre_Optimizer(INT32 phase, PU *pu, WN *wn_tree, DU_MANAGER *du_mgr,
+	          ALIAS_MANAGER *alias_mgr)
 {
   WN *wn_orig = wn_tree; // needed for region <--> RID consistency
 
@@ -1205,7 +1198,7 @@ Pre_Optimizer(INT32 phase, WN *wn_tree, DU_MANAGER *du_mgr,
     else
 	actions |= LOWER_BITS_OP;
     actions |= LOWER_TO_MEMLIB; // add memlib transformation
-    wn_tree = WN_Lower(wn_orig, actions, alias_mgr, "Pre_Opt");
+    wn_tree = WN_Lower(pu, wn_orig, actions, alias_mgr, "Pre_Opt");
 
 #ifdef TARG_X8664
     BOOL target_64bit = Is_Target_64bit();
@@ -1215,17 +1208,17 @@ Pre_Optimizer(INT32 phase, WN *wn_tree, DU_MANAGER *du_mgr,
 
 #if defined( KEY)
     if (target_64bit && WOPT_Enable_Retype_Expr)
-      WN_retype_expr(wn_tree);
+      WN_retype_expr(pu, wn_tree);
 #endif
 
 #if defined( KEY)
-    WN_unroll(wn_tree);
+    WN_unroll(pu, wn_tree);
 #endif
 
     if (Cur_PU_Feedback)
       Cur_PU_Feedback->Reset_Root_WN(wn_tree);
     if (Only_Unsigned_64_Bit_Ops && ! Delay_U64_Lowering)
-      U64_lower_wn(wn_tree, FALSE); 	 // lowering for unsigned 64-bit ISA
+      U64_lower_wn(pu, wn_tree, FALSE); 	 // lowering for unsigned 64-bit ISA
     Is_True(REGION_consistency_check(wn_tree),
 	    ("Pre_Optimizer REGION inconsistency")); // lowerer maintains RID
     wn_orig = wn_tree; // new orig tree
@@ -1264,6 +1257,10 @@ Pre_Optimizer(INT32 phase, WN *wn_tree, DU_MANAGER *du_mgr,
     // is only represented in the lowered IOs.
 
     LOWER_ACTIONS lower_flags = LOWER_NULL;
+	if(Is_Target_Orochi()){
+	// for Bulldozer we can use FMA and XOP instruction to enhance more opportunity optimization
+	  lower_flags |= LOWER_MADD;
+	}
 
     if (PU_has_namelist(Get_Current_PU())) 
       lower_flags |= LOWER_IO_STATEMENT;
@@ -1276,7 +1273,7 @@ Pre_Optimizer(INT32 phase, WN *wn_tree, DU_MANAGER *du_mgr,
       lower_flags |= LOWER_BITS_OP;
     
     if (lower_flags != LOWER_NULL) {
-      wn_tree = WN_Lower(wn_tree, lower_flags, alias_mgr, 
+      wn_tree = WN_Lower(pu, wn_tree, lower_flags, alias_mgr, 
 			 "Pre_opt: special lowering for NAMELIST");
       if (Cur_PU_Feedback)
 	Cur_PU_Feedback->Reset_Root_WN(wn_tree);
@@ -1968,7 +1965,7 @@ Pre_Optimizer(INT32 phase, WN *wn_tree, DU_MANAGER *du_mgr,
 
   disable_tree_freq_display();  // disable WHIRL tree frequency display
 
-  WN_verifier(opt_wn);
+  WN_verifier(pu, opt_wn);
 
   if (WN_opcode(opt_wn) == OPC_FUNC_ENTRY)
     Set_PU_Info_tree_ptr (Current_PU_Info, opt_wn);

@@ -843,7 +843,7 @@ PRINT_HOMING_INFO( WN *wn, ALIAS_MANAGER *am, BOOL first_time )
 // ====================================================================
 
 WN *
-RVI::Perform_RVI( WN *entry_wn, ALIAS_MANAGER *alias_mgr )
+RVI::Perform_RVI( PU *pu, WN *entry_wn, ALIAS_MANAGER *alias_mgr )
 {
   Is_True(REGION_consistency_check(entry_wn),
 	    ("RVI::Perform_RVI, inconsistent region in RVI"));
@@ -862,7 +862,8 @@ RVI::Perform_RVI( WN *entry_wn, ALIAS_MANAGER *alias_mgr )
     LOWER_MLDID_MSTID |
     LOWER_ALL_MAPS;      
 
-  WN *lda_wn = WN_Lower( phase1_wn, 
+  WN *lda_wn = WN_Lower( pu,
+    phase1_wn, 
     actions,
     alias_mgr, "RVI" );
 

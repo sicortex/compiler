@@ -79,6 +79,8 @@
 #include "wn_mp.h"                    // for WN_has_pragma_with_side_effect
 #include "ipl_lno_util.h" 
 #include "wb_ipl.h"
+#include "ipa_option.h"
+#include "glob.h"
 
 extern BOOL DoPreopt;
 extern BOOL Do_Par;
@@ -87,6 +89,9 @@ extern ALIAS_MANAGER* Ipl_Al_Mgr;
 extern DU_MANAGER *Ipl_Du_Mgr;
 extern DYN_ARRAY<char*>* Ipl_Symbol_Names;
 extern DYN_ARRAY<char*>* Ipl_Function_Names;
+extern WN_MAP Summary_Map;
+extern WN_MAP Stmt_Map;
+extern UINT32 IPL_Ignore_Small_Loops;
 
 extern void Init_Chi_Phi_Hash_Tables(MEM_POOL*);
 extern void IPL_Mark_Code(WN* func_nd);
@@ -939,72 +944,28 @@ Last_Node (WN_TREE_ITER<PRE_ORDER, WN*> i)
 }
 
 #ifdef KEY
-// TODO: We don't need to replace the stidx with the summary table index.
-//       We can just use the old-stidx -> new-stidx map in IPA.
 template <PROGRAM program>
 void
 SUMMARIZE<program>::Process_eh_globals (void)
 {
-    if (!(PU_src_lang (Get_Current_PU()) & PU_CXX_LANG) || 
-    	!PU_misc_info (Get_Current_PU()))
-    	return;
-    INITV_IDX i = INITV_next (INITV_next (INITO_val (PU_misc_info (Get_Current_PU()))));
-    INITO_IDX idx = TCON_uval (INITV_tc_val(i));
-    if (idx)	// typeinfo
+    PU::type_info_table type_table;
+    Get_Current_PU().Get_type_info_table(type_table);
+
+    for (PU::type_info_table::const_iterator it = type_table.begin();
+         it != type_table.end(); ++it)
     {
-      INITO* ino = &Inito_Table[idx];
-      INITV_IDX blk = INITO_val (*ino);
-      do
-      {
-        INITV_IDX st_entry = INITV_blk (blk);
-	ST_IDX st_idx = 0;
-	if (INITV_kind (st_entry) != INITVKIND_ZERO)
-	{
-	  st_idx = TCON_uval (INITV_tc_val (st_entry));
-	  FmtAssert (st_idx != 0, ("Invalid st idx"));
-	}
-	if (st_idx <= 0)
-	{
-	  blk = INITV_next (blk);
-	  continue;
-	}
-	INT32 index = Get_symbol_index (&St_Table [st_idx]);
-	INITV_IDX filter = INITV_next (st_entry); // for backup
-	FmtAssert (index >= 0, ("Unexpected summary id for eh symbol"));
-	INITV_Set_VAL (Initv_Table[st_entry], Enter_tcon (
-	               Host_To_Targ (MTYPE_U4, index)), 1);
-        Set_INITV_next (st_entry, filter);
-	blk = INITV_next (blk);
-      } while (blk);
+        if(it->first != NULL)
+            Get_symbol_index(it->first);
     }
 
-    i = INITV_next (i);
-    idx = TCON_uval (INITV_tc_val (i));
-    if (idx)	// eh-spec
+    PU::eh_spec_vector eh_spec;
+    Get_Current_PU().Get_eh_spec(eh_spec);
+
+    for (PU::eh_spec_vector::const_iterator it = eh_spec.begin();
+         it != eh_spec.end(); ++it)
     {
-      INITO* ino = &Inito_Table[idx];
-      INITV_IDX st_entry = INITV_blk (INITO_val (*ino));
-      do
-      {
-	ST_IDX st_idx = 0;
-	if (INITV_kind (st_entry) != INITVKIND_ZERO)
-	{
-          st_idx = TCON_uval (INITV_tc_val (st_entry));
-	  FmtAssert (st_idx > 0, ("Invalid eh-spec entry"));
-	}
-	if (st_idx == 0)
-	{
-	  st_entry = INITV_next (st_entry);
-	  continue;
-	}
-	INT32 index = Get_symbol_index (&St_Table[st_idx]);
-	INITV_IDX next = INITV_next (st_entry); // for backup
-	FmtAssert (index >= 0, ("Unexpected summary id for eh symbol"));
-	INITV_Set_VAL (Initv_Table[st_entry], Enter_tcon (
-	               Host_To_Targ (MTYPE_U4, index)), 1);
-	Set_INITV_next (st_entry, next);
-        st_entry = INITV_next (st_entry);
-      } while (st_entry);
+        if (*it != NULL)
+            Get_symbol_index(*it);
     }
 }
 
@@ -1030,19 +991,10 @@ SUMMARIZE<program>::Process_eh_region (WN * wn)
     INITV_IDX types = INITV_next (INITV_blk (blk));
     for (; types; types = INITV_next (types))
     {
-      int sym = 0;
-      if (INITV_kind (types) != INITVKIND_ZERO)
-        sym = TCON_uval (INITV_tc_val (types));
-      if (sym > 0)
+      if (INITV_kind (types) == INITVKIND_SYMOFF)
       {
-      	INT32 index = Get_symbol_index (&St_Table[sym]);
-	INITV_IDX next = INITV_next (types);	// for backup
-	// We don't expect index==0 since at least Process_eh_globals is 
-	// called before this.
-	FmtAssert (index > 0, ("Unexpected summary id for eh symbol"));
-	INITV_Set_VAL (Initv_Table[types], Enter_tcon (
-		       Host_To_Targ (MTYPE_U4, index)), 1);
-	Set_INITV_next (types, next);
+        ST_IDX sym = INITV_st (types);
+        Get_symbol_index (&St_Table[sym]);
       }
     }
 }
@@ -1072,7 +1024,7 @@ struct branch_dir
 {
   float taken, not_taken;
 };
-hash_map<WN*, branch_dir, Local::hashfn, Local::eqnode> if_map;
+extern hash_map<WN*, branch_dir, Local::hashfn, Local::eqnode> if_map;
 
 inline void get_parent_if ( WN ** p, WN ** b )
 {

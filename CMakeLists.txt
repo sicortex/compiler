@@ -17,17 +17,16 @@ ENDIF()
 # Search for various include files and functions
 include(${Path64_SOURCE_DIR}/cmake/Modules/ConfigureChecks.cmake)
 
-# Force the build_type=debug flags to sane values overriding users choices
-# -g0 is used on solaris to workaround bug in libdwarf
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "SunOS")
-    SET(CMAKE_C_FLAGS_DEBUG  "-O0 -g0 -D_DEBUG" CACHE STRING "Flags used by the compiler during debug builds." FORCE)
-    SET(CMAKE_CXX_FLAGS_DEBUG  "-O0 -g0 -D_DEBUG" CACHE STRING "Flags used by the compiler during debug builds." FORCE)
-    SET(CMAKE_Fortran_FLAGS_DEBUG  "-O0 -g0 -D_DEBUG" CACHE STRING "Flags used by the compiler during debug builds." FORCE)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(LINK_COPY copy_if_different)
 else()
-    SET(CMAKE_C_FLAGS_DEBUG  "-O0 -g -D_DEBUG" CACHE STRING "Flags used by the compiler during debug builds." FORCE)
-    SET(CMAKE_CXX_FLAGS_DEBUG  "-O0 -g -D_DEBUG" CACHE STRING "Flags used by the compiler during debug builds." FORCE)
-    SET(CMAKE_Fortran_FLAGS_DEBUG  "-O0 -g3 -D_DEBUG" CACHE STRING "Flags used by the compiler during debug builds." FORCE)
+    set(LINK_COPY create_symlink)
 endif()
+
+# Force the build_type=debug flags to sane values overriding users choices
+SET(CMAKE_C_FLAGS_DEBUG  "-O0 -g -D_DEBUG -DIs_True_On=1" CACHE STRING "Flags used by the compiler during debug builds." FORCE)
+SET(CMAKE_CXX_FLAGS_DEBUG  "-Wno-deprecated -O0 -g -D_DEBUG -DIs_True_On=1" CACHE STRING "Flags used by the compiler during debug builds." FORCE)
+SET(CMAKE_Fortran_FLAGS_DEBUG  "-O0 -g3 -D_DEBUG -DIs_True_On=1" CACHE STRING "Flags used by the compiler during debug builds." FORCE)
 
 # Using -mno-sse3 flag for release build if PATH64_ENABLE_PSCRUNTIME=ON
 if(PATH64_ENABLE_PSCRUNTIME)
@@ -36,7 +35,7 @@ endif()
 
 # Force the build_type=release flags to -O2 -DNDEBUG values overriding default cmake -O3
 SET(CMAKE_C_FLAGS_RELEASE  "-O2 -DNDEBUG ${SSE_FLAGS}" CACHE STRING "Flags used by the compiler during release builds." FORCE)
-SET(CMAKE_CXX_FLAGS_RELEASE  "-O2 -DNDEBUG ${SSE_FLAGS}" CACHE STRING "Flags used by the compiler during release builds." FORCE)
+SET(CMAKE_CXX_FLAGS_RELEASE  "-Wno-deprecated -O2 -DNDEBUG ${SSE_FLAGS}" CACHE STRING "Flags used by the compiler during release builds." FORCE)
 SET(CMAKE_Fortran_FLAGS_RELEASE  "-O2 -DNDEBUG ${SSE_FLAGS}" CACHE STRING "Flags used by the compiler during release builds." FORCE)
 
 
@@ -46,23 +45,14 @@ OPTION(PATH64_ENABLE_IPA "Enable IPA" ON)
 
 # Define user option whether to build the Fortran compiler.
 OPTION(PATH64_ENABLE_FORTRAN "Build Fortran compiler" ON)
-IF(PATH64_ENABLE_FORTRAN)
-  IF(NOT PATH64_USE_FOLD_F)
-    SET(CMAKE_Fortran_COMPILER_FORCED TRUE)
-    set(CMAKE_Fortran_COMPILER "true")
-  ENDIF()
-  ENABLE_LANGUAGE(Fortran)
-  IF(PATH64_USE_FOLD_F)
-      IF(CMAKE_Fortran_COMPILER)
-	INCLUDE(${Path64_SOURCE_DIR}/cmake/Modules/CheckFortran.cmake)
-      ELSE()
-	MESSAGE(STATUS "No working Fortran compiler is available")
-	SET(PATH64_ENABLE_FORTRAN 0)
-      ENDIF()
-  ELSE()
-    set(CMAKE_Fortran_COMPILER "${Path64_BINARY_DIR}/bin/pathf90")
-  ENDIF()
-ENDIF()
+
+if(PATH64_ENABLE_FORTRAN)
+    if("${CMAKE_Fortran_COMPILER}" STREQUAL "")
+        set(CMAKE_Fortran_COMPILER_FORCED TRUE)
+        set(CMAKE_Fortran_COMPILER "true")
+    endif()
+    enable_language(Fortran)
+endif()
 
 # Define user option whether to build the profiling libraries
 OPTION(PATH64_ENABLE_PROFILING "Build profiling libraries" ON)
@@ -166,17 +156,20 @@ string(REGEX REPLACE "^([0-9]+).+$" "\\1" PSC_MAJOR_VERSION ${TMPVERSION})
 string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*$" "\\1" PSC_MINOR_VERSION ${TMPVERSION})
 
 IF(NOT PSC_TARGET)
-    string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}-pathscale-${CMAKE_SYSTEM_NAME}" PSC_TARGET)
+    path64_get_host_arch(arch)
+    IF("${arch}" STREQUAL "x8664")
+        set(arch "x86_64")
+    ELSEIF("${arch}" STREQUAL "x8632")
+        set(arch "i386")
+    ENDIF()
+    string(TOLOWER "${arch}-unknown-${CMAKE_SYSTEM_NAME}" PSC_TARGET)
+    IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+        set(PSC_TARGET "${PSC_TARGET}-gnu")
+    ENDIF()
 ENDIF()
 
 # Checking that CRT paths are specified for all targets
 FOREACH(targ ${PATH64_ENABLE_TARGETS})
-    IF(PSC_CRT_PATH_${targ})
-        MESSAGE(STATUS "CRT path for ${targ} target: ${PSC_CRT_PATH_${targ}}")
-    ELSE()
-        MESSAGE(FATAL_ERROR "CRT path for ${targ} target is not specified. Please specify PSC_CRT_PATH_${targ} variable")
-    ENDIF()
-
     if(PSC_CRTBEGIN_PATH_${targ})
         message(STATUS "crtbegin/crtend path for ${targ} target: ${PSC_CRTBEGIN_PATH_${targ}}")
     else()
@@ -199,14 +192,6 @@ IF(PATH64_ENABLE_HUGEPAGES)
 	ENDIF()
 ELSE()
 	MESSAGE(STATUS "Not building with huge pages support")
-ENDIF()
-
-# Do we build the optimized math libraries
-OPTION(PATH64_ENABLE_MATHLIBS "Building optimized math libraries" OFF)
-IF(PATH64_ENABLE_MATHLIBS)
-	MESSAGE(STATUS "Optimized math libraries enabled")
-ELSE()
-	MESSAGE(STATUS "Optimized math libraries disabled")
 ENDIF()
 
 # Use X86 elf file format for whirl objects
@@ -352,12 +337,12 @@ ENDIF()
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     SET(SHELL_EXT cmd)
-    SET(SYMLINK_COMMAND ${CMAKE_COMMAND} -E copy) 
+    SET(SYMLINK_COMMAND ${CMAKE_COMMAND} -E copy_if_different) 
     SET(PATH64_AUXILARY_LD_FLAGS '"-FIXME"')
     # ADD_DEFINITIONS(-DPSC_FULL_VERSION="${PSC_FULL_VERSION}")
 ELSE()
     SET(SHELL_EXT sh)
-    SET(SYMLINK_COMMAND ln -s)
+    SET(SYMLINK_COMMAND ${CMAKE_COMMAND} -E create_symlink)
 ENDIF()
 # build runtime search paths
 include(${Path64_SOURCE_DIR}/cmake/Modules/GCCRuntimeDirs.cmake)
@@ -388,78 +373,6 @@ ADD_DEPENDENCIES(compiler-stage-Fortran compiler-stage)
 ADD_DEPENDENCIES(compiler-stage-libs-C compiler-stage-C)
 ADD_DEPENDENCIES(compiler-stage-libs-CXX compiler-stage-CXX compiler-stage-libs-C)
 ADD_DEPENDENCIES(compiler-stage-libs-Fortran compiler-stage-Fortran)
-
-function(get_compiler_version res)
-    exec_program(${CMAKE_C_COMPILER}
-                 ARGS --version
-                 OUTPUT_VARIABLE compiler_version
-                )
-
-    string(REGEX REPLACE ".* ([0-9]+)(\\.)([0-9]+)(\\.)([0-9]+).*" "\\1\\2\\3\\4\\5"
-           compiler_version ${compiler_version})
-
-    set(${res} ${compiler_version} PARENT_SCOPE)
-endfunction()
-
-
-# Copying pathscale runtime to <stage_dir>/lib/${arch}
-# if we are building debug version with pathcc (static linking is used in release build)
-if("X${CMAKE_C_COMPILER_ID}" STREQUAL "XPathScale" AND NOT "X${CMAKE_BUILD_TYPE}" STREQUAL "XRelease")
-    find_program(pathcc_full_path ${CMAKE_C_COMPILER})
-    get_filename_component(pathscale_path "${pathcc_full_path}" PATH)
-    get_filename_component(pathscale_path "${pathscale_path}/.." ABSOLUTE)
-    message(STATUS "Path to pathcc using to build: ${pathscale_path}")
-
-    get_compiler_version(pathscale_version)
-    path64_get_host_target(host_targ)
-    path64_get_host_arch(host_arch)
-    path64_get_target_bits(host_bits ${host_targ})
-    set(pathscale_libs_path "${pathscale_path}/lib/${pathscale_version}/${host_arch}/${host_bits}")
-
-    set(pathscale_libs_stage_deps)
-    set(pathscale_libs libmv.so libmpath.so)
-    if(PATH64_ENABLE_FORTRAN)
-        if(PATH64_USE_FOLD_F)
-            list(APPEND pathscale_libs libpathfortran.so)
-        endif()
-    endif()
-    if(PATH64_ENABLE_PSCRUNTIME)
-        list(APPEND pathscale_libs libgcc.so libeh.so libcxxrt.so libstl.so)
-    endif()
-
-    foreach(arch ${PATH64_ENABLE_ARCHES})
-        foreach(lib ${pathscale_libs})
-            add_custom_command(OUTPUT ${Path64_BINARY_DIR}/lib/${arch}/${lib}
-                               COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                                       "${pathscale_libs_path}/${lib}"
-                                       "${Path64_BINARY_DIR}/lib/${arch}/${lib}"
-                               DEPENDS "${pathscale_libs_path}/${lib}")
-            list(APPEND pathscale_libs_stage_deps "${Path64_BINARY_DIR}/lib/${arch}/${lib}")
-
-            list(FIND PATH64_ENABLE_TARGETS ${host_targ} res)
-            if(NOT ${res} EQUAL -1)
-                # Making link <install_dir>/lib/${arch}/${lib} ->
-                #             <install_dir>/lib/${arch}/${host_bits}/${lib}
-                install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/${PSC_FULL_VERSION}/${arch}\") \n execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"./../${host_arch}/${host_bits}/${lib}\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/${PSC_FULL_VERSION}/${arch}/${lib}\")")
-            else()
-                # Copying pathscale lib to <instalL_dir>/lib/${arch}/${lib}
-                install(FILES "${pathscale_libs_path}/${lib}" DESTINATION "lib/${PSC_FULL_VERSION}/${arch}")
-            endif()
-          
-        endforeach()
-
-        # Making link for libpathfortran
-        if(PATH64_ENABLE_FORTRAN)
-            if(NOT PATH64_USE_FOLD_F)
-                install(CODE "file(MAKE_DIRECTORY \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/${PSC_FULL_VERSION}/${arch}\") \n execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"./../${host_arch}/${host_bits}/libpathfortran.so\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/lib/${PSC_FULL_VERSION}/${arch}/libpathfortran.so\")")
-            endif()
-        endif()
-    endforeach()
-
-    add_custom_target(pathscale-libs-stage DEPENDS ${pathscale_libs_stage_deps})
-    add_dependencies(compiler-stage pathscale-libs-stage)
-endif()
-
 
 # Build GCC and pathscale.
 IF(PATH64_ENABLE_GNU_FRONTEND)

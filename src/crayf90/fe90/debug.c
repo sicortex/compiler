@@ -4570,6 +4570,8 @@ static	void	print_expanded_ir(int	ir_idx)
       case Sin_Opr:
       case Log_E_Opr:
       case Log_10_Opr:
+      case Gamma_Opr:
+      case Log_Gamma_Opr:
       case Tan_Opr:
       case Tanh_Opr:
       case Sinh_Opr:
@@ -5021,9 +5023,12 @@ static void dump_at_ntry (FILE		*out_file,
       return;
    }
 
+   if (out_file == NULL)
+       out_file = stdout;
+
    /* Note that the fields are displayed in alphabetical order.         */
 
-   fprintf(out_file, "%-s\n", AT_OBJ_NAME_PTR(at_idx));
+   fprintf(out_file, "%s\n", AT_OBJ_NAME_PTR(at_idx));
 
    fprintf(out_file, "  %-25s %-25s %-16s= %-8d\n",
                      obj_class_str[AT_OBJ_CLASS(at_idx)],
@@ -5938,6 +5943,9 @@ static void dump_at_ntry (FILE		*out_file,
                  "ATT_SCP_IDX", ATT_SCP_IDX(at_idx),
                  "ATT_SEQUENCE_SET", boolean_str[ATT_SEQUENCE_SET(at_idx)],
                  "ATT_UNIQUE_ID", ATT_UNIQUE_ID(at_idx));
+
+	 fprintf(out_file, "  %-16s= %-7d\n",
+		 "ATT_PARENT_TYPE", ATT_PARENT_TYPE(at_idx));
 
          if (ATT_STRUCT_BIT_LEN_IDX(at_idx) != NULL_IDX) {
             sprintf(str, "(%10s)",

@@ -1562,7 +1562,7 @@ void IPO_Modify_WN_for_field_reorder (IPA_NODE* node)
         }// of al cases
     }
     #ifdef Is_True  
-    WN_verifier(wn1);
+    WN_verifier(&node->Get_PU(), wn1);
     Verify_GLOBAL_SYMTAB();
     #endif
     node->Set_Whirl_Tree(wn1);

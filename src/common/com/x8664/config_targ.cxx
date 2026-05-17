@@ -330,8 +330,9 @@ Targ_Name ( TARGET_PROCESSOR b)
     case TARGET_wolfdale: return "Wolfdale"; 
     case TARGET_pentium4: return "Pentium4";
     case TARGET_xeon: return "Xeon";
-    case TARGET_anyx86: return "Anyx86";
+    case TARGET_anyx86: return "Generic";
     case TARGET_barcelona: return "Barcelona";
+	case TARGET_orochi: return "bdver1";
 	case TARGET_sandy: return "Sandy Bridge";
     default:
       r = bnb[bnb_used].name;
@@ -476,6 +477,10 @@ Prepare_Target ( void )
 #endif
       targ = TARGET_barcelona;
     }
+	else if ( strcasecmp ( Processor_Name, "bdver1") == 0){
+	  targ = TARGET_orochi;
+	  // TODO: here to add Tareget sse?
+	}
     else if ( strcasecmp ( Processor_Name, "athlon64fx" ) == 0 ) {
       targ = TARGET_opteron;
     }
@@ -506,11 +511,12 @@ Prepare_Target ( void )
       if (!Target_SSE2_Set && !Target_SSE3_Set)
         Target_SSE3 = TRUE;
     }
-    else if ( strcasecmp ( Processor_Name, "anyx86" ) == 0 ) {
+    else if ( strcasecmp ( Processor_Name, "generic" ) == 0 ) {
       targ = TARGET_anyx86;
     }
     else if (strcasecmp ( Processor_Name, "sandy") == 0){
       targ = TARGET_sandy;
+	  // TODO: here to add Tareget sse?
     }
     else {
       ErrMsg ( EC_Inv_TARG, "processor", Processor_Name );
@@ -528,7 +534,7 @@ Prepare_Target ( void )
   /* Now make sure ABI/ISA and Target are consistent if both specified,
    * and if one is default the other:
    */
-  if ( Is_Target_x86_64() ) {
+  if ( Is_Target_x86_64()) {
     if( Target_ABI == ABI_UNDEF ){
       Target_ABI = ABI_n64;
     }

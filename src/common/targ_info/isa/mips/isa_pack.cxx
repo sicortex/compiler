@@ -46,6 +46,7 @@
 #include "topcode.h"
 #include "isa_pack_gen.h"
  
+int
 main()
 {
   ISA_Pack_Begin("MIPS", 32);
@@ -431,4 +432,5 @@ main()
 			 TOP_UNDEFINED);
 
   ISA_Pack_End();
+  return 0;
 }

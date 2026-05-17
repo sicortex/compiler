@@ -33,13 +33,8 @@
 
 extern WN_MAP Prompf_Id_Map; /* Maps WN constructs to unique identifiers */
 
-#pragma weak W2C_Should_Emit_Nested_PUs
-#pragma weak W2C_Outfile_Translate_Pu
-#pragma weak W2F_Should_Emit_Nested_PUs
-#pragma weak W2F_Outfile_Translate_Pu
-
-
 extern void Prompf_Emit_Whirl_to_Source(PU_Info* current_pu,
+                                        PU* pu,
                                         WN* func_nd)
 {
   ST_IDX   st = PU_Info_proc_sym(current_pu);
@@ -48,10 +43,10 @@ extern void Prompf_Emit_Whirl_to_Source(PU_Info* current_pu,
 
   if (Anl_Needs_Whirl2c() && 
       (W2C_Should_Emit_Nested_PUs() || !nested))
-    W2C_Outfile_Translate_Pu(func_nd, TRUE);
+    W2C_Outfile_Translate_Pu(pu, func_nd, TRUE);
   else if (Anl_Needs_Whirl2f() &&  
 	   (W2F_Should_Emit_Nested_PUs() || !nested))
-    W2F_Outfile_Translate_Pu(func_nd);
+    W2F_Outfile_Translate_Pu(pu, func_nd);
 }
 
 

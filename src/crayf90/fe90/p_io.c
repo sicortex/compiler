@@ -3561,7 +3561,7 @@ static int translate_pp_format(fmt_type		*old_const,
 void parse_flush_stmt(void)
 {
 char *flush_name = "_flush08";
-int i, call_idx, flush_idx, result_idx, arg[4];
+int line, col, i, asg_idx, call_idx, flush_idx, result_idx, arg[4];
 opnd_type result;
 boolean flag;
 
@@ -3570,6 +3570,9 @@ boolean flag;
     }
 
     INSERT_IO_START;
+
+    line = TOKEN_LINE(token);
+    col  = TOKEN_COLUMN(token);
 
     if (LA_CH_VALUE == LPAREN) {
 	if (!parse_io_control_list(&result, Flush))
@@ -3611,7 +3614,6 @@ boolean flag;
     }
 
     NTR_IR_TBL(call_idx);
-    SH_IR_IDX(curr_stmt_sh_idx) = call_idx;
 
     IR_OPR(call_idx)      = Call_Opr;
     IR_TYPE_IDX(call_idx) = TYPELESS_DEFAULT_TYPE;
@@ -3642,6 +3644,27 @@ boolean flag;
     IR_LINE_NUM_L(call_idx) = TOKEN_LINE(token);
 
     COPY_OPND(IR_OPND_R(call_idx), result);
+
+    result_idx                    = gen_compiler_tmp(1, 0, Priv, TRUE);
+    ATD_TYPE_IDX(result_idx)      = CG_INTEGER_DEFAULT_TYPE;
+    ATD_STOR_BLK_IDX(result_idx)  = SCP_SB_STACK_IDX(curr_scp_idx);
+    AT_REFERENCED(result_idx)     = Referenced;
+    AT_DEFINED(result_idx)        = TRUE;
+    AT_SEMANTICS_DONE(result_idx) = TRUE;
+
+    NTR_IR_TBL(asg_idx);
+    IR_OPR(asg_idx)        = Alt_Return_Opr;
+    IR_TYPE_IDX(asg_idx)   = CG_INTEGER_DEFAULT_TYPE;
+    IR_LINE_NUM(asg_idx)   = line;
+    IR_COL_NUM(asg_idx)    = col;
+    IR_LINE_NUM_L(asg_idx) = line;
+    IR_COL_NUM_L(asg_idx)  = col;
+    IR_FLD_L(asg_idx)      = AT_Tbl_Idx;
+    IR_IDX_L(asg_idx)      = result_idx;
+    IR_FLD_R(asg_idx)      = IR_Tbl_Idx;
+    IR_IDX_R(asg_idx)      = call_idx;
+
+    SH_IR_IDX(curr_stmt_sh_idx) = asg_idx;
 
     if (LA_CH_VALUE != EOS)
 	parse_err_flush(Find_EOS, EOS_STR);

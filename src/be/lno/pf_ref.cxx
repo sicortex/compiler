@@ -149,9 +149,6 @@
 #endif
 #include "targ_sim.h"
 
-#include "w2c_weak.h"
-#include "w2f_weak.h"
-
 #define INT_INFINITY 9999
 #define absof(x) (((x)>0) ? (x) : (0-(x)))
 #define maxof(x, y) (((x)>(y)) ? (x) : (y))
@@ -2319,7 +2316,7 @@ if(LNO_Run_Prefetch > SOME_PREFETCH && offset != 0 &&
 #ifdef TARG_X8664
      if(Is_Target_Core() || Is_Target_EM64T())
        fancy_offset_incr=8;
-     else if(Is_Target_Barcelona())
+     else if(Is_Target_Barcelona() || Is_Target_Orochi())
        fancy_offset_incr=28;
      else
 #endif

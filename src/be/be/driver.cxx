@@ -65,7 +65,6 @@
 /* #include <libgen.h> */
 
 #include "defs.h"
-#include "dso.h"		    /* for load_so() */
 #include "be_errors.h"		/* Set_Error_Tables(), etc. */
 #include "erglob.h"		    /* for EC_ errmsg */
 #include "mempool.h"		    /* for MEM_Initialze()  */
@@ -132,7 +131,10 @@
 #include "output_func_start_profiler.h"
 #include "goto_conv.h"
 #endif
+
+#define MODULE_NAME be
 #include "err_host.tab"
+
 #include "libelftc.h"
 
 extern ERROR_DESC EDESC_BE[], EDESC_CG[];
@@ -144,148 +146,6 @@ extern void CYG_Instrument_Driver(WN *);
 #endif
 
 extern void Initialize_Targ_Info(void);
-
-// symbols defined in cg.so
-#ifndef USE_WEAK_REFERENCES
-
-extern void CG_Process_Command_Line (INT, char **, INT, char **);
-extern void CG_Init ();
-extern void CG_Fini ();
-extern void CG_PU_Initialize (WN*);
-extern void CG_PU_Finalize ();
-extern WN* CG_Generate_Code (WN*, ALIAS_MANAGER*, DST_IDX, BOOL);
-extern void EH_Generate_Range_List (WN *);
-
-#else
-
-#pragma weak CG_Process_Command_Line
-
-#pragma weak CG_Init
-#pragma weak CG_Fini
-#pragma weak CG_PU_Finalize
-#pragma weak CG_PU_Initialize
-#pragma weak CG_Generate_Code
-#pragma weak EH_Generate_Range_List
-
-#endif // USE_WEAK_REFERENCES
-
-// symbols defined in wopt.so
-#ifndef USE_WEAK_REFERENCES
-
-extern void wopt_main (INT argc, char **argv, INT, char **);
-extern void Wopt_Init ();
-extern void Wopt_Fini ();
-extern WN* Perform_Preopt_Optimization (WN *, WN *);
-extern WN* Perform_Global_Optimization (WN *, WN *, ALIAS_MANAGER *);
-extern WN* Pre_Optimizer (INT32, WN*, DU_MANAGER*, ALIAS_MANAGER*);
-extern void choose_from_complete_struct_for_relayout_candidates();
-extern DU_MANAGER* Create_Du_Manager (MEM_POOL *);
-extern void Delete_Du_Manager (DU_MANAGER *, MEM_POOL *);
-extern BOOL Verify_alias (ALIAS_MANAGER *, WN *);
-
-#else
-
-#pragma weak wopt_main
-#pragma weak Wopt_Init
-#pragma weak Wopt_Fini
-#pragma weak Perform_Global_Optimization
-#pragma weak Perform_Preopt_Optimization
-#pragma weak Pre_Optimizer
-#pragma weak choose_from_complete_struct_for_relayout_candidates
-#pragma weak Create_Du_Manager
-#pragma weak Delete_Du_Manager
-#pragma weak Verify_alias
-
-#endif // USE_WEAK_REFERENCES
-
-// symbols defined in lno.so
-#ifndef USE_WEAK_REFERENCES
-
-extern void (*lno_main_p) (INT, char**, INT, char**);
-#define lno_main (*lno_main_p)
-
-extern void (*Lno_Init_p) ();
-#define Lno_Init (*Lno_Init_p)
-
-extern void (*Lno_Fini_p) ();
-#define Lno_Fini (*Lno_Fini_p)
-
-extern WN* (*Perform_Loop_Nest_Optimization_p) (PU_Info*, WN*, WN*, BOOL);
-#define Perform_Loop_Nest_Optimization (*Perform_Loop_Nest_Optimization_p)
-
-#else 
-
-#pragma weak lno_main
-#pragma weak Lno_Init
-#pragma weak Lno_Fini
-#pragma weak Perform_Loop_Nest_Optimization
-
-#endif // USE_WEAK_REFERENCES
-
-// symbols defined in ipl.so
-
-#ifndef USE_WEAK_REFERENCES
-
-extern void (*Ipl_Extra_Output_p) (Output_File *);
-#define Ipl_Extra_Output (*Ipl_Extra_Output_p)
-
-extern void (*Ipl_Init_p) ();
-#define Ipl_Init (*Ipl_Init_p)
-
-extern void (*Ipl_Fini_p) ();
-#define Ipl_Fini (*Ipl_Fini_p)
-
-extern void (*ipl_main_p) (INT, char **);
-#define ipl_main (*ipl_main_p)
-
-extern void (*Perform_Procedure_Summary_Phase_p) (WN*, DU_MANAGER*,
-						  ALIAS_MANAGER*, void*);
-#define Perform_Procedure_Summary_Phase (*Perform_Procedure_Summary_Phase_p)
-
-#ifdef KEY	// bug 3672
-extern void (*Preprocess_struct_access_p)(void);
-#define Preprocess_struct_access (*Preprocess_struct_access_p)
-#endif
-
-#else
-
-#pragma weak ipl_main
-#pragma weak Ipl_Init
-#pragma weak Ipl_Fini
-#pragma weak Ipl_Extra_Output
-#pragma weak Perform_Procedure_Summary_Phase
-
-#endif // USE_WEAK_REFERENCES
-
-#include "w2c_weak.h"
-#include "w2f_weak.h"
-
-#if ! defined(BUILD_OS_DARWIN) && !defined(_WIN32)
-#pragma weak Prp_Process_Command_Line
-#pragma weak Prp_Needs_Whirl2c
-#pragma weak Prp_Needs_Whirl2f
-#pragma weak Prp_Init
-#pragma weak Prp_Instrument_And_EmitSrc
-#pragma weak Prp_Fini
-
-#pragma weak Anl_Cleanup
-#pragma weak Anl_Process_Command_Line
-#pragma weak Anl_Needs_Whirl2c
-#pragma weak Anl_Needs_Whirl2f
-#pragma weak Anl_Init
-#pragma weak Anl_Init_Map
-#pragma weak Anl_Static_Analysis
-#pragma weak Anl_Fini
-#endif /* ! defined(BUILD_OS_DARWIN) */
-
-#ifndef __GNUC__
-#pragma weak Prompf_Emit_Whirl_to_Source__GP7pu_infoP2WN
-#elif (__GNUC__ == 2)
-#pragma weak Prompf_Emit_Whirl_to_Source__FP7pu_infoP2WN
-#else
-#pragma weak _Z27Prompf_Emit_Whirl_to_SourceP7pu_infoP2WN	// gcc 3.2
-#endif
-
 extern void Prompf_Emit_Whirl_to_Source(PU_Info* current_pu, WN* func_nd);
 
 #ifdef _WIN32
@@ -326,6 +186,9 @@ extern BOOL   Purple_loaded;     /* Defined in cleanup.c */
 extern BOOL   Whirl2f_loaded;    /* Defined in cleanup.c */
 extern BOOL   Whirl2c_loaded;    /* Defined in cleanup.c */
 
+
+void Cleanup_Files(BOOL report, BOOL delete_dotofile);
+        
 extern void *Current_Dep_Graph;
 FILE *DFile = stderr;
 
@@ -395,34 +258,23 @@ load_components (INT argc, char **argv)
 
     if (Run_ipl) {
       Get_Phase_Args (PHASE_IPL, &phase_argc, &phase_argv);
-      dso_load_simply ("ipl", Ipl_Path, Show_Progress);
       ipl_main (phase_argc, phase_argv);
       Set_Error_Descriptor (EP_BE, EDESC_BE);
     }
 
     if (Run_lno || Run_autopar) {
       Get_Phase_Args (PHASE_LNO, &phase_argc, &phase_argv);
-      dso_load_simply ("lno", LNO_Path, Show_Progress);
       lno_main (phase_argc, phase_argv, argc, argv);
-
-      // load in ipl.so if we need to perform automatic
-      // parallelization and interprocedural analysis has
-      // been performed
-      if (Run_autopar && LNO_IPA_Enabled) {
-	  dso_load_simply("ipl", Ipl_Path, Show_Progress);
-      }
-  }
+    }
 
     if (Run_prompf || Run_w2fc_early) {
       Get_Phase_Args (PHASE_PROMPF, &phase_argc, &phase_argv);
-      dso_load_simply("prompf_anl", Prompf_Anl_Path, Show_Progress);
       Prompf_anl_loaded = TRUE;
       Anl_Process_Command_Line(phase_argc, phase_argv, argc, argv);
     }
 
     if (Run_purple) {
       Get_Phase_Args (PHASE_PURPLE, &phase_argc, &phase_argv);
-      dso_load_simply("purple", Purple_Path, Show_Progress);
       Purple_loaded = TRUE;
       Prp_Process_Command_Line(phase_argc, phase_argv, argc, argv);
     }
@@ -432,7 +284,6 @@ load_components (INT argc, char **argv)
 	(Run_purple && Prp_Needs_Whirl2c()))
     {
       Get_Phase_Args (PHASE_W2C, &phase_argc, &phase_argv);
-      dso_load_simply("whirl2c", W2C_Path, Show_Progress);
       Whirl2c_loaded = TRUE;
       if (Run_prompf)
 	W2C_Set_Prompf_Emission(&Prompf_Id_Map);
@@ -444,7 +295,6 @@ load_components (INT argc, char **argv)
 	(Run_purple && Prp_Needs_Whirl2f()))
     {
       Get_Phase_Args (PHASE_W2F, &phase_argc, &phase_argv);
-      dso_load_simply("whirl2f", W2F_Path, Show_Progress);
       Whirl2f_loaded = TRUE;
       if (Run_prompf)
 	W2F_Set_Prompf_Emission(&Prompf_Id_Map);
@@ -748,19 +598,19 @@ Adjust_Opt_Level (PU_Info* current_pu, WN *pu, char *pu_name)
 } /* Adjust_Opt_Level */
 
 static void
-Ipl_Processing (PU_Info *current_pu, WN *pu)
+Ipl_Processing (PU_Info *current_pu, PU *pu, WN *pu_wn)
 {
     struct DU_MANAGER *du_mgr;
     struct ALIAS_MANAGER *al_mgr;
 
     MEM_POOL_Push (&MEM_local_pool);
 
-    PU_adjust_addr_flags(Get_Current_PU_ST(), pu);
+    PU_adjust_addr_flags(Get_Current_PU_ST(), pu_wn);
 
     if (Run_preopt) {
 	du_mgr = Create_Du_Manager(MEM_pu_nz_pool_ptr);
 	al_mgr = Create_Alias_Manager(MEM_pu_nz_pool_ptr);
-	pu = Pre_Optimizer(PREOPT_IPA0_PHASE, pu, du_mgr, al_mgr);
+	pu_wn = Pre_Optimizer(PREOPT_IPA0_PHASE, pu, pu_wn, du_mgr, al_mgr);
 #ifdef Is_True_On
 	if (Get_Trace (TKIND_ALLOC, TP_IPA)) {
 	    fprintf (TFile, "\n%s%s\tMemory allocation information after"
@@ -772,11 +622,11 @@ Ipl_Processing (PU_Info *current_pu, WN *pu)
 	Delete_Du_Manager (du_mgr, MEM_pu_nz_pool_ptr);
     } else {
 	Set_Error_Phase ( "IPA Summary" );
-	Perform_Procedure_Summary_Phase (pu, du_mgr, al_mgr, 0);
+	Perform_Procedure_Summary_Phase (pu_wn, du_mgr, al_mgr, 0);
     }
 
     /* Write out the current proc */
-    Set_PU_Info_tree_ptr(current_pu, pu);
+    Set_PU_Info_tree_ptr(current_pu, pu_wn);
 
     Write_PU_Info (current_pu);
 
@@ -788,21 +638,21 @@ Ipl_Processing (PU_Info *current_pu, WN *pu)
 /* Compilation time loop: LNO			 		      */
 /*====================================================================*/
 static WN *
-LNO_Processing (PU_Info *current_pu, WN *pu)
+LNO_Processing (PU_Info *current_pu, PU *pu, WN *pu_wn)
 {
   REGION_CS_ITER rgn_iter;
 
-  REGION_CS_ITER_init(&rgn_iter, pu);
+  REGION_CS_ITER_init(&rgn_iter, pu_wn);
   /* PV 457243 for Mongoose 7.2 do just the PU (RID_TYPE_func_entry),
      for Mongoose 7.3 use: RID_TYPE_olimit | RID_TYPE_pragma
      These keeps regions out of LNO for 7.2 */
-  for (REGION_CS_NoEarlierSub_First(&rgn_iter, pu, RID_TYPE_func_entry);
+  for (REGION_CS_NoEarlierSub_First(&rgn_iter, pu_wn, RID_TYPE_func_entry);
        REGION_CS_NoEarlierSub_While(&rgn_iter);
        REGION_CS_NoEarlierSub_Next(&rgn_iter)) {
 
     WN *rwn;
 
-    rwn = REGION_remove_and_mark(pu, &rgn_iter);
+    rwn = REGION_remove_and_mark(pu, pu_wn, &rgn_iter);
     Is_True(rwn != NULL,
 	    ("BE driver, IR inconsistency, LNO loop"));
     if (Get_Trace(TP_REGION,TT_REGION_ALL)) {
@@ -826,7 +676,7 @@ LNO_Processing (PU_Info *current_pu, WN *pu)
           Free_Dep_Graph(); 
 	  Current_Dep_Graph = PU_Info_depgraph_ptr(Current_PU_Info);
 	}
-	rwn = Perform_Loop_Nest_Optimization(current_pu, pu, rwn, 
+	rwn = Perform_Loop_Nest_Optimization(current_pu, pu, pu_wn, rwn, 
           TRUE /*can use alloca*/);
 	Set_PU_Info_depgraph_ptr(Current_PU_Info,Current_Dep_Graph);
 	if (Current_Dep_Graph) {
@@ -864,29 +714,29 @@ LNO_Processing (PU_Info *current_pu, WN *pu)
     }
 
     if (REGION_CS_ITER_is_not_stacked(&rgn_iter)) /* this is tricky */
-      pu = rwn;
+      pu_wn = rwn;
     REGION_replace_from_mark(rwn, &rgn_iter);
 
     if (Get_Trace(TP_REGION,TT_REGION_ALL)) {
       fprintf(TFile,"------------ bottom of LNO loop: -----------\n");
-      REGION_consistency_check(pu);
-      RID_WN_Tree_Print(TFile,pu);
+      REGION_consistency_check(pu_wn);
+      RID_WN_Tree_Print(TFile,pu_wn);
       if (Run_cg)
-	fdump_region_tree(TFile,pu);
+	fdump_region_tree(TFile,pu_wn);
       else
-	fdump_tree(TFile,pu);
+	fdump_tree(TFile,pu_wn);
       fprintf(TFile,"--------------------------------------------\n");
     }
   } /* end of compilation time region loop */
 
-  return pu;
+  return pu_wn;
 } /* LNO_Processing */
 
 
 /* Misc. processing after LNO is done, PU exists as a whole during this
    procedure */
 static void
-Post_LNO_Processing (PU_Info *current_pu, WN *pu)
+Post_LNO_Processing (PU_Info *current_pu, PU *pu, WN *pu_wn)
 {
     BOOL is_user_visible_pu = (CURRENT_SYMTAB == GLOBAL_SYMTAB + 1) || 
                               ((Language == LANG_F90) &&
@@ -899,28 +749,28 @@ Post_LNO_Processing (PU_Info *current_pu, WN *pu)
 	if (W2C_Should_Emit_Nested_PUs() || is_user_visible_pu) {
 	    if (Cur_PU_Feedback)
 		W2C_Set_Frequency_Map(WN_MAP_FEEDBACK);
-	    W2C_Outfile_Translate_Pu(pu, TRUE/*emit_global_decls*/);
+	    W2C_Outfile_Translate_Pu(pu, pu_wn, TRUE/*emit_global_decls*/);
 	}
     }
     if (Run_w2f && !Run_w2fc_early && !Run_prompf) {
 	if (W2F_Should_Emit_Nested_PUs() || is_user_visible_pu) {
 	    if (Cur_PU_Feedback)
 		W2F_Set_Frequency_Map(WN_MAP_FEEDBACK);
-	    W2F_Outfile_Translate_Pu(pu);
+	    W2F_Outfile_Translate_Pu(pu, pu_wn);
 	}
     }
 
     /* only write .N file for PU, no need to replace region because
        REGION_remove_and_mark does nothing for pu (rwn is the pu) */
     if (need_lno_output) {
-	Set_PU_Info_tree_ptr(current_pu, pu);
+	Set_PU_Info_tree_ptr(current_pu, pu_wn);
 	Write_PU_Info(current_pu);
 	Verify_SYMTAB (CURRENT_SYMTAB);
     }
 } /* Post_LNO_Processing */
 
 static WN *
-WOPT_Processing (PU_Info *current_pu, WN *pu, REGION_CS_ITER *rgn_iter,
+WOPT_Processing (PU_Info *current_pu, PU *pu, WN *pu_wn, REGION_CS_ITER *rgn_iter,
 		 WN *rwn)
 {
     rwn = Perform_Global_Optimization (pu, rwn, alias_mgr);
@@ -928,7 +778,7 @@ WOPT_Processing (PU_Info *current_pu, WN *pu, REGION_CS_ITER *rgn_iter,
     if (Get_Trace(TP_REGION,TT_REGION_ALL)) {
       fprintf(TFile, "===== driver, after Perform_Global_Optimization");
       fprintf(TFile," RGN %d =====\n", RID_id(REGION_get_rid(rwn)));
-      RID_WN_Tree_Print(TFile,pu);
+      RID_WN_Tree_Print(TFile,pu_wn);
       fdump_tree(TFile,rwn);
       fprintf(TFile,"===== driver ---------------------\n");
       fprintf(TFile,"#### Verify_alias, after mainopt, RGN %d\n",
@@ -944,17 +794,17 @@ WOPT_Processing (PU_Info *current_pu, WN *pu, REGION_CS_ITER *rgn_iter,
 
 // Performance region loop WOPT-CG
 static WN *
-Do_WOPT_and_CG_with_Regions (PU_Info *current_pu, WN *pu)
+Do_WOPT_and_CG_with_Regions (PU_Info *current_pu, PU *pu, WN *pu_wn)
 {
     REGION_CS_ITER rgn_iter;
     BOOL Run_region_bounds;
     BOOL cg_one_time = TRUE;
 
     /* look over whole PU and set up stack model */
-    Initialize_Stack_Frame (pu);	
+    Initialize_Stack_Frame (pu_wn);	
 
     // decide whether the PU has regions that need bounds in it
-    { RID *rid = REGION_get_rid(pu);
+    { RID *rid = REGION_get_rid(pu_wn);
       Is_True(rid != NULL && RID_TYPE_func_entry(rid) && RID_id(rid) == 0,
 	      ("Do_WOPT_and_CG_with_Regions, RID is incorrect"));
       Run_region_bounds = RID_contains_bounds(rid);
@@ -975,7 +825,7 @@ Do_WOPT_and_CG_with_Regions (PU_Info *current_pu, WN *pu)
     // Create the region boundary sets, be/region/region_bounds.cxx
     if (Run_region_bounds) {
       Set_Error_Phase("Generate Region Boundaries");
-      Generate_region_boundaries(pu, alias_mgr);
+      Generate_region_boundaries(pu_wn, alias_mgr);
     }
 
     // region loop
@@ -987,15 +837,15 @@ Do_WOPT_and_CG_with_Regions (PU_Info *current_pu, WN *pu)
     // 3) Process_pragma_options changes the compile options based on region
     //    pragmas in the code.
     
-    REGION_CS_ITER_init(&rgn_iter, pu);
-    for (REGION_CS_NoEarlierSub_First(&rgn_iter, pu,
+    REGION_CS_ITER_init(&rgn_iter, pu_wn);
+    for (REGION_CS_NoEarlierSub_First(&rgn_iter, pu_wn,
 	   (RID_TYPE)(RID_TYPE_olimit | RID_TYPE_pragma | RID_TYPE_loop));
 	 REGION_CS_NoEarlierSub_While(&rgn_iter);
 	 REGION_CS_NoEarlierSub_Next(&rgn_iter)) {
       WN *rwn;
       BOOL need_options_pop = FALSE;
 
-      rwn = REGION_remove_and_mark(pu, &rgn_iter);
+      rwn = REGION_remove_and_mark(pu, pu_wn, &rgn_iter);
 
       Is_True(rwn != NULL, ("BE driver, IR inconsistency, WOPT-CG loop"));
       Is_True(REGION_get_rid(rwn) != NULL, ("BE driver, NULL RID"));
@@ -1024,7 +874,7 @@ Do_WOPT_and_CG_with_Regions (PU_Info *current_pu, WN *pu)
 #endif
 
       if (Show_Progress) {
-	if (rwn != pu)
+	if (rwn != pu_wn)
 	  fprintf(stderr, "... compiling region (%d)\n", 
 		  RID_id(REGION_get_rid(rwn)));
 	else if (!cg_one_time)	/* must have had regions in pu */
@@ -1045,7 +895,7 @@ Do_WOPT_and_CG_with_Regions (PU_Info *current_pu, WN *pu)
       Set_Error_Phase ( "Before WOPT" );
 
       if (Run_wopt) {
-	rwn = WOPT_Processing (current_pu, pu, &rgn_iter, rwn);
+	rwn = WOPT_Processing (current_pu, pu, pu_wn, &rgn_iter, rwn);
         if (WN_opcode(rwn) == OPC_FUNC_ENTRY)
           Verify_SYMTAB (CURRENT_SYMTAB);
 	if ( Cur_PU_Feedback ) {
@@ -1075,7 +925,7 @@ Do_WOPT_and_CG_with_Regions (PU_Info *current_pu, WN *pu)
       if (Instrumentation_Enabled
 	  && (Instrumentation_Type_Num & WHIRL_PROFILE)
 	  && (Instrumentation_Phase_Num == PROFILE_PHASE_BEFORE_CG)) {
-	rwn = WN_Lower(rwn, LOWER_SCF, NULL, 
+	rwn = WN_Lower(pu, rwn, LOWER_SCF, NULL, 
 		       "Lower structured control flow");
 	WN_Instrument(rwn, PROFILE_PHASE_BEFORE_CG);
 #if 0
@@ -1083,7 +933,7 @@ Do_WOPT_and_CG_with_Regions (PU_Info *current_pu, WN *pu)
 	wb_gwe(rwn);
 #endif
       } else if (Feedback_Enabled[PROFILE_PHASE_BEFORE_CG]) {
-	rwn = WN_Lower(rwn, LOWER_SCF, NULL, 
+	rwn = WN_Lower(pu, rwn, LOWER_SCF, NULL, 
 		       "Lower structured control flow");
 	WN_Annotate(rwn, PROFILE_PHASE_BEFORE_CG, &MEM_pu_pool);
       }
@@ -1097,14 +947,14 @@ Do_WOPT_and_CG_with_Regions (PU_Info *current_pu, WN *pu)
     if (!Run_wopt ||
         // OSP 421, MLDID/MSTID is not lowered.
         Query_Skiplist (WOPT_Skip_List, Current_PU_Count()) ) {
-      rwn = WN_Lower(rwn, LOWER_MLDID_MSTID, alias_mgr, 
+      rwn = WN_Lower(pu, rwn, LOWER_MLDID_MSTID, alias_mgr, 
                        "Lower MLDID/MSTID when not running WOPT");
 #ifdef KEY // bug 7298: this flag could have been set by LNO's preopt
       Clear_BE_ST_pu_has_valid_addr_flags(PU_Info_proc_sym(current_pu)); 
 #endif
     }
  
-	rwn = WN_Lower(rwn, LOWER_TO_CG, alias_mgr, "Lowering to CG");
+	rwn = WN_Lower(pu, rwn, LOWER_TO_CG, alias_mgr, "Lowering to CG");
 #ifdef TARG_IA64
 	if (Only_Unsigned_64_Bit_Ops && ! Run_wopt)
 	  U64_lower_wn(rwn, FALSE);
@@ -1125,7 +975,7 @@ Do_WOPT_and_CG_with_Regions (PU_Info *current_pu, WN *pu)
 	  Set_Error_Phase("Data Layout");
     	  /* look over whole PU and calculate size of actual area */
     	  Calculate_Stack_Frame_Sizes (rwn);	
-	  CG_PU_Initialize(pu);
+	  CG_PU_Initialize(pu_wn);
 	}
 
 	if (!REGION_CS_ITER_is_not_stacked(&rgn_iter) ||
@@ -1152,7 +1002,7 @@ Do_WOPT_and_CG_with_Regions (PU_Info *current_pu, WN *pu)
       } // if (Run_cg)
 
       if (REGION_CS_ITER_is_not_stacked(&rgn_iter)) /* this is tricky */
-	pu = rwn;
+	pu_wn = rwn;
       REGION_replace_from_mark(rwn, &rgn_iter);
       // put options back the way they were
       if (need_options_pop)
@@ -1160,19 +1010,19 @@ Do_WOPT_and_CG_with_Regions (PU_Info *current_pu, WN *pu)
       if (Get_Trace(TP_REGION,TT_REGION_ALL)) {
 	fprintf(TFile,
 		"------------ bottom of WOPT-CG loop: ------------\n");
-	Is_True(REGION_consistency_check(pu),(""));
-	RID_WN_Tree_Print(TFile,pu);
+	Is_True(REGION_consistency_check(pu_wn),(""));
+	RID_WN_Tree_Print(TFile,pu_wn);
 	if (Run_cg)
-	  fdump_region_tree(TFile,pu);
+	  fdump_region_tree(TFile,pu_wn);
 	else
-	  fdump_tree(TFile,pu);
+	  fdump_tree(TFile,pu_wn);
 	fprintf(TFile,"--------------------------------------------\n");
       }
-      if (rwn != pu)
+      if (rwn != pu_wn)
 	Report_CG_Region_Timing ( Tim_File, Cur_PU_Name );
     }
     Verify_SYMTAB (CURRENT_SYMTAB);
-    return pu;
+    return pu_wn;
 } /* Do_WOPT_and_CG_with_Regions */
 
 
@@ -1264,7 +1114,7 @@ static void Update_EHRegion_Inito (WN *pu) {
 }
 
 static void
-Backend_Processing (PU_Info *current_pu, WN *pu)
+Backend_Processing (PU_Info *current_pu, PU *pu, WN *pu_wn)
 {
     {
 	/* Always process the first PU for fill-align, since that one contains
@@ -1275,7 +1125,7 @@ Backend_Processing (PU_Info *current_pu, WN *pu)
 	BOOL needs_fill_align_lowering =
 	    PU_needs_fill_align_lowering (Get_Current_PU ());
 	if (needs_fill_align_lowering || !done_first_pu) {
-	    Process_Fill_Align_Pragmas (pu);
+	    Process_Fill_Align_Pragmas (pu_wn);
 	    done_first_pu = TRUE;
 	}
     }
@@ -1284,7 +1134,7 @@ Backend_Processing (PU_Info *current_pu, WN *pu)
     BOOL need_options_pop = FALSE;
 
     // process any PU level options pragmas
-    WN *block = WN_func_pragmas(pu); 
+    WN *block = WN_func_pragmas(pu_wn); 
     for (WN *pragwn = WN_first(block); pragwn; pragwn = WN_next(pragwn))
       if (WN_pragma(pragwn) == WN_PRAGMA_OPTIONS) {
 	ST *st = WN_st(pragwn);
@@ -1294,10 +1144,10 @@ Backend_Processing (PU_Info *current_pu, WN *pu)
       } 
 #endif
 
-    PU_adjust_addr_flags(Get_Current_PU_ST(), pu);
+    PU_adjust_addr_flags(Get_Current_PU_ST(), pu_wn);
 
     if (Run_MemCtr)
-	MemCtr_Add (pu);
+	MemCtr_Add (pu_wn);
 
     /* Make sure that RETURN_VAL nodes, Return_Val_Preg references and
        MLDID/MSTID nodes have been lowered. This requires its own pass
@@ -1306,7 +1156,7 @@ Backend_Processing (PU_Info *current_pu, WN *pu)
     if (WHIRL_Return_Val_On || WHIRL_Mldid_Mstid_On) {
         Is_True(WHIRL_Return_Val_On && WHIRL_Mldid_Mstid_On,
 	        ("-INTERNAL:return_val and -INTERNAL:mldid_mstid must be on the same time"));
-	pu = WN_Lower (pu, LOWER_RETURN_VAL, NULL,
+	pu_wn = WN_Lower (pu, pu_wn, LOWER_RETURN_VAL, NULL,
 		       "RETURN_VAL & MLDID/MSTID lowering");
     }
 
@@ -1325,8 +1175,8 @@ Backend_Processing (PU_Info *current_pu, WN *pu)
 	Set_PU_Info_state(Current_PU_Info,WT_DEPGRAPH,Subsect_InMem);
 
 	Set_Error_Phase ( "MP Lowering" );
-        WB_LWR_Initialize(pu, NULL);
-	pu = WN_Lower (pu, LOWER_MP, NULL, "Before MP Lowering");
+        WB_LWR_Initialize(pu_wn, NULL);
+	pu_wn = WN_Lower (pu, pu_wn, LOWER_MP, NULL, "Before MP Lowering");
 //Bug 4688
 #ifdef KEY
         extern void Post_MP_Processing (WN *);
@@ -1339,30 +1189,30 @@ Backend_Processing (PU_Info *current_pu, WN *pu)
     if( Instrumentation_Enabled
 	&& (Instrumentation_Type_Num & WHIRL_PROFILE)
 	&& (Instrumentation_Phase_Num == PROFILE_PHASE_BEFORE_LNO)) {
-	WN_Instrument(pu, PROFILE_PHASE_BEFORE_LNO); 
+	WN_Instrument(pu_wn, PROFILE_PHASE_BEFORE_LNO); 
     } else if ( Feedback_Enabled[PROFILE_PHASE_BEFORE_LNO] ) {
-      WN_Annotate(pu, PROFILE_PHASE_BEFORE_LNO, &MEM_pu_pool);   
+      WN_Annotate(pu_wn, PROFILE_PHASE_BEFORE_LNO, &MEM_pu_pool);   
     }
     Set_Error_Phase ( "LNO Processing" );
 
     if (Run_lno || Run_Distr_Array || Run_preopt || Run_autopar) {
 #ifdef KEY // to avoid assertion in PU that represents file-scope asm statement
-	if (! (WN_operator(pu) == OPR_FUNC_ENTRY && 
-	       ST_asm_function_st(*WN_st(pu)))) 
+	if (! (WN_operator(pu_wn) == OPR_FUNC_ENTRY && 
+	       ST_asm_function_st(*WN_st(pu_wn)))) 
 #endif
-	pu = LNO_Processing (current_pu, pu);/* make -O0, -O1, -O2 a bit faster*/
+	pu_wn = LNO_Processing (current_pu, pu, pu_wn);/* make -O0, -O1, -O2 a bit faster*/
 #ifndef KEY 
 	// Bug 7283 - the following code cannot handle the case where multiple
 	// fields of struct are used in a region. Only the field pointed to by
 	// the pragma offset will be replaced.
 	if (Run_autopar)
-	    Rewrite_Pragmas_On_Structs (NULL, WN_func_body(pu));
+	    Rewrite_Pragmas_On_Structs (NULL, WN_func_body(pu_wn));
 #endif
     }
 
     /* First round output (.N file, w2c, w2f, etc.) */
     Set_Error_Phase ( "Post LNO Processing" );
-    Post_LNO_Processing (current_pu, pu);
+    Post_LNO_Processing (current_pu, pu, pu_wn);
     if (!Run_wopt && !Run_cg) return;
 
 #ifdef KEY // bug 7741
@@ -1371,9 +1221,9 @@ Backend_Processing (PU_Info *current_pu, WN *pu)
       // Some LDAs may have been removed in preopt, so recompute
       // addr_saved flag.
       Clear_local_symtab_addr_flags(Scope_tab[CURRENT_SYMTAB]);
-      Recompute_addr_saved_stmt (pu);
+      Recompute_addr_saved_stmt (pu_wn);
       if (!PU_ftn_lang (Get_Current_PU()))
-        Set_addr_saved_stmt(pu, CXX_Alias_Const ||
+        Set_addr_saved_stmt(pu_wn, CXX_Alias_Const ||
            (OPT_IPA_addr_analysis && PU_ipa_addr_analysis(Get_Current_PU())));
     }
 #endif
@@ -1393,8 +1243,8 @@ Backend_Processing (PU_Info *current_pu, WN *pu)
     has_mp = PU_has_mp (Get_Current_PU ());
     if (has_mp && !Early_MP_Processing) {
 	Set_Error_Phase ( "MP Lowering" );
-        WB_LWR_Initialize(pu, NULL);
-	pu = WN_Lower (pu, LOWER_MP, NULL, "Before MP Lowering");
+        WB_LWR_Initialize(pu_wn, NULL);
+	pu_wn = WN_Lower (pu, pu_wn, LOWER_MP, NULL, "Before MP Lowering");
 #ifdef KEY
 // Bug 4411
         extern void Post_MP_Processing (WN *);
@@ -1406,33 +1256,33 @@ Backend_Processing (PU_Info *current_pu, WN *pu)
 #ifdef KEY
     if (PU_cxx_lang (Get_Current_PU()))
 #endif
-    Update_EHRegion_Inito (pu);
+    Update_EHRegion_Inito (pu_wn);
 
     /* Generate EH range table for PU.  The high and low labels are
      * filled in during code generation.
      */
     if (Run_cg) 
-	EH_Generate_Range_List(pu);
+	EH_Generate_Range_List(pu_wn);
 
     BOOL save_run_wopt = Run_wopt;
     // I believe I can assert that WN_operator(pu) == OPR_FUNC_ENTRY
     // here, but I won't, simply because I don't need to. Might as
     // well check. -- RK 990713
     if (Run_wopt &&
-	(WN_operator(pu) == OPR_FUNC_ENTRY) &&
-	ST_asm_function_st(*WN_st(pu))) {
+	(WN_operator(pu_wn) == OPR_FUNC_ENTRY) &&
+	ST_asm_function_st(*WN_st(pu_wn))) {
       // Throttle WOPT; we don't want it for PU's that merely wrap up
       // file-scope asm statements.
       Run_wopt = FALSE;
     }
 
     Set_Error_Phase ( "WOPT/CG Processing" );
-    pu = Do_WOPT_and_CG_with_Regions (current_pu, pu);
+    pu_wn = Do_WOPT_and_CG_with_Regions (current_pu, pu, pu_wn);
 
     Run_wopt = save_run_wopt;
 
     Set_Error_Phase ( "Post Backend Processing" );
-    Post_Process_Backend (current_pu, pu);
+    Post_Process_Backend (current_pu, pu_wn);
 
 #ifdef KEY
     if (need_options_pop)
@@ -1446,8 +1296,6 @@ Backend_Processing (PU_Info *current_pu, WN *pu)
 static WN *
 Preprocess_PU (PU_Info *current_pu)
 {
-  WN *pu = NULL;
-
   Initialize_PU_Stats ();  /* Needed for Olimit as well as tracing */
 
   Current_PU_Info = current_pu;
@@ -1537,7 +1385,8 @@ Preprocess_PU (PU_Info *current_pu)
   /* NOTE: "pu" is not defined until this point, since the actual
    * (WN *) is calculated by Read_Local_Info().
    */
-  pu = PU_Info_tree_ptr(current_pu);
+  WN *pu_wn = PU_Info_tree_ptr(current_pu);
+  PU *pu = &Pu_Table[ST_pu(St_Table[PU_Info_proc_sym(current_pu)])];
 
   /* Disable all prompf processing for PUs generated by the compiler,
    * such as cloned subroutines, with exception of mp routines which
@@ -1575,7 +1424,7 @@ Preprocess_PU (PU_Info *current_pu)
 #endif
 
   Stop_Timer (T_ReadIR_CU);
-  Check_for_IR_Dump(TP_IR_READ,pu,"IR_READ");
+  Check_for_IR_Dump(TP_IR_READ,pu_wn,"IR_READ");
 
   if (Show_Progress) {
     fprintf(stderr, "Compiling %s(%d)\n",
@@ -1601,13 +1450,13 @@ Preprocess_PU (PU_Info *current_pu)
   if (Run_prompf && 
       !Is_Set_PU_Info_flags(current_pu, PU_IS_COMPILER_GENERATED)) {
     Prompf_Id_Map = Anl_Init_Map(MEM_pu_pool_ptr); 
-    WB_ANL_Initialize(pu, Prompf_Id_Map); 
-    Anl_Static_Analysis(pu, Prompf_Id_Map);
+    WB_ANL_Initialize(pu_wn, Prompf_Id_Map); 
+    Anl_Static_Analysis(pu_wn, Prompf_Id_Map);
     WB_ANL_Terminate(); 
   }
 
   if (Run_purple) {
-    Prp_Instrument_And_EmitSrc(pu);
+    Prp_Instrument_And_EmitSrc(pu_wn);
   }
 
 #ifdef KEY
@@ -1615,7 +1464,7 @@ Preprocess_PU (PU_Info *current_pu)
        // bug 14188: by default, disabled for fortran
       (!PU_ftn_lang(Get_Current_PU()) || Early_Goto_Conversion_Set))
   {
-      GTABLE goto_table( pu, MEM_pu_pool_ptr );
+      GTABLE goto_table( pu_wn, MEM_pu_pool_ptr );
       goto_table.Remove_Gotos();
       // goto_table gets destructed here
   }
@@ -1626,13 +1475,13 @@ Preprocess_PU (PU_Info *current_pu)
        && (Instrumentation_Type_Num & WHIRL_PROFILE)
        && (Instrumentation_Phase_Num == PROFILE_PHASE_BEFORE_VHO)) {
     if (!is_mp_nested_pu )
-      WN_Instrument(pu, PROFILE_PHASE_BEFORE_VHO); 
+      WN_Instrument(pu_wn, PROFILE_PHASE_BEFORE_VHO); 
 #if 0
     extern void wb_gwe(WN*); // hack to check __profile calls.
-    wb_gwe(pu);
+    wb_gwe(pu_wn);
 #endif
   } else if ( Feedback_Enabled[PROFILE_PHASE_BEFORE_VHO] ) {
-    WN_Annotate(pu, PROFILE_PHASE_BEFORE_VHO, &MEM_pu_pool);
+    WN_Annotate(pu_wn, PROFILE_PHASE_BEFORE_VHO, &MEM_pu_pool);
   }
 
 #ifdef KEY
@@ -1641,18 +1490,18 @@ Preprocess_PU (PU_Info *current_pu)
        ( ! PU_no_instrument(Get_Current_PU()) ||
 	 PU_has_inlines(Get_Current_PU()) ) ) {
     Set_Error_Phase ( "CYG Instrumenting" );
-    CYG_Instrument_Driver( pu );
+    CYG_Instrument_Driver( pu_wn );
   }
 #endif
 
   Set_Error_Phase ( "VHO Processing" );
-  pu = VHO_Lower_Driver (current_pu, pu);
+  pu_wn = VHO_Lower_Driver (current_pu, pu, pu_wn);
 
   if ( Cur_PU_Feedback ) {
     Cur_PU_Feedback->Verify("after VHO lower");
   }
 
-  pu = Adjust_Opt_Level (current_pu, pu, ST_name(PU_Info_proc_sym(current_pu)));
+  pu_wn = Adjust_Opt_Level (current_pu, pu_wn, ST_name(PU_Info_proc_sym(current_pu)));
 
   if (wopt_loaded) {
     Create_Restricted_Map(MEM_pu_nz_pool_ptr);
@@ -1663,8 +1512,8 @@ Preprocess_PU (PU_Info *current_pu)
    * with no regions also */
   /* NOTE: part of what REGION_initialize does can be moved
    * to when the .B file is read in. */
-  REGION_Initialize (pu, PU_has_region (Get_Current_PU ()));
-  return pu;
+  REGION_Initialize (pu_wn, PU_has_region (Get_Current_PU ()));
+  return pu_wn;
 } /* Preprocess_PU */
 
 static void
@@ -1732,12 +1581,10 @@ Preorder_Process_PUs (PU_Info *current_pu)
   BOOL orig_olimit_opt = Olimit_opt;
 
   WN *pu;
+  PU & func = Pu_Table [ST_pu (St_Table [PU_Info_proc_sym (current_pu)])];
 #ifdef TARG_X8664
   if (!Force_Frame_Pointer_Set)
   {
-    const PU & func =
-        Pu_Table [ST_pu (St_Table [PU_Info_proc_sym (current_pu)])];
-
     // C++ PU having exception regions, or with -g
     if ((PU_cxx_lang (func) && PU_has_region (func)) || Debug_Level > 0
 #ifdef KEY
@@ -1759,7 +1606,7 @@ Preorder_Process_PUs (PU_Info *current_pu)
   // they will grow together as PREGs are created.
   Scope_tab[CURRENT_SYMTAB].preg_tab->Register(Be_preg_tab);
 
-  WN_verifier(pu);
+  WN_verifier(&func, pu);
 
   Verify_SYMTAB (CURRENT_SYMTAB);
 
@@ -1779,11 +1626,11 @@ Preorder_Process_PUs (PU_Info *current_pu)
   }
 
   if (Run_ipl) {
-    Ipl_Processing (current_pu, pu);
+    Ipl_Processing (current_pu, &func, pu);
     Verify_SYMTAB (CURRENT_SYMTAB);
   }
   else {
-    Backend_Processing (current_pu, pu);
+    Backend_Processing (current_pu, &func, pu);
     Verify_SYMTAB (CURRENT_SYMTAB);
   }
   if (reset_opt_level) {
@@ -1905,6 +1752,12 @@ Process_Feedback_Options (OPTION_LIST* olist)
   }
 } // Process_Feedback_Options
 
+
+void Do_Cleanup() {
+    Cleanup_Files(FALSE, TRUE);
+}
+
+
 // Provide a place to stop after components are loaded
 extern "C" {
   void be_debug(void) {}
@@ -1914,12 +1767,14 @@ main (INT argc, char **argv)
 {
   INT local_ecount, local_wcount;
   PU_Info *pu_tree;
+
+  Set_Signal_Cleanup(&Do_Cleanup);
   
   setlinebuf (stdout);
   setlinebuf (stderr);
   Handle_Signals ();
   MEM_Initialize ();
-  Set_Error_Tables (Phases, host_errlist);
+  Set_Error_Tables (PHASES_NAME, ERRLIST_NAME);
   Cur_PU_Name = NULL;
   Init_Error_Handler ( 100 );
   Set_Error_Line ( ERROR_LINE_UNKNOWN );
@@ -2030,13 +1885,11 @@ main (INT argc, char **argv)
       if (!Run_wopt && !Run_preopt) {
 	/* load wopt */
 	Get_Phase_Args (PHASE_WOPT, &phase_argc, &phase_argv);
-	dso_load_simply ("wopt", WOPT_Path, Show_Progress);
 	wopt_main (phase_argc, phase_argv, argc, argv);
 	wopt_loaded = TRUE;
       }
 
       Get_Phase_Args (PHASE_LNO, &phase_argc, &phase_argv);
-      dso_load_simply ("lno", LNO_Path, Show_Progress);
       lno_main (phase_argc, phase_argv, argc, argv);
     }
   }

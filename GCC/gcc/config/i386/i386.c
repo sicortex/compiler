@@ -1482,9 +1482,9 @@ ix86_handle_option (size_t code, const char *arg ATTRIBUTE_UNUSED, int value)
       if (!value)
 	{
           target_flags &= ~(MASK_SSE2 | MASK_SSE3 | MASK_SSSE3 | MASK_SSE4A |
-                            MASK_SSE4_1 | MASK_SSE4_2);
+                            MASK_SSE4_1 | MASK_SSE4_2 |MASK_AVX);
           target_flags_explicit |= MASK_SSE2 | MASK_SSE3 | MASK_SSSE3 |
-                                   MASK_SSE4A | MASK_SSE4_1 | MASK_SSE4_2;
+                                   MASK_SSE4A | MASK_SSE4_1 | MASK_SSE4_2 |MASK_AVX;
 	}
       return true;
 
@@ -1492,48 +1492,53 @@ ix86_handle_option (size_t code, const char *arg ATTRIBUTE_UNUSED, int value)
       if (!value)
 	{
           target_flags &= ~(MASK_SSE3 | MASK_SSSE3 | MASK_SSE4A | MASK_SSE4_1 |
-                            MASK_SSE4_2);
+                            MASK_SSE4_2 | MASK_AVX);
           target_flags_explicit |= MASK_SSE3 | MASK_SSSE3 | MASK_SSE4A |
-                                   MASK_SSE4_1 | MASK_SSE4_2;
+                                   MASK_SSE4_1 | MASK_SSE4_2 | MASK_AVX;
 	}
       return true;
 
     case OPT_msse3:
       if (!value)
        {
-         target_flags &= ~(MASK_SSSE3 | MASK_SSE4A | MASK_SSE4_1 | MASK_SSE4_2);
-         target_flags_explicit |= MASK_SSSE3 | MASK_SSE4A | MASK_SSE4_1 | MASK_SSE4_2;
+         target_flags &= ~(MASK_SSSE3 | MASK_SSE4A | MASK_SSE4_1 | MASK_SSE4_2 | MASK_AVX);
+         target_flags_explicit |= MASK_SSSE3 | MASK_SSE4A | MASK_SSE4_1 | MASK_SSE4_2 |MASK_AVX;
         }
        return true;
 
     case OPT_mssse3:
       if (!value)
        {
-         target_flags &= ~(MASK_SSE4A | MASK_SSE4_1 | MASK_SSE4_2);
-         target_flags_explicit |= MASK_SSE4A | MASK_SSE4_1 | MASK_SSE4_2;
+         target_flags &= ~(MASK_SSE4A | MASK_SSE4_1 | MASK_SSE4_2 | MASK_AVX);
+         target_flags_explicit |= MASK_SSE4A | MASK_SSE4_1 | MASK_SSE4_2 | MASK_AVX;
         }
        return true;
 
     case OPT_msse4a:
       if (!value)
        {
-         target_flags &= ~(MASK_SSE4_1 | MASK_SSE4_2);
-         target_flags_explicit |= MASK_SSE4_1 | MASK_SSE4_2;
+         target_flags &= ~(MASK_SSE4_1 | MASK_SSE4_2 | MASK_AVX);
+         target_flags_explicit |= (MASK_SSE4_1 | MASK_SSE4_2 | MASK_AVX);
         }
        return true;
 
     case OPT_msse4_1:
       if (!value)
        {
-         target_flags &= ~MASK_SSE4_2;
-         target_flags_explicit |= MASK_SSE4_2;
+         target_flags &= ~(MASK_SSE4_2 | MASK_AVX);
+         target_flags_explicit |= MASK_AVX | MASK_SSE4_2;
         }
        return true;
 
     case OPT_msse4_2:
-         target_flags &= ~0;
-         target_flags_explicit |= 0;
+         target_flags &= ~MASK_AVX;
+         target_flags_explicit |= MASK_AVX;
        return true;
+
+	case OPT_mavx:
+		 target_flags &= ~0;
+		 target_flags_explicit |= 0;
+	   return true;
 
     default:
       return true;
@@ -2015,6 +2020,10 @@ override_options (void)
      software floating point, don't use 387 inline intrinsics.  */
   if (!TARGET_80387)
     target_flags |= MASK_NO_FANCY_MATH_387;
+
+  /* Turn on AVX builtins for -mavx*/
+  if (TARGET_AVX)
+  	target_flags |= MASK_AVX;
 
   /* Turn on SSE4_1 builtins for -msse4_2.  */
   if (TARGET_SSE4_2)
@@ -15715,6 +15724,23 @@ ix86_init_mmx_sse_builtins (void)
 
   def_builtin (MASK_SSE2, "__builtin_ia32_pmaddwd128", v4si_ftype_v8hi_v8hi, IX86_BUILTIN_PMADDWD128);
 
+  ftype = build_function_type_list(V4SI_type_node, integer_type_node,integer_type_node,integer_type_node,
+                                    integer_type_node, NULL_TREE);
+  def_builtin(MASK_SSE2, "__builtin_ia32_setr_epi32", ftype, IX86_BUILTIN_SETREPI32);
+	
+  ftype = build_function_type_list(V8HI_type_node, short_integer_type_node,short_integer_type_node,short_integer_type_node,
+                                    short_integer_type_node,short_integer_type_node,short_integer_type_node,
+                                    short_integer_type_node,short_integer_type_node, NULL_TREE);
+  def_builtin(MASK_SSE2, "__builtin_ia32_setr_epi16", ftype, IX86_BUILTIN_SETREPI16);
+	
+  ftype = build_function_type_list(V16QI_type_node, signed_char_type_node, signed_char_type_node, signed_char_type_node, signed_char_type_node,
+                                    signed_char_type_node,signed_char_type_node,signed_char_type_node,signed_char_type_node,signed_char_type_node,
+                                    signed_char_type_node,signed_char_type_node,signed_char_type_node,signed_char_type_node,signed_char_type_node,
+                                    signed_char_type_node,signed_char_type_node,NULL_TREE);
+  def_builtin(MASK_SSE2, "__builtin_ia32_setr_epi8", ftype, IX86_BUILTIN_SETREPI8);
+	
+  ftype = build_function_type_list(V8HI_type_node, V8HI_type_node, V8HI_type_node, NULL_TREE);
+
   /* Prescott New Instructions.  */
   def_builtin (MASK_SSE3, "__builtin_ia32_monitor",
 	       void_ftype_pcvoid_unsigned_unsigned,
@@ -15732,6 +15758,12 @@ ix86_init_mmx_sse_builtins (void)
 	       v16qi_ftype_pcchar, IX86_BUILTIN_LDDQU);
 	
 	/* sse4_1*/
+#if 0
+  ftype = build_function_type_list(integer_type_node, unsigned_type_node, NULL_TREE );
+  def_builtin (MASK_SSE4_1, "__builtin_popcount", ftype, IX86_BUILTIN_POPCNTL);
+  ftype = build_function_type_list(long_long_integer_type_node, long_long_unsigned_type_node, NULL_TREE );
+  def_builtin (MASK_SSE4_1, "__builtin_popcountll", ftype, IX86_BUILTIN_POPCNTQ);
+#endif
 	/* blend family*/
   ftype = build_function_type_list (V8HI_type_node, V8HI_type_node, V8HI_type_node, integer_type_node, NULL_TREE);
   def_builtin (MASK_SSE4_1, "__builtin_ia32_pblendw128",ftype, IX86_BUILTIN_PBLENDW128);
@@ -15802,8 +15834,8 @@ ix86_init_mmx_sse_builtins (void)
   def_builtin (MASK_SSE4_1, "__builtin_ia32_vec_ext_v4si",ftype, IX86_BUILTIN_PEXTRD);
   ftype = build_function_type_list (long_long_integer_type_node, V2DI_type_node,integer_type_node,  NULL_TREE);
   def_builtin (MASK_SSE4_1, "__builtin_ia32_vec_ext_v2di",ftype, IX86_BUILTIN_PEXTRQ);
-  ftype = build_function_type_list (float_type_node, V4SF_type_node,integer_type_node,  NULL_TREE);
-  def_builtin (MASK_SSE4_1, "__builtin_ia32_vec_ext_v4sf",ftype, IX86_BUILTIN_EXTRACTPS);
+  ftype = build_function_type_list (integer_type_node, V4SF_type_node,integer_type_node,  NULL_TREE);
+  def_builtin (MASK_SSE4_1, "__builtin_ia32_extract_ps",ftype, IX86_BUILTIN_EXTRACTPS);
 /*insert*/
   ftype = build_function_type_list (V16QI_type_node,V16QI_type_node, integer_type_node,integer_type_node,  NULL_TREE);
   def_builtin (MASK_SSE4_1, "__builtin_ia32_vec_set_v16qi",ftype, IX86_BUILTIN_PINSRB);
@@ -15950,7 +15982,6 @@ ix86_init_mmx_sse_builtins (void)
   def_builtin (MASK_SSE4_2, "__builtin_ia32_crc32di", ftype, IX86_BUILTIN_CRC32Q);
 
 	/*ssse3*/
-	ftype = build_function_type_list(V8HI_type_node, V8HI_type_node, V8HI_type_node, NULL_TREE);
 
 	def_builtin (MASK_SSSE3, "__builtin_ia32_phaddw128", ftype, IX86_BUILTIN_PHADDW128);
 
@@ -16058,6 +16089,21 @@ ix86_init_mmx_sse_builtins (void)
 	/*AVX intrinsic*/
 #include "i386_avx.c"
 	//ftype = build_function_type_list(V4DF_type_node, V4DF_type_node, V4DF_type_node, NULL_TREE);
+
+/*AES */
+    // TODO: replace with MASK_AES
+	ftype = build_function_type_list(V2DI_type_node, V2DI_type_node, V2DI_type_node, NULL_TREE);
+	def_builtin(MASK_AVX, "__builtin_ia32_aesdec128", ftype, IX86_BUILTIN_AESDEC);
+	def_builtin(MASK_AVX, "__builtin_ia32_aesenc128", ftype, IX86_BUILTIN_AESENC);
+	def_builtin(MASK_AVX, "__builtin_ia32_aesdeclast128", ftype, IX86_BUILTIN_AESDECLAST);
+	def_builtin(MASK_AVX, "__builtin_ia32_aesenclast128", ftype, IX86_BUILTIN_AESENCLAST);
+	ftype = build_function_type_list(V2DI_type_node, V2DI_type_node, NULL_TREE);
+	def_builtin(MASK_AVX, "__builtin_ia32_aesimc128", ftype, IX86_BUILTIN_AESIMC);
+	ftype = build_function_type_list(V2DI_type_node, V2DI_type_node, integer_type_node, NULL_TREE);
+	def_builtin(MASK_AVX, "__builtin_ia32_aeskeygenassist128", ftype, IX86_BUILTIN_AESKEYGENASSIST);
+	/*PCLMUL*/
+	ftype = build_function_type_list(V2DI_type_node, V2DI_type_node, V2DI_type_node, integer_type_node, NULL_TREE);
+	def_builtin(MASK_AVX, "__builtin_ia32_pclmulqdq128", ftype, IX86_BUILTIN_PCLMULDQD);
 
 	//def_builtin (MASK_AVX, "__builtin_ia32_addpd256", ftype, IX86_BUILTIN_ADDPD256);
   /* Access to the vec_init patterns.  */

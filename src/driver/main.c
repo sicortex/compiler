@@ -37,7 +37,7 @@
 
 */
 
-#ifdef __linux
+#if defined(__linux) && !defined(_GNU_SOURCE)
 #define _GNU_SOURCE
 #endif
 
@@ -1074,6 +1074,10 @@ prescan_options (int argc, char *argv[])
       ipa_conflict_option = argv[i];
     } else if (!strcmp(argv[i], "-fbgen")) {
       ipa_conflict_option = argv[i];
+    } else if (!strcmp(argv[i], "-nodefaultlibs")) {
+      add_option_seen(O_nodefaultlibs);
+    } else if (!strcmp(argv[i], "-nostdlib")) {
+      add_option_seen(O_nostdlib);
     }
 #if 0
     // Disable for SiCortex 5069: allow -g -ipa
@@ -1455,6 +1459,9 @@ print_search_path ()
         lib_path = target_library_path();
         add_string(libdirs, lib_path);
 
+#ifdef __FreeBSD__
+	add_string(libdirs, ":/usr/lib");
+#else
 	if (abi == ABI_N32 || abi == ABI_M32) {
 		add_string(libdirs, ":/lib");
 		add_string(libdirs, ":/usr/lib");
@@ -1462,6 +1469,7 @@ print_search_path ()
 		add_string(libdirs, ":/lib64");
 		add_string(libdirs, ":/usr/lib64");
 	}
+#endif
 	
 #ifndef PATH64_ENABLE_PSCRUNTIME
 	if ((fp = read_gcc_output ("-print-search-dirs"))) {
@@ -1550,7 +1558,7 @@ display_version(boolean dump_version_only)
   }
   // TODO : Move this string to a configure option
 #ifdef PATH64_ENABLE_PSCRUNTIME
-  fprintf(stderr, "PathScale (tm) Compiler Suite: Version %s\n",
+  fprintf(stderr, "PathScale EKOPath(tm) Compiler Suite: Version %s\n",
 	  compiler_version);
 #else 
   fprintf(stderr, "Path64 Community Compiler: Version %s\n",
@@ -1563,8 +1571,5 @@ display_version(boolean dump_version_only)
   }
   fprintf(stderr, "Built on: %s\n", build_date);
   fprintf(stderr, "Thread model: posix\n");	// Bug 4608.
-
-  fprintf(stderr, "GNU gcc version %s", psc_gcc_version);
-  // TODO : Move this string to a configure option
-  fprintf(stderr, " (PathScale " PSC_FULL_VERSION " driver)\n");
+  fprintf(stderr, "GNU gcc compatible version 4.2.1\n");
 }

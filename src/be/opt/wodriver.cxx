@@ -92,8 +92,8 @@ extern char * Ipa_File_Name;
 #endif
 
 #ifdef KEY
-extern void WN_reassoc(WN *);
-extern BOOL WN_reassoc_deepest_blocks(WN *);
+extern void WN_reassoc(PU *pu, WN *wn);
+extern BOOL WN_reassoc_deepest_blocks(PU *pu, WN *wn);
 #endif
 
 /* ====================================================================
@@ -144,7 +144,7 @@ Wopt_Init (void)
 /* Per program unit global optimization entry point	*/
 /* if region_wn != pu_wn, optimize the region		*/
 WN *
-Perform_Global_Optimization (WN *pu_wn, WN *region_wn, 
+Perform_Global_Optimization (PU *pu, WN *region_wn, 
 			     struct ALIAS_MANAGER *alias_mgr)
 {
     WN *opt_pu;
@@ -163,11 +163,11 @@ Perform_Global_Optimization (WN *pu_wn, WN *region_wn,
 
       WOPT_Enable_LNO_Copy_Propagate = FALSE;
 
-      opt_pu = Pre_Optimizer(PREOPT_PHASE, region_wn, du_mgr, alias_mgr);
+      opt_pu = Pre_Optimizer(PREOPT_PHASE, pu, region_wn, du_mgr, alias_mgr);
 
       Delete_Du_Manager(du_mgr,MEM_pu_nz_pool_ptr);
 
-      WN_reassoc_deepest_blocks(opt_pu);
+      WN_reassoc_deepest_blocks(pu, opt_pu);
       region_wn = opt_pu;
       // fdump_tree(TFile, region_wn);
     }
@@ -175,7 +175,7 @@ Perform_Global_Optimization (WN *pu_wn, WN *region_wn,
 
     du_mgr = Create_Du_Manager(MEM_pu_nz_pool_ptr);
 
-    opt_pu = Pre_Optimizer(MAINOPT_PHASE, region_wn, du_mgr, alias_mgr);
+    opt_pu = Pre_Optimizer(MAINOPT_PHASE, pu, region_wn, du_mgr, alias_mgr);
 
     Delete_Du_Manager(du_mgr,MEM_pu_nz_pool_ptr);
 
@@ -190,7 +190,7 @@ Perform_Global_Optimization (WN *pu_wn, WN *region_wn,
 /* Per program unit preopt optimization entry point */
 /* called in place of LNO if -PHASE:p is set */
 WN *
-Perform_Preopt_Optimization(WN *pu_wn, WN *region_wn)
+Perform_Preopt_Optimization(PU *pu, WN *region_wn)
 {
     WN *opt_pu = NULL;
     DU_MANAGER *du_mgr;
@@ -204,7 +204,7 @@ Perform_Preopt_Optimization(WN *pu_wn, WN *region_wn)
     du_mgr = Create_Du_Manager(MEM_pu_nz_pool_ptr);
 
     alias_mgr = Create_Alias_Manager(MEM_pu_nz_pool_ptr);
-    opt_pu = Pre_Optimizer(PREOPT_PHASE, region_wn, du_mgr, alias_mgr);
+    opt_pu = Pre_Optimizer(PREOPT_PHASE, pu, region_wn, du_mgr, alias_mgr);
 
     Delete_Du_Manager(du_mgr,MEM_pu_nz_pool_ptr);
     Delete_Alias_Manager(alias_mgr,MEM_pu_nz_pool_ptr);

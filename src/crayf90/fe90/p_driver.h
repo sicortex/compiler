@@ -245,6 +245,7 @@ static stmt_type_type		token_to_stmt_type [] = {
 #endif /* KEY Bug 10572 */
 				Equivalence_Stmt,     /* Tok_Kwd_Equivalence  */
 				Exit_Stmt,	      /* Tok_Kwd_Exit	      */
+				Assignment_Stmt,      /* Tok_Kwd_Extends      */
 				External_Stmt,	      /* Tok_Kwd_External     */
 				Assignment_Stmt,      /* Tok_Kwd_File	      */
 				Flush_Stmt,           /* Tok_Kwd_Flush	      */

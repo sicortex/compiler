@@ -50,7 +50,6 @@ path64_set_multiarch_sources(wgen42_sources COMMON
   ../common/com/dwarf_DST_dump.cxx
   ../common/com/dwarf_DST_mem.cxx
   ../common/com/dwarf_DST_producer.cxx
-  ../common/com/err_host.cxx
   ../common/com/glob.cxx
   ../common/com/intrn_info.cxx
   ../common/com/ir_bcom.cxx
@@ -78,6 +77,10 @@ path64_set_multiarch_sources(wgen42_sources COMMON
   ../common/com/@ARCH@/targ_sim.cxx
   ../common/com/@ARCH@/config_host.c
   ../common/com/@ARCH@/config_platform.c
+  ../common/com/erglob.cxx
+  ../common/com/erlib.cxx
+  ../common/com/erlink.cxx
+  ../common/com/erirb.cxx
   wgen_misc.cxx
   wgen_expr.cxx
   wgen_stmt.cxx
@@ -125,4 +128,4 @@ path64_add_dependencies_from_multiarch(compiler-stage wgen42)
 
 #install(TARGETS wgen42
 #        RUNTIME DESTINATION ${PATH64_LIB_PATH})
-#install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E create_symlink \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${PATH64_LIB_PATH}/wgen42${CMAKE_EXECUTABLE_SUFFIX}\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${PATH64_LIB_PATH}/wgen${CMAKE_EXECUTABLE_SUFFIX}\")")
+#install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -E copy_if_different \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${PATH64_LIB_PATH}/wgen42${CMAKE_EXECUTABLE_SUFFIX}\" \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${PATH64_LIB_PATH}/wgen${CMAKE_EXECUTABLE_SUFFIX}\")")

@@ -3233,6 +3233,12 @@ WGEN_target_builtins (gs_t exp, INTRINSIC * iopc, BOOL * intrinsic_op)
     case GSBI_IX86_BUILTIN_PMINUB128:
       *iopc = INTRN_PMINUB128;
       break;
+	case GSBI_IX86_BUILTIN_PMULUDQ:
+	  *iopc = INTRN_PMULUDQ;
+	  break;
+	case GSBI_IX86_BUILTIN_PMULUDQ128:
+      *iopc = INTRN_PMULUDQ128;
+	  break;
 #if 0 // wgen TODO
     case GSBI_IX86_BUILTIN_PEXTRW:
       {
@@ -3771,8 +3777,7 @@ WGEN_target_builtins (gs_t exp, INTRINSIC * iopc, BOOL * intrinsic_op)
 	  break;
       }
     case GSBI_IX86_BUILTIN_VEC_EXT_V4SF:
-      wn = WN_Tas(MTYPE_F4, MTYPE_To_TY(MTYPE_V16F4), arg0);
-      *intrinsic_op = FALSE;
+     *iopc = INTRN_VEC_EXT_V4SF;
       break;
     case GSBI_IX86_BUILTIN_PMADDWD:
     case GSBI_IX86_BUILTIN_PMADDWD128:
@@ -4294,6 +4299,15 @@ WGEN_target_builtins (gs_t exp, INTRINSIC * iopc, BOOL * intrinsic_op)
     case GSBI_IX86_BUILTIN_CRC32Q:
       *iopc = INTRN_CRC32Q;
       break;
+	case GSBI_IX86_BUILTIN_SETREPI32:
+	  *iopc = INTRN_SETREPI32;
+	  break;
+	case GSBI_IX86_BUILTIN_SETREPI16:
+	  *iopc = INTRN_SETREPI16;
+	  break;
+	case GSBI_IX86_BUILTIN_SETREPI8:
+	  *iopc = INTRN_SETREPI8;
+	  break;
     case GSBI_IX86_BUILTIN_PHADDW128:
       *iopc = INTRN_PHADDW128;
       break;
@@ -4375,6 +4389,27 @@ WGEN_target_builtins (gs_t exp, INTRINSIC * iopc, BOOL * intrinsic_op)
 		case GSBI_IX86_BUILTIN_PSHUFB:
 			*iopc = INTRN_PSHUFB;
 			break;
+		case GSBI_IX86_BUILTIN_AESDEC:
+			*iopc = INTRN_AESDEC;
+		    break;
+	    case GSBI_IX86_BUILTIN_AESENC:
+			*iopc = INTRN_AESENC;
+		    break;
+		case GSBI_IX86_BUILTIN_AESDECLAST:
+			*iopc = INTRN_AESDECLAST;
+		    break;
+	    case GSBI_IX86_BUILTIN_AESENCLAST:
+			*iopc = INTRN_AESENCLAST;
+		    break;
+	    case GSBI_IX86_BUILTIN_AESIMC:
+			*iopc = INTRN_AESIMC;
+		    break;
+	    case GSBI_IX86_BUILTIN_AESKEYGENASSIST:
+			*iopc = INTRN_AESKEYGENASSIST;
+		    break;
+	    case GSBI_IX86_BUILTIN_PCLMULDQD:
+			*iopc = INTRN_PCLMULDQD;
+		    break;
 /*AVX*/
 //    case GSBI_IX86_BUILTIN_ADDPD256:
 //      *iopc = INTRN_ADDPD256;
@@ -5890,9 +5925,16 @@ WGEN_Expand_Expr (gs_t exp,
     case GS_FIX_TRUNC_EXPR:
       {
         wn0 = WGEN_Expand_Expr (gs_tree_operand (exp, 0));
-	ty_idx = Get_TY (gs_tree_type(exp));
-	TYPE_ID mtyp = Widen_Mtype(TY_mtype(ty_idx));
-	wn = WN_Trunc(WN_rtype(wn0), mtyp, wn0);
+        ty_idx = Get_TY (gs_tree_type(exp));
+        TYPE_ID mtyp = TY_mtype(ty_idx);
+        TYPE_ID wmtyp = Widen_Mtype(mtyp);
+        wn = WN_Trunc(WN_rtype(wn0), wmtyp, wn0);
+
+        if (mtyp != wmtyp) {
+          FmtAssert(MTYPE_size_min(mtyp) < MTYPE_size_min(wmtyp),
+                    ("Bad widen type"));
+	      wn = WN_CreateCvtl(OPR_CVTL, wmtyp, MTYPE_V, MTYPE_size_min(mtyp), wn);
+        }
       }
       break;
 
@@ -7851,8 +7893,6 @@ WGEN_Expand_Expr (gs_t exp,
 #endif // FE_GNU_4_2_0
 #endif
 	      default:
-		DevWarn ("Encountered BUILT_IN: %d at line %d\n",
-			 gs_decl_function_code (func), lineno);
 		break;
             }
 	  }

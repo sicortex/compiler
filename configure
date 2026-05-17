@@ -64,9 +64,7 @@ for t in $targets; do
             awk '/-dynamic-linker/ { match($0, "-dynamic-linker +[^ ]+");
                                      print substr($0, RSTART+16, RLENGTH-16) }')
     PATH64_DEFS="$PATH64_DEFS
-      -DPSC_CRT_PATH_${name}=${gcccrt}
       -DPSC_CRTBEGIN_PATH_${name}=${gcclib}
-      -DPSC_DYNAMIC_LINKER_${name}=${ld_so}
       -DPSC_LIBSUPCPP_PATH_${name}=${gcclib}
       -DPSC_LIBSTDCPP_PATH_${name}=${gcclib}
       -DPSC_LIBGCC_PATH_${name}=${gcclib}
@@ -87,7 +85,6 @@ $run cmake -DCMAKE_INSTALL_PREFIX=$prefix                    \
            ${PATH64_DEFS}                                    \
            -DPATH64_ENABLE_PROFILING=OFF                     \
            -DPATH64_ENABLE_FORTRAN=OFF                       \
-           -DPATH64_ENABLE_MATHLIBS=ON                       \
            -DPSC_FULL_VERSION=$version                       \
            $src
 

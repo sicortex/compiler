@@ -87,26 +87,8 @@ extern char **environ_vars;	    /* list of environment variables */
 #define EF_IRIX_ABI64   0x00000010
 #endif
 
-extern void process_whirl64(void *, off_t, void *, int, const char *) __attribute__((weak));
-extern void process_whirl32(void *, off_t, void *, int, const char *) __attribute__((weak));
-extern void *ipa_open_input(char *, off_t *) __attribute__((weak));
-
-void *(*p_ipa_open_input)(char *, off_t *) = NULL;
-void (*p_ipa_init_link_line)(int, char **) = NULL;
-void (*p_ipa_add_link_flag)(const char*) = NULL;
-void (*p_ipa_modify_link_flag)(char*, char*) = NULL;
-void (*p_ipa_driver)(int, char **) = NULL;
-void (*p_process_whirl64)(void *, off_t, void *, int, const char *) = NULL;
-void (*p_process_whirl32)(void *, off_t, void *, int, const char *) = NULL;
-int  (*p_Count_elf_external_gots)(void) = NULL;
-void (*p_ipa_insert_whirl_marker)(void) = NULL;
-void (*p_Sync_symbol_attributes)(unsigned int, unsigned int, bfd_boolean, unsigned int) = NULL;
-#ifdef KEY
-void (*p_ipa_erase_link_flag)(const char*) = NULL;
-void (*p_Ipalink_Set_Error_Phase)(char *) = NULL;
-void (*p_Ipalink_ErrMsg_EC_infile)(char *) = NULL;
-void (*p_Ipalink_ErrMsg_EC_outfile)(char *) = NULL;
-#endif
+extern void process_whirl64(void *, off_t, void *, int, const char *);
+extern void process_whirl32(void *, off_t, void *, int, const char *);
 
 string toolroot = 0;		    /* set to environment variable TOOLROOT */
 
@@ -114,10 +96,9 @@ static int active_pid;
 
 static mode_t cmask = 0;	    /* file creation mode mask */
 
-static string thisfile = __FILE__;
 
-static char *default_path = "/usr/ia64-sgi-linux/lib/gcc-lib/ia64-sgi-linux/sgicc-1.0";
-static char *env_name = "LD_LIBRARY_PATH";
+static const char *default_path = "/usr/ia64-sgi-linux/lib/gcc-lib/ia64-sgi-linux/sgicc-1.0";
+static const char *env_name = "LD_LIBRARY_PATH";
 
 static string *tmp_list = 0;
 static int tmp_list_size = 0;
@@ -174,7 +155,7 @@ void msg (int type, int msg_id, ...) {return;}
 
 	 *******************************************************/
 char *
-ipa_copy_of (char *str)
+ipa_copy_of (const char *str)
 {
     register int len;
     register char *p;
@@ -194,7 +175,7 @@ ipa_copy_of (char *str)
 
 	 *******************************************************/
 string
-concat_names(const string name1, const string name2)
+concat_names(const_string name1, const_string name2)
 {
     char *mangled_name = NULL;
     int len = strlen(name1)+strlen(name2)+1;
@@ -238,9 +219,6 @@ do_compile (string *argv)
     int pid;
     
     if (toolroot) {
-	if ((toolroot = getenv ("TOOLROOT")) == 0)
-	    toolroot = ipa_copy_of(DEFAULT_TOOLROOT);
-	else
 	    toolroot = concat_names (toolroot, DEFAULT_TOOLROOT);
     }
 
@@ -540,7 +518,7 @@ create_unique_file (const string path, char suffix)
     FREE (p);
 
     if ((fd = creat (new_path, 0666 & ~cmask)) == -1) {
-	perror(new_path);
+        perror(new_path);
 	exit(1);
     }
 
@@ -563,20 +541,19 @@ get_command_line(bfd *abfd,
 		 string out_path, 
 		 int *arg_count)
 {
-    static string default_compilation_flags[] = DEFAULT_COMPILATION_FLAGS;
+    static const_string default_compilation_flags[] = DEFAULT_COMPILATION_FLAGS;
     int i;
     int argc = 0;
     string *old_argv;
     string *new_argv;
     Elf_Internal_Ehdr *ehdr = elf_elfheader (abfd);
-    asection *p_asec;
 
-    for (i = 1; i < ehdr->e_shnum; i++) {
+    for (i = 1; i < (int)ehdr->e_shnum; i++) {
     	Elf_Internal_Shdr *p_shdr = elf_elfsections (abfd)[i];
 
 	if (p_shdr->sh_info == WT_COMP_FLAGS) {
 	    char *base_addr;
-	    int j;
+            int j;
 	    ELF_WORD *args;
 
 	    if (p_shdr->sh_size <= 1)
@@ -590,7 +567,7 @@ get_command_line(bfd *abfd,
 	    MALLOC_ASSERT (old_argv);
 	    
 	    for (j = 0; j < argc; j++) {
-		OBJ_ASSERT (args[j] < p_shdr->sh_size, abfd,
+                OBJ_ASSERT (args[j] < (ELF_WORD)p_shdr->sh_size, abfd,
 			    "invalid WT_COMP_FLAGS WHIRL section");
 		old_argv[j] = base_addr + args[j];
 	    }
@@ -637,12 +614,10 @@ extract_archive_member (bfd *abfd, string path)
 {
     int fd = -1;
     int mode = 0644;
-    pointer addr = (pointer)-1;
-    struct areltdata *p_areltdata = (struct areltdata *)abfd->arelt_data;
+    //pointer addr = (pointer)-1;
     struct ar_hdr *p_hdr = arch_hdr(abfd);
     size_t parsed_size;
     char *buf;
-    int ret;
 
     parsed_size = strtol (p_hdr->ar_size, NULL, 10);
     if ((fd = OPEN (path, O_WRONLY|O_CREAT|O_TRUNC, mode)) != -1) {
@@ -1187,13 +1162,13 @@ ipa_process_whirl ( bfd *abfd)
 #else
     abfd->usrdata =
 #endif
-      (PTR)(*p_ipa_open_input)((char *)abfd->filename, &mapped_size);
+      (PTR)ipa_open_input((char *)abfd->filename, &mapped_size);
 
 #if !defined(__ALWAYS_USE_64BIT_ELF__) && !defined(FAT_WHIRL_OBJECTS)
     /* Should be sync. with Config_Target_From_ELF() defined in be.so
      */
     if( ( elf_elfheader (abfd)->e_flags & EF_IRIX_ABI64 ) == 0 )
-      (*p_process_whirl32) ( 
+      process_whirl32 ( 
 			    (void *)abfd, 
 			    elf_elfheader (abfd)->e_shnum, 
 #ifdef KEY
@@ -1205,7 +1180,7 @@ ipa_process_whirl ( bfd *abfd)
 			    abfd->filename);
     else
 #endif    
-      (*p_process_whirl64) ( 
+      process_whirl64 ( 
 			    (void *)abfd, 
 			    elf_elfheader (abfd)->e_shnum, 
 #ifdef KEY
@@ -1217,108 +1192,6 @@ ipa_process_whirl ( bfd *abfd)
 			    abfd->filename);
 }
 
-
-
-	/*******************************************************
-		Function: ipa_set_syms
-
-		dlopen ipa.so and set entry points with
-		dlsym calls.
-
-	 *******************************************************/
-void
-ipa_set_syms(void)
-{
-
-    void *p_handle = NULL;
-    char *p_error = NULL;
-
-    p_handle = dlopen("ipa.so",RTLD_LAZY);
-    if (!p_handle) {
-    	fputs (dlerror(), stderr);
-    	exit(1);
-    }
-    
-    p_ipa_open_input = dlsym(p_handle,"ipa_open_input");
-    if ((p_error = dlerror()) != NULL)  {
-    	fputs(p_error, stderr);
-    	exit(1);
-    }
-
-    p_ipa_init_link_line = dlsym(p_handle,"ipa_init_link_line");
-    if ((p_error = dlerror()) != NULL)  {
-    	fputs(p_error, stderr);
-    	exit(1);
-    }
-
-    p_ipa_add_link_flag = dlsym(p_handle,"ipa_add_link_flag");
-    if ((p_error = dlerror()) != NULL)  {
-    	fputs(p_error, stderr);
-    	exit(1);
-    }
-
-    p_ipa_modify_link_flag = dlsym(p_handle,"ipa_modify_link_flag");
-    if ((p_error = dlerror()) != NULL)  {
-    	fputs(p_error, stderr);
-    	exit(1);
-    }
-
-    p_ipa_driver = dlsym(p_handle,"ipa_driver");
-    if ((p_error = dlerror()) != NULL)  {
-    	fputs(p_error, stderr);
-    	exit(1);
-    }
-
-    p_process_whirl64 = dlsym(p_handle,"process_whirl64");
-    if ((p_error = dlerror()) != NULL)  {
-    	fputs(p_error, stderr);
-    	exit(1);
-    }
-
-    p_process_whirl32 = dlsym(p_handle,"process_whirl32");
-    if ((p_error = dlerror()) != NULL)  {
-    	fputs(p_error, stderr);
-    	exit(1);
-    }
-
-    p_ipa_insert_whirl_marker = dlsym(p_handle,"ipa_insert_whirl_marker");
-    if ((p_error = dlerror()) != NULL)  {
-    	fputs(p_error, stderr);
-    	exit(1);
-    }
-
-    p_Sync_symbol_attributes = dlsym(p_handle,"Sync_symbol_attributes");
-    if ((p_error = dlerror()) != NULL)  {
-    	fputs(p_error, stderr);
-    	exit(1);
-    }
-
-#ifdef KEY
-    p_ipa_erase_link_flag = dlsym(p_handle,"ipa_erase_link_flag");
-    if ((p_error = dlerror()) != NULL)  {
-    	fputs(p_error, stderr);
-    	exit(1);
-    }
-
-    p_Ipalink_Set_Error_Phase = dlsym(p_handle,"Ipalink_Set_Error_Phase");
-    if ((p_error = dlerror()) != NULL)  {
-    	fputs(p_error, stderr);
-    	exit(1);
-    }
-
-    p_Ipalink_ErrMsg_EC_infile = dlsym(p_handle,"Ipalink_ErrMsg_EC_infile");
-    if ((p_error = dlerror()) != NULL)  {
-    	fputs(p_error, stderr);
-    	exit(1);
-    }
-
-    p_Ipalink_ErrMsg_EC_outfile = dlsym(p_handle,"Ipalink_ErrMsg_EC_outfile");
-    if ((p_error = dlerror()) != NULL)  {
-    	fputs(p_error, stderr);
-    	exit(1);
-    }
-#endif
-}
 
 	/*******************************************************
 		Function: ipa_symbol_sync
@@ -1393,10 +1266,10 @@ ipa_symbol_sync(struct bfd_link_hash_entry *p_bfd_link_hash, PTR info)
     if (p_elf_link_hash->ipa_indx != WHIRL_ST_IDX_UNINITIALIZED &&
     	p_elf_link_hash->ipa_indx != WHIRL_ST_IDX_NOT_AVAILABLE) {
 
-    	(*p_Sync_symbol_attributes) (p_elf_link_hash->ipa_indx, 
-				     result,
-			    	     is_weak,
-				     p_elf_link_hash->other);
+    	Sync_symbol_attributes (p_elf_link_hash->ipa_indx, 
+				result,
+			    	is_weak,
+				p_elf_link_hash->other);
 	
     }
     

@@ -191,7 +191,7 @@ enum { IHOT=FALSE, ICOLD=TRUE };
 #define Set_BB_cold	Set_BB_local_flag1
 #define Reset_BB_cold	Reset_BB_local_flag1
 
-extern const char __Release_ID[];
+extern const char * __Release_ID;
 #ifdef KEY
 extern BOOL profile_arcs;
 extern BOOL PU_has_trampoline;  // defined in wn_lower.cxx
@@ -1046,8 +1046,13 @@ Print_Common (FILE *pfile, ST *st)
 #if defined(BUILD_OS_DARWIN) || defined(_WIN32) /* .comm alignment arg not allowed */
     fprintf ( pfile, ", %" SCNd64 "\n", TY_size(ST_type(st)));
 #else /* defined(BUILD_OS_DARWIN) */
-    if (LNO_Run_Simd && Simd_Align && TY_size(ST_type(st)) >= 16)
-      fprintf ( pfile, ", %" SCNd64 ", 16\n", TY_size(ST_type(st)));
+    if (LNO_Run_Simd && Simd_Align && TY_size(ST_type(st)) >= 16){
+	//always make sandy bridge align to 32
+	  if(Target_AVX)
+	    fprintf( pfile, ", %" SCNd64 ",32\n", TY_size(ST_type(st)));
+	  else
+        fprintf ( pfile, ", %" SCNd64 ", 16\n", TY_size(ST_type(st)));
+    }
     else
       fprintf ( pfile, ", %" SCNd64 ", %d\n", 
  	TY_size(ST_type(st)), TY_align(ST_type(st)));
@@ -1895,16 +1900,7 @@ static void Verify_Instruction(OP *op)
   if( OP_reads_rflags( op ) ){
     OP* prev = OP_prev( op );
     while( prev != NULL ){
-#ifdef TARG_X8664
-      if( TOP_is_change_rflags( OP_code(prev)) 
-                ||OP_code(prev) == TOP_ptest
-				||OP_code(prev) == TOP_pcmpestri 
-				||OP_code(prev) == TOP_pcmpestrm
-				||OP_code(prev) == TOP_pcmpistri 
-				||OP_code(prev) == TOP_pcmpistrm)
-#else
       if( TOP_is_change_rflags( OP_code(prev) ) )
-#endif
 	break;
       prev = OP_prev( prev );
     }
@@ -7183,6 +7179,29 @@ EMT_Emit_PU ( FILE *asm_file, ST *pu, DST_IDX pu_dst, WN *rwn )
   }
   FOREACH_SYMBOL (CURRENT_SYMTAB, sym, i) {
     if (ST_is_not_used(sym)) continue;
+
+    ST *base_st;
+    INT64 base_ofst;
+    Base_Symbol_And_Offset (sym, &base_st, &base_ofst);
+
+    /* Allocate all unused and unallocated variables now instead
+     * of later so it doesnt introduce different sections to .cfi
+     * block. Switch to .text after the section initialization.
+     */
+    if (generate_dwarf && sym == base_st && ST_class(sym) == CLASS_VAR &&
+        ST_sclass(sym) == SCLASS_PSTATIC) {
+
+	Allocate_Object(sym);
+        Base_Symbol_And_Offset (sym, &base_st, &base_ofst);
+
+        bool switchBackToText = ST_elf_index(base_st) == 0;
+        /* Allocate .bss */
+        Init_Section(base_st);
+        /* Switch back if we initialized the base_st. */
+	if (switchBackToText)
+          fprintf (Asm_File, "\n\t%s %s\n", AS_SECTION, ST_name(text_base));
+        continue;
+    }
     if (ST_sclass(sym) == SCLASS_COMMON) {
       EMT_Put_Elf_Symbol (sym);
     }
@@ -7708,6 +7727,7 @@ Target_Name (TARGET_PROCESSOR t)
   {
     case TARGET_opteron: return "opteron";
     case TARGET_barcelona: return "barcelona";
+	case TARGET_orochi: return "bdver1";
     case TARGET_athlon64: return "athlon64";
     case TARGET_athlon: return "athlon";
     case TARGET_em64t: return "em64t";
@@ -7715,7 +7735,7 @@ Target_Name (TARGET_PROCESSOR t)
     case TARGET_wolfdale: return "wolfdale";
     case TARGET_pentium4: return "pentium4";
     case TARGET_xeon: return "xeon";
-    case TARGET_anyx86: return "anyx86";
+    case TARGET_anyx86: return "generic";
 	case TARGET_sandy: return "sandy";
     default: Fail_FmtAssertion ("Add support for %s", Targ_Name (t));
   }

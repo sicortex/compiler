@@ -220,10 +220,15 @@ ML_WHIRL_EMITTER::Pop_region( void )
   WN_first(region_body) = first_region_wn;
   WN_last(region_body)  = last_region_wn;
 
+  // filter out dead exits from exit list
+  INT32 nexits = REGION_delete_dead_exits(Cfg(),
+                                          bb_region->Region_exit_list(),
+                                          bb_region->Region_num_exits());
+
   WN *region_wn = WN_CreateRegion(REGION_type_to_kind(bb_region->Rid()),
 				  region_body,
 				  bb_region->Region_pragma_list(),
-				  bb_region->Region_exit_list(), 
+				  bb_region->Region_exit_list(),
 				  RID_id(bb_region->Rid()),
 				  bb_region->Ereg_supp());
 
@@ -248,7 +253,7 @@ ML_WHIRL_EMITTER::Pop_region( void )
 
   // update the RID and level
   REGION_emit(bb_region->Rid(), region_wn, RL_MAINOPT, 
-	      bb_region->Region_num_exits(), bb_region->Region_line_num());
+	      nexits, bb_region->Region_line_num());
 }
 
 //=====================================================================
@@ -456,15 +461,15 @@ ML_WHIRL_EMITTER::Emit(void)
       }
 
       bb->Set_wngend();
+    }
 
-      // was this block the end of a region?
-      while (_region_stack.Elements() > 0 &&
-	     _region_stack.Top()->Region_end() == bb) {
-	Is_Trace(Trace(),(TFile,"Pop_region(RGN %d), prev_wn = 0x%p\n",
-	    RID_id(_region_stack.Top()->Region_start()->Regioninfo()->Rid()),
-		  _region_stack.Top()->Prev_wn()));
-        Pop_region();
-      }
+    // was this block the end of a region?
+    while (_region_stack.Elements() > 0 &&
+           _region_stack.Top()->Region_end() == bb) {
+      Is_Trace(Trace(),(TFile,"Pop_region(RGN %d), prev_wn = 0x%p\n",
+          RID_id(_region_stack.Top()->Region_start()->Regioninfo()->Rid()),
+      	  _region_stack.Top()->Prev_wn()));
+      Pop_region();
     }
   }
 

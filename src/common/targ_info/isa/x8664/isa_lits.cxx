@@ -32,7 +32,7 @@
 
 #include "isa_lits_gen.h"
 
-main ()
+int main ()
 {
   ISA_Lits_Begin();
 
@@ -46,4 +46,5 @@ main ()
   ISA_Create_Lit_Class( "pcrel32",SIGNED,   SignedBitRange(32),   LIT_RANGE_END);
 
   ISA_Lits_End();
+  return 0;
 }

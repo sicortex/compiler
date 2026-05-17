@@ -62,7 +62,20 @@ eelf_x86_64_fbsd.c )
 # /bin/sh ../src/ipa_link/ld/genscripts.${SHELL_EXT} "../src/ipa_link/ld" "/opt/pathscale/lib" "/opt/pathscale" "/opt/pathscale" x86_64-unknown-linux-gnu x86_64-unknown-linux-gnu x86_64-unknown-linux-gnu "elf_x86_64 elf_i386" "/usr/local/lib /lib /usr/lib" no i386linux "i386-unknown-linux-gnuaout" # Makes ei386linux.c
 
 
-set_property(SOURCE ldmain.c PROPERTY COMPILE_DEFINITIONS DEFAULT_EMULATION="elf_x86_64";SCRIPTDIR="${INSTALL_DIR}/x86_64-unknown-linux-gnu/lib";BINDIR="${INSTALL_DIR}/bin";TOOLBINDIR="${INSTALL_DIR}/x86_64-unknown-linux-gnu/bin";TARGET="x86_64-unknown-linux-gnu";TARGET_SYSTEM_ROOT="")
+path64_get_host_arch(arch)
+IF("${arch}" STREQUAL "x8664")
+    set(arch "x86_64")
+ELSEIF("${arch}" STREQUAL "x8632")
+    set(arch "i386")
+ENDIF()
+
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "SunOS")
+    set(targ "i386-pc-solaris2.11")
+else()
+    set(targ "${PSC_TARGET}")
+endif()
+
+set_property(SOURCE ldmain.c PROPERTY COMPILE_DEFINITIONS DEFAULT_EMULATION="elf_${arch}";SCRIPTDIR="${INSTALL_DIR}/${PSC_TARGET}/lib";BINDIR="${INSTALL_DIR}/bin";TOOLBINDIR="${INSTALL_DIR}/${PSC_TARGET}/bin";TARGET="${targ}";TARGET_SYSTEM_ROOT="")
 
 # I don't know if this is needed to pull in libiberty
 FOREACH(f
@@ -84,32 +97,21 @@ FOREACH(f
 ENDFOREACH(f)
 
 #ADD_LIBRARY(iberty ${iberty_SRCS})
-add_executable(ld ${LD_SRCS})
-SET_TARGET_PROPERTIES(ld PROPERTIES OUTPUT_NAME "ipa_link")
-IF(${EXPORT_DYNAMIC_SUPPORTED} MATCHES "yes")
-    SET_TARGET_PROPERTIES(ld PROPERTIES LINK_FLAGS "-Wl,--export-dynamic")
-ENDIF()
-target_link_libraries(ld bfd iberty ${libdl})
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
-set(ipa_symlinks_deps)
-
-foreach(arch ${PATH64_ENABLE_ARCHES})
-    set(output ${Path64_BINARY_DIR}/lib/${PSC_FULL_VERSION}/${arch}/ipa_link${CMAKE_EXECUTABLE_SUFFIX})
-    add_custom_command(
-        OUTPUT ${output}
-        COMMAND ${CMAKE_COMMAND} -E create_symlink ../../bin/ipa_link ${output}
-    )
-
-    list(APPEND ipa_symlinks_deps ${output})
-endforeach()
-
-add_custom_target(stageit-ipa_link DEPENDS ${ipa_symlinks_deps})
-add_dependencies(stageit-ipa_link ld)
-add_dependencies(compiler-stage stageit-ipa_link)
-
-install(TARGETS ld
-    RUNTIME DESTINATION ${PATH64_LIB_PATH}/x8664
-    LIBRARY DESTINATION ${PATH64_LIB_PATH}/x8664)
+path64_set_multiarch_sources(ld_srcs COMMON ${LD_SRCS})
+path64_add_multiarch_executable(ipa_link ld_srcs)
+set(link_flags "")
+if(PATH64_LIBDWARF_PATH)
+    set(link_flags "${link_flags} -L ${PATH64_LIBDWARF_PATH} -Wl,-rpath,${PATH64_LIBDWARF_PATH}")
+endif()
+if(${EXPORT_DYNAMIC_SUPPORTED} MATCHES "yes")
+    set(link_flags "${link_flags} -Wl,--export-dynamic")
+endif()
+path64_set_multiarch_property(ipa_link LINK_FLAGS "${link_flags}")
+path64_multiarch_link_multiarch_libraries(ipa_link ipa)
+path64_multiarch_link_libraries(ipa_link bfd iberty ${libdl})
+path64_add_dependencies_from_multiarch(compiler-stage ipa_link)
+path64_install_multiarch(ipa_link)
 

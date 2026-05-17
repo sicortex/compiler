@@ -996,6 +996,13 @@ CK_WHERE:
          goto EXIT;
       }
 
+      if (l_opnd.fld == AT_Tbl_Idx &&
+	  TYP_LINEAR(ATD_TYPE_IDX(l_opnd.idx)) == Proc_Ptr) {
+	  IR_OPR(ir_idx) = ProcPtr_Asg_Opr;
+	  procedure_pointer_semantics(ir_idx);
+	  goto EXIT;
+      }
+
       if (!exp_desc_l.pointer) {
          attr_idx = find_base_attr(&l_opnd, &line, &col);
          PRINTMSG(line, 417, Error, col);
@@ -2323,7 +2330,9 @@ static boolean expr_sem_d(opnd_type      *result_opnd,
                if (ATD_CLASS(attr_idx) != Struct_Component &&
                    ! ATD_LCV_IS_CONST(attr_idx)     &&
                    ! ATD_PARENT_OBJECT(attr_idx) &&
-                   ATD_CLASS(attr_idx) != Constant) {
+                   ATD_CLASS(attr_idx) != Constant &&
+		   !(ATD_CLASS(attr_idx) == Compiler_Tmp &&
+		    AT_DEFINED(attr_idx) && ATD_FLD(attr_idx) == CN_Tbl_Idx) ) {
 
                   if (!fnd_semantic_err(Obj_Use_Init_Expr,
                                         line,

@@ -60,15 +60,7 @@
 #include "cxx_memory.h"		// CXX_DELETE_ARRAY
 #include "region_whirl_templates.h"	// REGION_search_block
 
-/* this next header should be after the external declarations in the others */
-#include "pragma_weak.h"	/* weak pragmas for Valid_alias...	*/
-
-#ifndef USE_WEAK_REFERENCES
-extern void (*Print_points_to_p) (FILE *fp, POINTS_TO *ptmp);
-#define Print_points_to (*Print_points_to_p)
-#else
-#pragma weak Print_points_to
-#endif
+extern void Print_points_to(FILE *fp, POINTS_TO *ptmp);
 
 // Emit 'T' or 'F' in the print routines for BOOLs
 #define tf(x) ((x) ? 'T' : 'F')
@@ -1556,20 +1548,20 @@ void REGION_CS_print(REGION_CS_ITER *iter)
 // case, nothing is done except set the is_pu and is_not_stacked bits so
 // we know what to do in REGION_replace_from_mark.
 // =======================================================================
-WN *REGION_remove_and_mark(WN *pu, REGION_CS_ITER *iter)
+WN *REGION_remove_and_mark(PU *pu, WN *pu_wn, REGION_CS_ITER *iter)
 {
   WN *new_rwn, *rwn;
 
   rwn = REGION_CS_ITER_wn(iter);
   // do nothing if rwn is the whole pu
-  if (pu == rwn || rwn == NULL || WN_opcode(rwn) == OPC_FUNC_ENTRY) {
-    if (WN_opcode(pu) == OPC_FUNC_ENTRY)
+  if (pu_wn == rwn || rwn == NULL || WN_opcode(rwn) == OPC_FUNC_ENTRY) {
+    if (WN_opcode(pu_wn) == OPC_FUNC_ENTRY)
       REGION_CS_ITER_is_pu(iter) = TRUE;
     REGION_CS_ITER_is_not_stacked(iter) = TRUE;
-    return pu;
+    return pu_wn;
   }
 
-  Is_True(REGION_consistency_check(pu), (""));
+  Is_True(REGION_consistency_check(pu_wn), (""));
   Is_True(REGION_consistency_check(rwn), (""));
   Is_True(WN_opcode(rwn) == OPC_REGION,
 	  ("REGION_remove_and_mark, can't find region"));
@@ -1608,15 +1600,15 @@ WN *REGION_remove_and_mark(WN *pu, REGION_CS_ITER *iter)
     WN_region_pragmas(rwn) = WN_CreateBlock();
   }
 
-  Is_True(REGION_consistency_check(pu),(""));
+  Is_True(REGION_consistency_check(pu_wn),(""));
   Is_True(REGION_consistency_check(new_rwn),(""));
   if (Get_Trace(TP_REGION,TT_REGION_ALL)) {
     fprintf(TFile,"===== REGION_remove_and_mark RGN %d\n",
 	    RID_id(REGION_get_rid(new_rwn)));
   }
 
-  WN_verifier(rwn);
-  WN_verifier(new_rwn);
+  WN_verifier(pu, rwn);
+  WN_verifier(pu, new_rwn);
   return new_rwn;
 }
 

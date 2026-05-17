@@ -1155,8 +1155,8 @@ Expand_Copy (TN *result, TN *src, TYPE_ID mtype, OPS *ops)
 
   } else if( MTYPE_is_float(mtype) ){
     if( Is_Target_SSE2() )
-      Build_OP( is_128bit ? TOP_movdq: 
-		(mtype == MTYPE_F8 ? TOP_movsd : TOP_movss), result, src, ops );
+      Build_OP( is_128bit ? ( Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq): 
+		(mtype == MTYPE_F8 ?  TOP_movsd : TOP_movss), result, src, ops );
     else
       Build_OP( TOP_fmov, result, src, ops );
 
@@ -1166,7 +1166,7 @@ Expand_Copy (TN *result, TN *src, TYPE_ID mtype, OPS *ops)
       Set_OP_copy( OP_prev(OPS_last(ops)) );
 
     } else {
-      Build_OP( MTYPE_is_size_double(mtype) ? TOP_mov64: TOP_mov32, 
+      Build_OP( MTYPE_is_size_double(mtype) ? TOP_mov64: (TOP_mov32), 
 		result, src, ops);
     }
   }
@@ -1441,25 +1441,25 @@ Expand_Add (TN *result, TN *src1, TN *src2, TYPE_ID mtype, OPS *ops)
   } else {
     switch(mtype) {
     case MTYPE_V16I1:
-      Build_OP (TOP_add128v8, result, src1, src2, ops);
+        Build_OP ( Target_AVX? TOP_vpaddb_f128_ofloat_float_float : TOP_add128v8, result, src1, src2, ops);
       break;
     case MTYPE_V16I2:
-      Build_OP (TOP_add128v16, result, src1, src2, ops);
+        Build_OP ( Target_AVX? TOP_vpaddw_f128_ofloat_float_float : TOP_add128v16, result, src1, src2, ops);
       break;
     case MTYPE_V16I4:
-      Build_OP (TOP_add128v32, result, src1, src2, ops);
+        Build_OP (Target_AVX? TOP_vpaddd_f128_ofloat_float_float : TOP_add128v32, result, src1, src2, ops);
       break;
     case MTYPE_V16I8:
-      Build_OP (TOP_add128v64, result, src1, src2, ops);
+        Build_OP (Target_AVX? TOP_vpaddq_f128_ofloat_float_float : TOP_add128v64, result, src1, src2, ops);
       break;
     case MTYPE_V8I1:
-      Build_OP (TOP_add128v8, result, src1, src2, ops);
+        Build_OP (Target_AVX? TOP_vpaddb_f128_ofloat_float_float : TOP_add128v8, result, src1, src2, ops);
       break;
     case MTYPE_V8I2:
-      Build_OP (TOP_add128v16, result, src1, src2, ops);
+        Build_OP (Target_AVX? TOP_vpaddw_f128_ofloat_float_float : TOP_add128v16, result, src1, src2, ops);
       break;
     case MTYPE_V8I4:
-      Build_OP (TOP_add128v32, result, src1, src2, ops);
+        Build_OP (Target_AVX? TOP_vpaddd_f128_ofloat_float_float : TOP_add128v32, result, src1, src2, ops);
       break;
     case MTYPE_M8I1:
       Build_OP (TOP_add64v8, result, src1, src2, ops);
@@ -1471,7 +1471,7 @@ Expand_Add (TN *result, TN *src1, TN *src2, TYPE_ID mtype, OPS *ops)
       Build_OP (TOP_add64v32, result, src1, src2, ops);
       break;
     case MTYPE_V8F4:
-      Build_OP (TOP_fadd128v32, result, src1, src2, ops);
+	  Build_OP (Target_AVX? TOP_vaddps_f128_ofloat_float_float : TOP_fadd128v32, result, src1, src2, ops);
       break;
     case MTYPE_M8F4:
       Fail_FmtAssertion ("Expand_Add: NYI");
@@ -1554,25 +1554,25 @@ Expand_Sub (TN *result, TN *src1, TN *src2, TYPE_ID mtype, OPS *ops)
   else {
     switch(mtype) {
     case MTYPE_V16I1:
-      Build_OP (TOP_sub128v8, result, src1, src2, ops);
+        Build_OP (Target_AVX? TOP_vpsubb_f128_ofloat_float_float : TOP_sub128v8, result, src1, src2, ops);
       break;
     case MTYPE_V16I2:
-      Build_OP (TOP_sub128v16, result, src1, src2, ops);
+        Build_OP (Target_AVX? TOP_vpsubw_f128_ofloat_float_float : TOP_sub128v16, result, src1, src2, ops);
       break;
     case MTYPE_V16I4:
-      Build_OP (TOP_sub128v32, result, src1, src2, ops);
+	  Build_OP ( Target_AVX? TOP_vpsubd_f128_ofloat_float_float : TOP_sub128v32, result, src1, src2, ops);
       break;
     case MTYPE_V16I8:
-      Build_OP (TOP_sub128v64, result, src1, src2, ops);
+	  Build_OP (Target_AVX? TOP_vpsubq_f128_ofloat_float_float : TOP_sub128v64, result, src1, src2, ops);
       break;
     case MTYPE_V8I1:
-      Build_OP (TOP_sub128v8, result, src1, src2, ops);
+	  Build_OP (Target_AVX? TOP_vpsubb_f128_ofloat_float_float : TOP_sub128v8, result, src1, src2, ops);
       break;
     case MTYPE_V8I2:
-      Build_OP (TOP_sub128v16, result, src1, src2, ops);
+	  Build_OP (Target_AVX? TOP_vpsubw_f128_ofloat_float_float : TOP_sub128v16, result, src1, src2, ops);
       break;
     case MTYPE_V8I4:
-      Build_OP (TOP_sub128v32, result, src1, src2, ops);
+	  Build_OP (Target_AVX? TOP_vpsubd_f128_ofloat_float_float : TOP_sub128v32, result, src1, src2, ops);
       break;
     case MTYPE_M8I1:
       Build_OP (TOP_sub64v8, result, src1, src2, ops);
@@ -1605,13 +1605,15 @@ Expand_Neg (TN *result, TN *src, TYPE_ID mtype, OPS *ops)
   FmtAssert ((MTYPE_bit_size(mtype) == 32 || 
 	      MTYPE_bit_size(mtype) == 64 ||
 	      MTYPE_bit_size(mtype) == 96 ||
-	      MTYPE_bit_size(mtype) == 128 ),
+	      MTYPE_bit_size(mtype) == 128||
+	      MTYPE_bit_size(mtype) == 256),
 	               ("Expand_Neg: illegal result size\n"));
 
   if (mtype == MTYPE_V16F4 || mtype == MTYPE_V16F8 ||
       mtype == MTYPE_V16I1 || mtype == MTYPE_V16I2 ||
       mtype == MTYPE_V16I4 || mtype == MTYPE_V16I8 ||
-      mtype == MTYPE_V16C8) {
+      mtype == MTYPE_V16C8 || mtype == MTYPE_V32F4 ||
+      mtype == MTYPE_V32F8) {
     switch (mtype) {
     case MTYPE_V16F4: {
       TCON then = Host_To_Targ (MTYPE_I4, 0x80000000);
@@ -1636,6 +1638,28 @@ Expand_Neg (TN *result, TN *src, TYPE_ID mtype, OPS *ops)
       Build_OP(is_64bit ? TOP_xorpd: TOP_xorps, result, src, tmp, ops);
       break;
     }
+	case MTYPE_V32F4: {
+	  TCON then = Host_To_Targ (MTYPE_I4, 0x80000000);
+	  TCON now = Create_Simd_Const(MTYPE_V32I4, then);
+	  ST *sym = New_Const_Sym(Enter_tcon(now), Be_Type_Tbl(TCON_ty(now)));
+	  Allocate_Object(sym);
+	  TN *sym_tn = Gen_Symbol_TN(sym, 0, 0);
+	  TN *tmp = Build_TN_Like(result);
+	  Exp_Load(mtype, mtype, tmp, TN_var(sym_tn), TN_offset(sym_tn), ops, 0);
+	  Build_OP(TOP_vxorps_f256_ofloat_float_float, result, src, tmp, ops);
+	  break;
+	}
+	case MTYPE_V32F8: {
+	  TCON then = Host_To_Targ (MTYPE_I4, 0x8000000000000000ULL);
+	  TCON now = Create_Simd_Const(MTYPE_V32I8, then);
+	  ST *sym = New_Const_Sym(Enter_tcon(now), Be_Type_Tbl(TCON_ty(now)));
+	  Allocate_Object(sym);
+	  TN *sym_tn = Gen_Symbol_TN(sym, 0, 0);
+	  TN *tmp = Build_TN_Like(result);
+	  Exp_Load(mtype, mtype, tmp, TN_var(sym_tn), TN_offset(sym_tn), ops, 0);
+	  Build_OP(TOP_vxorpd_f256_ofloat_float_float, result, src, tmp, ops);
+	  break;
+	}
 #ifdef KEY
     //Bug 5701 13347: Vectorize Neg of Integers
     case MTYPE_V16I1:
@@ -1696,7 +1720,7 @@ Expand_Neg (TN *result, TN *src, TYPE_ID mtype, OPS *ops)
     }
 
     Set_OP_no_alias( OPS_last(ops)  );
-    Build_OP(is_64bit ? TOP_xorpd: TOP_xorps, result, src, tmp, ops);
+    Build_OP(is_64bit ?  TOP_xorpd : TOP_xorps, result, src, tmp, ops);
 #else
     // Perform neg operation by a sub operation from 0.0.
     TCON tcon = Host_To_Targ_Float( is_64bit ? MTYPE_F8 : MTYPE_F4, 0.0 );
@@ -1746,7 +1770,8 @@ Expand_Abs (TN *dest, TN *src, TYPE_ID mtype, OPS *ops)
     Build_OP( TOP_fabs, dest, src, ops );
 
   } else if ( MTYPE_is_vector( mtype ) ) {
-    FmtAssert( mtype == MTYPE_V16F4 || mtype == MTYPE_V16F8, ("NYI") );
+    FmtAssert( mtype == MTYPE_V16F4 || mtype == MTYPE_V16F8 
+		       || mtype == MTYPE_V32F4 || mtype == MTYPE_V32F8, ("NYI") );
     if ( mtype == MTYPE_V16F4 ) {
       TCON then = Host_To_Targ (MTYPE_I4, 0x7FFFFFFF);
       TCON now  = Create_Simd_Const (MTYPE_V16F4, then);
@@ -1755,8 +1780,11 @@ Expand_Abs (TN *dest, TN *src, TYPE_ID mtype, OPS *ops)
       TN *sym_tn = Gen_Symbol_TN(sym, 0, 0);
       TN *tmp = Build_TN_Like(dest);
       Exp_Load(mtype, mtype, tmp, TN_var(sym_tn), TN_offset(sym_tn), ops, 0);
-      Build_OP(TOP_andps, dest, src, tmp, ops);      
-    } else {
+	  if(Target_AVX)
+	  	Build_OP(TOP_vandps_f128_ofloat_float_float, dest, src, tmp, ops);
+	  else
+        Build_OP(TOP_andps, dest, src, tmp, ops);      
+    } else if(mtype == MTYPE_V16F8) {
       TCON then = Host_To_Targ (MTYPE_I8, 0x7FFFFFFFFFFFFFFFULL);
       TCON now  = Create_Simd_Const (MTYPE_V16F8, then);
       ST *sym = New_Const_Sym (Enter_tcon (now), Be_Type_Tbl(TCON_ty(now)));
@@ -1766,9 +1794,29 @@ Expand_Abs (TN *dest, TN *src, TYPE_ID mtype, OPS *ops)
       Exp_Load(mtype, mtype, tmp, TN_var(sym_tn), TN_offset(sym_tn), ops, 0);
       Build_OP(TOP_andpd, dest, src, tmp, ops);
     }
-
-  } else {
-    TCON tcon = is_double ? Host_To_Targ (MTYPE_I8, 0x7FFFFFFFFFFFFFFFULL) :
+	else if(mtype == MTYPE_V32F4) {
+  	  TCON then = Host_To_Targ (MTYPE_I4, 0x7FFFFFFF);
+      TCON now  = Create_Simd_Const (MTYPE_V32F4, then);
+      ST *sym = New_Const_Sym (Enter_tcon (now), Be_Type_Tbl(TCON_ty(now)));
+      Allocate_Object(sym);
+      TN *sym_tn = Gen_Symbol_TN(sym, 0, 0);
+      TN *tmp = Build_TN_Like(dest);
+      Exp_Load(mtype, mtype, tmp, TN_var(sym_tn), TN_offset(sym_tn), ops, 0);
+	  Build_OP(TOP_vandps_f256_ofloat_float_float, dest, src, tmp, ops);
+	}
+	else{
+      TCON then = Host_To_Targ (MTYPE_I8, 0x7FFFFFFFFFFFFFFFULL);
+      TCON now  = Create_Simd_Const (MTYPE_V32F8, then);
+      ST *sym = New_Const_Sym (Enter_tcon (now), Be_Type_Tbl(TCON_ty(now)));
+      Allocate_Object(sym);
+      TN *sym_tn = Gen_Symbol_TN(sym, 0, 0);
+      TN *tmp = Build_TN_Like(dest);
+      Exp_Load(mtype, mtype, tmp, TN_var(sym_tn), TN_offset(sym_tn), ops, 0);
+      Build_OP(TOP_vandpd_f256_ofloat_float_float, dest, src, tmp, ops);
+   } 
+  }
+  else { 
+      TCON tcon = is_double ? Host_To_Targ (MTYPE_I8, 0x7FFFFFFFFFFFFFFFULL) :
       Host_To_Targ (MTYPE_I4, 0x7FFFFFFF);
     ST *sym = New_Const_Sym (Enter_tcon (tcon), Be_Type_Tbl(TCON_ty(tcon)) );
     Allocate_Object(sym);
@@ -1789,6 +1837,7 @@ Expand_Abs (TN *dest, TN *src, TYPE_ID mtype, OPS *ops)
     Set_OP_no_alias( OPS_last(ops)  );
     Build_OP(is_double ? TOP_andpd: TOP_andps, dest, src, tmp, ops);
   }
+  
   return;
 }
 
@@ -2259,7 +2308,7 @@ void Expand_Binary_Complement (TN *dest, TN *src, TYPE_ID mtype, OPS *ops)
     TN *sym_tn = Gen_Symbol_TN(sym, 0, 0);
     TN *tmp = Build_TN_Like(dest);
     Exp_Load(MTYPE_V16I8, MTYPE_V16I8, tmp, TN_var(sym_tn), TN_offset(sym_tn),ops, 0);
-    Build_OP (TOP_xor128v64, dest, tmp, src, ops);
+    Build_OP (Target_AVX ? TOP_vpor_f128_ofloat_float_float: TOP_xor128v64, dest, tmp, src, ops);
     return ;
   }
   if( OP_NEED_PAIR(mtype) )
@@ -2320,13 +2369,13 @@ void Expand_Binary_And (TN *dest, TN *src1, TN *src2, TYPE_ID mtype, OPS *ops)
   } else {
     switch(mtype) {
     case MTYPE_V16I1: 
-      Build_OP(TOP_and128v8, dest, src1, src2, ops); break;
+      Build_OP(Target_AVX ? TOP_vpand_f128_ofloat_float_float: TOP_and128v8, dest, src1, src2, ops); break;
     case MTYPE_V16I2: 
-      Build_OP(TOP_and128v16, dest, src1, src2, ops); break;
+      Build_OP(Target_AVX ? TOP_vpand_f128_ofloat_float_float: TOP_and128v16, dest, src1, src2, ops); break;
     case MTYPE_V16I4: 
-      Build_OP(TOP_and128v32, dest, src1, src2, ops); break;
+      Build_OP(Target_AVX ? TOP_vpand_f128_ofloat_float_float: TOP_and128v32, dest, src1, src2, ops); break;
     case MTYPE_V16I8: 
-      Build_OP(TOP_and128v64, dest, src1, src2, ops); break;
+      Build_OP(Target_AVX ? TOP_vpand_f128_ofloat_float_float: TOP_and128v64, dest, src1, src2, ops); break;
     default:
       if( OP_NEED_PAIR(mtype) ){
 	Expand_Split_BOP( OPR_BAND, mtype, dest, src1, src2, ops );
@@ -2370,13 +2419,13 @@ void Expand_Binary_Or (TN *dest, TN *src1, TN *src2, TYPE_ID mtype, OPS *ops)
   } else {
     switch(mtype) {
     case MTYPE_V16I1: 
-      Build_OP(TOP_or128v8, dest, src1, src2, ops); break;
+      Build_OP(Target_AVX ? TOP_vpor_f128_ofloat_float_float: TOP_or128v8, dest, src1, src2, ops); break;
     case MTYPE_V16I2: 
-      Build_OP(TOP_or128v16, dest, src1, src2, ops); break;
+      Build_OP(Target_AVX ? TOP_vpor_f128_ofloat_float_float: TOP_or128v16, dest, src1, src2, ops); break;
     case MTYPE_V16I4: 
-      Build_OP(TOP_or128v32, dest, src1, src2, ops); break;
+      Build_OP(Target_AVX ? TOP_vpor_f128_ofloat_float_float: TOP_or128v32, dest, src1, src2, ops); break;
     case MTYPE_V16I8: 
-      Build_OP(TOP_or128v64, dest, src1, src2, ops); break;
+      Build_OP(Target_AVX ? TOP_vpor_f128_ofloat_float_float: TOP_or128v64, dest, src1, src2, ops); break;
     default:
       if( OP_NEED_PAIR(mtype) ){
 	Expand_Split_BOP( OPR_BIOR, mtype, dest, src1, src2, ops );
@@ -2420,13 +2469,13 @@ void Expand_Binary_Xor (TN *dest, TN *src1, TN *src2, TYPE_ID mtype, OPS *ops)
   } else {
     switch(mtype) {
     case MTYPE_V16I1: 
-      Build_OP(TOP_xor128v8, dest, src1, src2, ops); break;
+      Build_OP(Target_AVX ? TOP_vpxor_f128_ofloat_float_float: TOP_xor128v8, dest, src1, src2, ops); break;
     case MTYPE_V16I2: 
-      Build_OP(TOP_xor128v16, dest, src1, src2, ops); break;
+      Build_OP(Target_AVX ? TOP_vpxor_f128_ofloat_float_float: TOP_xor128v16, dest, src1, src2, ops); break;
     case MTYPE_V16I4: 
-      Build_OP(TOP_xor128v32, dest, src1, src2, ops); break;
+      Build_OP(Target_AVX ? TOP_vpxor_f128_ofloat_float_float: TOP_xor128v32, dest, src1, src2, ops); break;
     case MTYPE_V16I8: 
-      Build_OP(TOP_xor128v64, dest, src1, src2, ops); break;
+      Build_OP(Target_AVX ? TOP_vpxor_f128_ofloat_float_float: TOP_xor128v64, dest, src1, src2, ops); break;
     default:
       if( OP_NEED_PAIR(mtype) ){
 	Expand_Split_BOP( OPR_BXOR, mtype, dest, src1, src2, ops );
@@ -2973,11 +3022,11 @@ static void Expand_Unsigned_Float_To_Int_m32( TN* result,
 
   TN* fp_tmp_tn = Build_TN_Like( src );
   TN* ctrl = Generate_Cmp_Ctrl_TN( OPR_LE );
-  Build_OP( is_double ? TOP_cmpsd : TOP_cmpss,
+  Build_OP( is_double ?  TOP_cmpsd :  TOP_cmpss,
 	    fp_tmp_tn, fp_const, src, ctrl, ops );
-  Build_OP( is_double ? TOP_andpd : TOP_andps, fp_tmp_tn,
+  Build_OP( is_double ?  TOP_andpd : TOP_andps, fp_tmp_tn,
 	    fp_tmp_tn, fp_const, ops );
-  Build_OP( is_double ? TOP_subsd : TOP_subss, fp_tmp_tn,
+  Build_OP( is_double ?  TOP_subsd : TOP_subss, fp_tmp_tn,
 	    src, fp_tmp_tn, ops );
 
   TN* int_tmp_tn = Build_TN_Of_Mtype( MTYPE_U4 );
@@ -2987,11 +3036,11 @@ static void Expand_Unsigned_Float_To_Int_m32( TN* result,
   Exp_Immediate( sign_mask, Gen_Literal_TN(0x80000000,4), ops );
 
   TN* rflags = Rflags_TN();
-  Build_OP( is_double ? TOP_comisd : TOP_comiss,
+  Build_OP( is_double ?  TOP_comisd : TOP_comiss,
 	    rflags, fp_const, src, ops );
   Expand_Cmov( TOP_cmovbe, int_tmp_tn, sign_mask, rflags, ops );
 
-  Build_OP( is_double ? TOP_cvttsd2si : TOP_cvttss2si, dest, fp_tmp_tn, ops );
+  Build_OP( is_double ?  TOP_cvttsd2si : TOP_cvttss2si, dest, fp_tmp_tn, ops );
   Build_OP( TOP_add32, dest, dest, int_tmp_tn, ops );
 
   if( result != dest ){
@@ -3062,16 +3111,16 @@ Expand_Float_To_Int (ROUND_MODE rm, TN *dest, TN *src, TYPE_ID imtype, TYPE_ID f
 
   else if ( fmtype == MTYPE_V16F4 ) {
     if (imtype == MTYPE_V16I4)
-      top = TOP_cvttps2dq;
+      top = (Target_AVX? TOP_vcvttps2dq_f128_ofloat_float : TOP_cvttps2dq);
     else if (imtype == MTYPE_V16I8)
-      top = TOP_movdq;	// bug 12731
+      top = (Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq);	// bug 12731
     else
       FmtAssert(FALSE, ("Expand_Float_To_Int: NYI"));
   }
 
   else if ( fmtype == MTYPE_V16F8 ) {
     // Workaround for bug 3082, not supposed to generate correct code
-    top = TOP_cvttpd2dq;
+    top = (Target_AVX? TOP_vcvttpd2dq_f128_ofloat_float : TOP_cvttpd2dq);
   }
 
   FmtAssert( top != TOP_UNDEFINED,
@@ -3125,7 +3174,7 @@ Expand_Float_To_Int_Tas (TN *dest, TN *src, TYPE_ID imtype, OPS *ops)
   }
   else {
     // store the float value to memory
-    Build_OP(Is_Target_SSE2() ? TOP_stsd : TOP_fstpl, src, base_tn, ofst_tn, ops );
+    Build_OP(Is_Target_SSE2() ?  TOP_stsd : TOP_fstpl, src, base_tn, ofst_tn, ops );
     // load the value into an int register.
     Expand_Load(OPCODE_make_op(OPR_LDID, imtype, imtype), dest, base_tn, ofst_tn, ops);
   }
@@ -3154,22 +3203,31 @@ Expand_Int_To_Float_Tas (TN *dest, TN *src, TYPE_ID fmtype, OPS *ops)
     // store the int value to memory
     Build_OP(TOP_store32, src, base_tn, ofst_tn, ops );
     // load the value into a float register.
-    Build_OP(Is_Target_SSE2() ? TOP_ldss : TOP_flds, dest, base_tn, ofst_tn, ops );
+    Build_OP(Is_Target_SSE2() ?  TOP_ldss : TOP_flds, dest, base_tn, ofst_tn, ops );
   }
   else {
     // store the int value to memory
     Expand_Store(MTYPE_U8, src, base_tn, ofst_tn, ops );
     // load the value into a float register.
-    Build_OP(Is_Target_SSE2() ? TOP_ldsd : TOP_fldl, dest, base_tn, ofst_tn, ops );
+    Build_OP(Is_Target_SSE2() ?  TOP_ldsd : TOP_fldl, dest, base_tn, ofst_tn, ops );
   }
 } 
 
 void
 Expand_Int_To_Vect_Tas (TN *dest, TN *src, TYPE_ID vectype, OPS *ops)
 {
-  FmtAssert(MTYPE_byte_size(vectype) == 8,
-  	    ("Expand_Int_To_Vect_Tas: 16-byte vector type not handled"));
-  FmtAssert(TN_register_class(src) == ISA_REGISTER_CLASS_integer,
+  UINT vectsize = MTYPE_byte_size(vectype);
+  TYPE_ID mtype;
+  switch (vectsize) {
+    case 8: mtype = MTYPE_U8; break;
+    case 16: mtype = MTYPE_V16I4; break;
+    case 32: mtype = MTYPE_V32I4; break;
+    default:
+            FmtAssert(0, 
+  	      ("Expand_Int_To_Vect_Tas: vector type not handled"));
+  }
+  FmtAssert(TN_register_class(src) == ISA_REGISTER_CLASS_integer
+            || TN_register_class(src) == ISA_REGISTER_CLASS_float,
   	    ("Expand_Int_To_Vect_Tas: source operand not integer"));
 
   // Allocate space to store the integer value
@@ -3188,7 +3246,7 @@ Expand_Int_To_Vect_Tas (TN *dest, TN *src, TYPE_ID vectype, OPS *ops)
   TN* ofst_tn = Gen_Literal_TN( base_ofst, 4 );
 
   // store the int value to memory
-  Expand_Store(MTYPE_U8, src, base_tn, ofst_tn, ops);
+  Expand_Store(mtype, src, base_tn, ofst_tn, ops);
 
   // load the value into the vector register
   Expand_Load(OPCODE_make_op(OPR_LDID,vectype,vectype), dest, base_tn, ofst_tn,
@@ -3300,15 +3358,15 @@ void Expand_Float_To_Float_Floorf( TN* dest, TN* src,
   TN* ones_or_zeros = Build_TN_Like( dest );
   TN* fraction_tn = Build_TN_Like( dest );
 
-  Build_OP( TOP_andps, sign_tn, sign_mask, src,     ops );
-  Build_OP( TOP_orps,  mi6_tn,  mi6_val,   sign_tn, ops );
+  Build_OP(  TOP_andps, sign_tn, sign_mask, src,     ops );
+  Build_OP(  TOP_orps,  mi6_tn,  mi6_val,   sign_tn, ops );
   Build_OP( TOP_addss, tmp1,    src,       mi6_tn,  ops );
-  Build_OP( TOP_subss, result1, tmp1,      mi6_tn,  ops );
-  Build_OP( TOP_subss, diff_tn, result1,   src,     ops );
+  Build_OP(  TOP_subss, result1, tmp1,      mi6_tn,  ops );
+  Build_OP(  TOP_subss, diff_tn, result1,   src,     ops );
   TN* ctrl = Generate_Cmp_Ctrl_TN( OPR_GT );
-  Build_OP( TOP_cmpss, ones_or_zeros, diff_tn, sign_mask, ctrl, ops );
-  Build_OP( TOP_andps, fraction_tn, ones_or_zeros, one_point_zero, ops );
-  Build_OP( TOP_subss, dest,    result1,   fraction_tn, ops );
+  Build_OP(  TOP_cmpss, ones_or_zeros, diff_tn, sign_mask, ctrl, ops );
+  Build_OP(   TOP_andps, fraction_tn, ones_or_zeros, one_point_zero, ops );
+  Build_OP(  TOP_subss, dest,    result1,   fraction_tn, ops );
 }
 
 
@@ -3362,14 +3420,14 @@ void Expand_Float_To_Float_Floor( TN* dest, TN* src,
   TN* fraction_tn = Build_TN_Like( dest );
 
   Build_OP( TOP_andpd, sign_tn, sign_mask, src,     ops );
-  Build_OP( TOP_xorpd, xor_tn,  src, sign_tn, ops );
+  Build_OP(  TOP_xorpd, xor_tn,  src, sign_tn, ops );
   TN* ctrl_lt = Generate_Cmp_Ctrl_TN( OPR_LT );
-  Build_OP( TOP_cmpsd, lt_tn, xor_tn, mi6_val, ctrl_lt, ops );
+  Build_OP(  TOP_cmpsd, lt_tn, xor_tn, mi6_val, ctrl_lt, ops );
   Build_OP( TOP_andpd, and_tn, lt_tn, mi6_val, ops );
-  Build_OP( TOP_orpd, mi6_tn, and_tn, sign_tn, ops );
+  Build_OP(  TOP_orpd, mi6_tn, and_tn, sign_tn, ops );
   Build_OP( TOP_addsd, tmp1,    src,       mi6_tn,  ops );
   Build_OP( TOP_subsd, result1, tmp1,      mi6_tn,  ops );
-  Build_OP( TOP_subsd, diff_tn, result1,   src,     ops );
+  Build_OP(  TOP_subsd, diff_tn, result1,   src,     ops );
   TN* ctrl = Generate_Cmp_Ctrl_TN( OPR_GT );
   Build_OP( TOP_cmpsd, ones_or_zeros, diff_tn, sign_mask, ctrl, ops );
   Build_OP( TOP_andpd, fraction_tn, ones_or_zeros, one_point_zero, ops );
@@ -3389,7 +3447,7 @@ Expand_Float_To_Int_Floor (TN *dest, TN *src, TYPE_ID imtype, TYPE_ID fmtype, OP
 
   TN* src1  = Build_TN_Like( src );
   if( Is_Target_SSE2() )
-    Build_OP( is_double ? TOP_xorpd : TOP_xorps, src1, src, src, ops );
+    Build_OP( is_double ?  TOP_xorpd :  TOP_xorps, src1, src, src, ops );
   else
     Build_OP( TOP_fldz, src1, ops );
 
@@ -3462,7 +3520,7 @@ Expand_Float_To_Float (TN *dest, TN *src, TYPE_ID rtype, TYPE_ID desc, OPS *ops)
       !MTYPE_is_quad( desc ) ){
     if (!MTYPE_is_vector(rtype)){
 #ifdef KEY //bug 14346: fp-fp scalar conversion for barcelona is special
-     if(Is_Target_Barcelona())
+     if(Is_Target_Orochi()||Is_Target_Barcelona())
       Build_OP( (rtype == MTYPE_F8) ? TOP_cvtps2pd : TOP_cvtpd2ps,
 		dest, src, ops );
      else
@@ -3471,8 +3529,10 @@ Expand_Float_To_Float (TN *dest, TN *src, TYPE_ID rtype, TYPE_ID desc, OPS *ops)
                 dest, src, ops );
     }
     else
-      Build_OP( (rtype == MTYPE_V16F8) ? TOP_cvtps2pd : TOP_cvtpd2ps,
-		dest, src, ops );	
+      Build_OP( (rtype == MTYPE_V16F8) ? (Target_AVX? TOP_vcvtps2pd_f128_ofloat_float : TOP_cvtps2pd) : 
+                                         (Target_AVX? TOP_vcvtpd2ps_f128_ofloat_float : TOP_cvtpd2ps),
+		dest, src, ops );
+   //Fixme: difference between f64 and f128
     return;
   }
 
@@ -3578,7 +3638,7 @@ static void Expand_Unsigned_Int_To_Float_m32( TN* dest,
   }
 
   Cur_BB = bb_exit;
-  Build_OP( is_double ? TOP_movsd : TOP_movss, dest, tmp_dest, ops );
+  Build_OP( is_double ?  TOP_movsd : TOP_movss , dest, tmp_dest, ops );
 }
 
 
@@ -3632,8 +3692,11 @@ static void Expand_Unsigned_Long_To_Float( TN* dest, TN* src, TYPE_ID mtype, OPS
   // Build bb_then here.
   {
     OPS* bb_then_ops = &New_OPs;
-    Build_OP( is_64bit ? TOP_cvtsi2sdq : TOP_cvtsi2ssq, tmp_dest, src, bb_then_ops );
-    Build_OP( TOP_jmp, Gen_Label_TN( bb_exit_label, 0 ), bb_then_ops );
+	//TODO: add vcvtsi2sdq
+    //Build_OP( is_64bit ? (Target_AVX? TOP_vcvtsi2sdq_i64_ofloat_int64: TOP_cvtsi2sdq) : 
+	//	                 (Target_AVX? TOP_vcvtsi2ssq_i64_ofloat_int64: TOP_cvtsi2ssq), tmp_dest, src, bb_then_ops );
+    Build_OP(is_64bit? TOP_cvtsi2sdq : TOP_cvtsi2ssq, tmp_dest, src, bb_then_ops);
+	Build_OP( TOP_jmp, Gen_Label_TN( bb_exit_label, 0 ), bb_then_ops );
 
     total_bb_insts = 0;
     Last_Processed_OP = NULL;
@@ -3653,9 +3716,13 @@ static void Expand_Unsigned_Long_To_Float( TN* dest, TN* src, TYPE_ID mtype, OPS
     Build_OP( TOP_shri64, tmp1, src, Gen_Literal_TN( 1, 4 ), bb_else_ops );
     Build_OP( TOP_andi32, tmp2, src, Gen_Literal_TN( 1, 4 ), bb_else_ops );
     Build_OP( TOP_or64, tmp3, tmp1, tmp2, bb_else_ops );
-    Build_OP( is_64bit ? TOP_cvtsi2sdq : TOP_cvtsi2ssq,
-	      dest1, tmp3, bb_else_ops );
-    Build_OP( is_64bit ? TOP_addsd : TOP_addss,
+	//TODO: add vcvtsi2sdq
+    //Build_OP( is_64bit ? (Target_AVX? TOP_vcvtsi2sdq_i64_ofloat_int64: TOP_cvtsi2sdq) : 
+	//	                 (Target_AVX? TOP_vcvtsi2ssq_i64_ofloat_int64: TOP_cvtsi2ssq),
+	//      dest1, tmp3, bb_else_ops );
+	Build_OP( is_64bit ? TOP_cvtsi2sdq: TOP_cvtsi2ssq, dest1, tmp3, bb_else_ops );
+
+    Build_OP( is_64bit ?  TOP_addsd :  TOP_addss,
 	      tmp_dest, dest1, dest1, bb_else_ops );
 
     total_bb_insts = 0;
@@ -3666,7 +3733,7 @@ static void Expand_Unsigned_Long_To_Float( TN* dest, TN* src, TYPE_ID mtype, OPS
   }
 
   if( tmp_dest != dest ){
-    Build_OP( mtype == MTYPE_F8 ? TOP_movsd : TOP_movss, dest, tmp_dest, ops );
+	Build_OP( mtype == MTYPE_F8 ?  TOP_movsd : TOP_movss, dest, tmp_dest, ops );
   }
 
   Cur_BB = bb_exit;
@@ -3883,7 +3950,8 @@ Expand_Int_To_Float (TN *dest, TN *src, TYPE_ID imtype, TYPE_ID fmtype, OPS *ops
     } else if( MTYPE_bit_size(imtype) == 32 ){
       if( MTYPE_is_signed(imtype) )
 #ifdef KEY //cvt signed integer to single precision scalar
-       if(Is_Target_Barcelona()){
+       if(Is_Target_Barcelona() ||
+	   	Is_Target_Orochi()){
          TN *tmp_dest = Build_TN_Like(dest);
          Build_OP(TOP_movg2x, tmp_dest, src, ops);
          src = tmp_dest;
@@ -3932,7 +4000,7 @@ Expand_Int_To_Float (TN *dest, TN *src, TYPE_ID imtype, TYPE_ID fmtype, OPS *ops
 
       if( MTYPE_is_signed(imtype) ){
 #ifdef KEY
-        if(Is_Target_Barcelona()){
+        if(Is_Target_Barcelona()|| Is_Target_Orochi()){
          TN *tmp_dest = Build_TN_Like(dest);
          Build_OP(TOP_movg2x, tmp_dest, src, ops); 
          src = tmp_dest;
@@ -3967,6 +4035,12 @@ Expand_Int_To_Float (TN *dest, TN *src, TYPE_ID imtype, TYPE_ID fmtype, OPS *ops
       top = TOP_cvtsi2sdq; // bug 3082 workaround, others should not reach here
 	else if(imtype == MTYPE_V16I8) 
       top = TOP_cvtdq2ps;
+  } else if (fmtype == MTYPE_V32F8) {
+      if(imtype == MTYPE_V16I4)
+	  	top = TOP_vcvtdq2pd_f128_ofloat_float;
+  } else if (fmtype == MTYPE_V32F4) {
+      if(imtype == MTYPE_V32I4)
+	  	top = TOP_vcvtdq2ps_f256_ofloat_float;
   }
 
   FmtAssert( top != TOP_UNDEFINED, ("Expand_Int_To_Float: Undefined opcode") );
@@ -4092,9 +4166,9 @@ Expand_Select (
     Exp_Store( imtype, tmp2, st, 0, ops, 0 );
     Exp_Load( fmtype, fmtype, tmp3, st, 0, ops, 0 );
 #endif
-    Build_OP( is_double ? TOP_andpd : TOP_andps, tmp4, true_tn, tmp3, ops );
-    Build_OP( is_double ? TOP_andnpd : TOP_andnps, tmp5, tmp3, false_tn, ops );
-    Build_OP( is_double ? TOP_orpd : TOP_orps, dest_tn, tmp5, tmp4, ops );
+    Build_OP( is_double ? TOP_andpd :  TOP_andps, tmp4, true_tn, tmp3, ops );
+    Build_OP( is_double ?  TOP_andnpd : TOP_andnps, tmp5, tmp3, false_tn, ops );
+    Build_OP( is_double ?  TOP_orpd : TOP_orps, dest_tn, tmp5, tmp4, ops );
 
   } else {
     FmtAssert(FALSE, ("Handle this case"));
@@ -4125,11 +4199,17 @@ Expand_Min (TN *dest, TN *src1, TN *src2, TYPE_ID mtype, OPS *ops)
 	     !MTYPE_is_quad( mtype ) ){
     switch(mtype) {
     case MTYPE_V16F4:
-      Build_OP( TOP_fmin128v32, dest, src1, src2, ops );      
+      Build_OP(Target_AVX ? TOP_vminps_f128_ofloat_float_float: TOP_fmin128v32, dest, src1, src2, ops );      
       break;
     case MTYPE_V16F8:
-      Build_OP( TOP_fmin128v64, dest, src1, src2, ops );      
+      Build_OP(Target_AVX ? TOP_vminpd_f128_ofloat_float_float: TOP_fmin128v64, dest, src1, src2, ops );      
       break;
+	case MTYPE_V32F4:
+	  Build_OP(TOP_vminps_f256_ofloat_float_float, dest, src1, src2, ops);
+	  break;
+	case MTYPE_V32F8:
+	  Build_OP(TOP_vminpd_f128_ofloat_float_float, dest, src1, src2, ops);
+	  break;
     default:
       Build_OP( mtype == MTYPE_F8 ? TOP_minsd : TOP_minss, 
 		dest, src1, src2, ops );
@@ -4143,27 +4223,27 @@ Expand_Min (TN *dest, TN *src1, TN *src2, TYPE_ID mtype, OPS *ops)
       TN *tmp4 = Build_TN_Like(src1); 
       TN *tmp5 = Build_TN_Like(src1); 
       TN *tmp6 = Build_TN_Like(src1); 
-      Build_OP( TOP_movdq, tmp1, src1, ops );
-      Build_OP( TOP_movdq, tmp2, tmp1, ops );
-      Build_OP( TOP_movdq, tmp3, src2, ops );
+      Build_OP( (Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq), tmp1, src1, ops );
+      Build_OP( (Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq), tmp2, tmp1, ops );
+      Build_OP( (Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq), tmp3, src2, ops );
       switch(mtype){
         case MTYPE_V16I1: //added for bug 5695, refer to 8676
-            Build_OP( TOP_xor128v8, tmp4, tmp1, tmp3, ops );
-            Build_OP( TOP_cmpgt128v8, tmp5, tmp3, tmp2, ops );
-            Build_OP( TOP_and128v8, tmp6, tmp5, tmp4, ops );
-            Build_OP( TOP_xor128v8, dest, tmp6, tmp3, ops );
+            Build_OP( Target_AVX ? TOP_vpxor_f128_ofloat_float_float: TOP_xor128v8, tmp4, tmp1, tmp3, ops );
+            Build_OP( Target_AVX ? TOP_vpcmpgtb_f128_ofloat_float_float: TOP_cmpgt128v8, tmp5, tmp3, tmp2, ops );
+            Build_OP( Target_AVX ? TOP_vpand_f128_ofloat_float_float: TOP_and128v8, tmp6, tmp5, tmp4, ops );
+            Build_OP( Target_AVX ? TOP_vpxor_f128_ofloat_float_float : TOP_xor128v8, dest, tmp6, tmp3, ops );
             break;
         case MTYPE_V16I2: //added for bug 5695, refer to 8676
-            Build_OP( TOP_xor128v16, tmp4, tmp1, tmp3, ops );
-            Build_OP( TOP_cmpgt128v16, tmp5, tmp3, tmp2, ops );
-            Build_OP( TOP_and128v16, tmp6, tmp5, tmp4, ops );
-            Build_OP( TOP_xor128v16, dest, tmp6, tmp3, ops );
+            Build_OP( Target_AVX? TOP_vpxor_f128_ofloat_float_float: TOP_xor128v16, tmp4, tmp1, tmp3, ops );
+            Build_OP( Target_AVX? TOP_vpcmpgtw_f128_ofloat_float_float: TOP_cmpgt128v16, tmp5, tmp3, tmp2, ops );
+            Build_OP( Target_AVX? TOP_vpand_f128_ofloat_float_float: TOP_and128v16, tmp6, tmp5, tmp4, ops );
+            Build_OP( Target_AVX? TOP_vpxor_f128_ofloat_float_float: TOP_xor128v16, dest, tmp6, tmp3, ops );
             break;
         case MTYPE_V16I4: /// original one
-            Build_OP( TOP_xor128v32, tmp4, tmp1, tmp3, ops );
-            Build_OP( TOP_cmpgt128v32, tmp5, tmp3, tmp2, ops );
-            Build_OP( TOP_and128v32, tmp6, tmp5, tmp4, ops );
-            Build_OP( TOP_xor128v32, dest, tmp6, tmp3, ops );
+            Build_OP( Target_AVX? TOP_vpxor_f128_ofloat_float_float: TOP_xor128v32, tmp4, tmp1, tmp3, ops );
+            Build_OP( Target_AVX? TOP_vpcmpgtd_f128_ofloat_float_float: TOP_cmpgt128v32, tmp5, tmp3, tmp2, ops );
+            Build_OP( Target_AVX? TOP_vpand_f128_ofloat_float_float: TOP_and128v32, tmp6, tmp5, tmp4, ops );
+            Build_OP( Target_AVX? TOP_vpxor_f128_ofloat_float_float:  TOP_xor128v32, dest, tmp6, tmp3, ops );
             break;
          default:
             FmtAssert(FALSE, ("NYI"));
@@ -4223,11 +4303,17 @@ Expand_Max (TN *dest, TN *src1, TN *src2, TYPE_ID mtype, OPS *ops)
 	     !MTYPE_is_quad(mtype) ){
     switch(mtype) {
     case MTYPE_V16F4:
-      Build_OP( TOP_fmax128v32, dest, src1, src2, ops );      
+      Build_OP( Target_AVX? TOP_vmaxps_f128_ofloat_float_float: TOP_fmax128v32, dest, src1, src2, ops );      
       break;
     case MTYPE_V16F8:
-      Build_OP( TOP_fmax128v64, dest, src1, src2, ops );      
+      Build_OP( Target_AVX? TOP_vmaxpd_f128_ofloat_float_float: TOP_fmax128v64, dest, src1, src2, ops );      
       break;
+	case MTYPE_V32F4:
+	  Build_OP(TOP_vmaxps_f256_ofloat_float_float, dest, src1, src2, ops);
+	  break;
+	case MTYPE_V32F8:
+	  Build_OP(TOP_vmaxpd_f128_ofloat_float_float, dest, src1, src2, ops);
+	  break;
     default:
       Build_OP( mtype == MTYPE_F8 ? TOP_maxsd : TOP_maxss, 
 		dest, src1, src2, ops );
@@ -4241,27 +4327,27 @@ Expand_Max (TN *dest, TN *src1, TN *src2, TYPE_ID mtype, OPS *ops)
       TN *tmp4 = Build_TN_Like(src1); 
       TN *tmp5 = Build_TN_Like(src1); 
       TN *tmp6 = Build_TN_Like(src1); 
-      Build_OP( TOP_movdq, tmp1, src1, ops );
-      Build_OP( TOP_movdq, tmp2, tmp1, ops );
-      Build_OP( TOP_movdq, tmp3, src2, ops );
+      Build_OP( (Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq), tmp1, src1, ops );
+      Build_OP( (Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq), tmp2, tmp1, ops );
+      Build_OP( (Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq), tmp3, src2, ops );
       switch(mtype){
         case MTYPE_V16I1: /// added for bug 8676
-            Build_OP( TOP_xor128v8, tmp4, tmp1, tmp3, ops );
-            Build_OP( TOP_cmpgt128v8, tmp5, tmp2, tmp3, ops );
-            Build_OP( TOP_and128v8, tmp6, tmp5, tmp4, ops );
-            Build_OP( TOP_xor128v8, dest, tmp6, tmp3, ops );
+            Build_OP(Target_AVX? TOP_vpxor_f128_ofloat_float_float: TOP_xor128v8, tmp4, tmp1, tmp3, ops );
+            Build_OP(Target_AVX? TOP_vpcmpgtb_f128_ofloat_float_float: TOP_cmpgt128v8, tmp5, tmp2, tmp3, ops );
+            Build_OP(Target_AVX? TOP_vpand_f128_ofloat_float_float: TOP_and128v8, tmp6, tmp5, tmp4, ops );
+            Build_OP(Target_AVX? TOP_vpxor_f128_ofloat_float_float: TOP_xor128v8, dest, tmp6, tmp3, ops );
             break;
         case MTYPE_V16I2: /// added for bug 8676
-	    Build_OP( TOP_xor128v16, tmp4, tmp1, tmp3, ops );
-            Build_OP( TOP_cmpgt128v16, tmp5, tmp2, tmp3, ops );
-            Build_OP( TOP_and128v16, tmp6, tmp5, tmp4, ops );
-            Build_OP( TOP_xor128v16, dest, tmp6, tmp3, ops );
+	    Build_OP(Target_AVX? TOP_vpxor_f128_ofloat_float_float:  TOP_xor128v16, tmp4, tmp1, tmp3, ops );
+            Build_OP(Target_AVX? TOP_vpcmpgtw_f128_ofloat_float_float: TOP_cmpgt128v16, tmp5, tmp2, tmp3, ops );
+            Build_OP(Target_AVX? TOP_vpand_f128_ofloat_float_float: TOP_and128v16, tmp6, tmp5, tmp4, ops );
+            Build_OP(Target_AVX? TOP_vpxor_f128_ofloat_float_float: TOP_xor128v16, dest, tmp6, tmp3, ops );
             break;
         case MTYPE_V16I4: /// original one
-	    Build_OP( TOP_xor128v32, tmp4, tmp1, tmp3, ops );
-	    Build_OP( TOP_cmpgt128v32, tmp5, tmp2, tmp3, ops );
-	    Build_OP( TOP_and128v32, tmp6, tmp5, tmp4, ops );
-	    Build_OP( TOP_xor128v32, dest, tmp6, tmp3, ops );
+	    Build_OP(Target_AVX? TOP_vpxor_f128_ofloat_float_float: TOP_xor128v32, tmp4, tmp1, tmp3, ops );
+	    Build_OP(Target_AVX? TOP_vpcmpgtd_f128_ofloat_float_float: TOP_cmpgt128v32, tmp5, tmp2, tmp3, ops );
+	    Build_OP(Target_AVX? TOP_vpand_f128_ofloat_float_float: TOP_and128v32, tmp6, tmp5, tmp4, ops );
+	    Build_OP(Target_AVX? TOP_vpxor_f128_ofloat_float_float: TOP_xor128v32, dest, tmp6, tmp3, ops );
             break;
          default:
             FmtAssert(FALSE, ("NYI"));
@@ -4323,13 +4409,21 @@ Expand_MinMax (TN *dest_min, TN *dest_max,
 	     !MTYPE_is_quad(mtype) ){
     switch(mtype) {
     case MTYPE_V16F4:
-      Build_OP( TOP_fmin128v32, dest_min, src1, src2, ops );      
-      Build_OP( TOP_fmax128v32, dest_max, src1, src2, ops );      
+      Build_OP( Target_AVX? TOP_vminps_f128_ofloat_float_float : TOP_fmin128v32, dest_min, src1, src2, ops );      
+      Build_OP( Target_AVX? TOP_vmaxps_f128_ofloat_float_float : TOP_fmax128v32, dest_max, src1, src2, ops );      
       break;
     case MTYPE_V16F8:
-      Build_OP( TOP_fmin128v64, dest_min, src1, src2, ops );      
-      Build_OP( TOP_fmax128v64, dest_max, src1, src2, ops );      
+      Build_OP( Target_AVX ? TOP_vminpd_f128_ofloat_float_float : TOP_fmin128v64, dest_min, src1, src2, ops );      
+      Build_OP( Target_AVX ? TOP_vmaxpd_f128_ofloat_float_float : TOP_fmax128v64, dest_max, src1, src2, ops );      
       break;
+	case MTYPE_V32F4:
+	  Build_OP(TOP_vminps_f256_ofloat_float_float, dest_min, src1, src2, ops);
+	  Build_OP(TOP_vmaxps_f256_ofloat_float_float, dest_max, src1, src2, ops);
+	  break;
+	case MTYPE_V32F8:
+	  Build_OP(TOP_vminpd_f256_ofloat_float_float, dest_min, src1, src2, ops);
+	  Build_OP(TOP_vmaxpd_f256_ofloat_float_float, dest_min, src1, src2, ops);
+	  break;
     default:
       Build_OP( mtype == MTYPE_F8 ? TOP_minsd : TOP_minss, 
 		dest_min, src1, src2, ops );
@@ -4348,15 +4442,15 @@ Expand_MinMax (TN *dest_min, TN *dest_max,
       TN *tmp6 = Build_TN_Like(src1); 
       TN *tmp7 = Build_TN_Like(src1); 
       
-      Build_OP( TOP_movdq, tmp1, src1, ops );
-      Build_OP( TOP_movdq, tmp2, tmp1, ops );
-      Build_OP( TOP_movdq, tmp3, tmp1, ops );      
-      Build_OP( TOP_movdq, tmp4, src2, ops );
-      Build_OP( TOP_cmpgt128v32, tmp5, tmp2, tmp4, ops );
-      Build_OP( TOP_xor128v32, tmp6, tmp3, tmp4, ops );
-      Build_OP( TOP_and128v32, tmp7, tmp5, tmp6, ops );
-      Build_OP( TOP_xor128v32, dest_max, tmp4, tmp7, ops );
-      Build_OP( TOP_xor128v32, dest_min, tmp1, tmp7, ops );
+      Build_OP( Target_AVX ? TOP_vmovdqa_f128_ofloat_float: TOP_movdq, tmp1, src1, ops );
+      Build_OP( Target_AVX ? TOP_vmovdqa_f128_ofloat_float: TOP_movdq, tmp2, tmp1, ops );
+      Build_OP( Target_AVX ? TOP_vmovdqa_f128_ofloat_float: TOP_movdq, tmp3, tmp1, ops );      
+      Build_OP( Target_AVX ? TOP_vmovdqa_f128_ofloat_float: TOP_movdq, tmp4, src2, ops );
+      Build_OP( Target_AVX ? TOP_vpcmpgtd_f128_ofloat_float_float : TOP_cmpgt128v32, tmp5, tmp2, tmp4, ops );
+      Build_OP( Target_AVX ? TOP_vpxor_f128_ofloat_float_float : TOP_xor128v32, tmp6, tmp3, tmp4, ops );
+      Build_OP( Target_AVX ? TOP_vpand_f128_ofloat_float_float : TOP_and128v32, tmp7, tmp5, tmp6, ops );
+      Build_OP( Target_AVX ? TOP_vpxor_f128_ofloat_float_float : TOP_xor128v32, dest_max, tmp4, tmp7, ops );
+      Build_OP( Target_AVX ? TOP_vpxor_f128_ofloat_float_float : TOP_xor128v32, dest_min, tmp1, tmp7, ops );
     } else
       FmtAssert(FALSE, ("NYI"));
 
@@ -4485,31 +4579,31 @@ Exp_Stid_And_VComp(
   if (MTYPE_is_float(desc)) {
     TN* ctrl = Generate_Cmp_Ctrl_TN( compare_opr );  
 
-    Build_OP( (OPCODE_desc(compare) == MTYPE_V16I8 ) ? TOP_cmppd : TOP_cmpps,
+      Build_OP( (OPCODE_desc(compare) == MTYPE_V16I8 ) ? TOP_cmppd : TOP_cmpps,
 		 result, cmp_kid1, cmp_kid2, ctrl, ops);
   }
   else {
     BOOL rev_condition = FALSE;
     switch( OPCODE_operator(compare) ){
     case OPR_EQ: 
-      Build_OP(TOP_cmpeq128v32, result, cmp_kid1, cmp_kid2, ops);
+      Build_OP(Target_AVX? TOP_vpcmpeqw_f128_ofloat_float_float: TOP_cmpeq128v32, result, cmp_kid1, cmp_kid2, ops);
       break;
     case OPR_NE:
-      Build_OP(TOP_cmpeq128v32, result, cmp_kid1, cmp_kid2, ops);
+      Build_OP(Target_AVX? TOP_vpcmpeqw_f128_ofloat_float_float : TOP_cmpeq128v32, result, cmp_kid1, cmp_kid2, ops);
       rev_condition = TRUE;
       break;
     case OPR_GT:
-      Build_OP(TOP_cmpgt128v32, result, cmp_kid1, cmp_kid2, ops);
+      Build_OP(Target_AVX? TOP_vpcmpgtw_f128_ofloat_float_float : TOP_cmpgt128v32, result, cmp_kid1, cmp_kid2, ops);
       break;
     case OPR_LE: 
-      Build_OP(TOP_cmpgt128v32, result, cmp_kid1, cmp_kid2, ops);
+      Build_OP(Target_AVX? TOP_vpcmpgtw_f128_ofloat_float_float : TOP_cmpgt128v32, result, cmp_kid1, cmp_kid2, ops);
       rev_condition = TRUE;
       break;
     case OPR_LT:
-      Build_OP(TOP_cmpgt128v32, result, cmp_kid2, cmp_kid1, ops);
+      Build_OP(Target_AVX ? TOP_vpcmpgtw_f128_ofloat_float_float : TOP_cmpgt128v32, result, cmp_kid2, cmp_kid1, ops);
       break;
     case OPR_GE:
-      Build_OP(TOP_cmpgt128v32, result, cmp_kid2, cmp_kid1, ops);
+      Build_OP(Target_AVX ? TOP_vpcmpgtw_f128_ofloat_float_float : TOP_cmpgt128v32, result, cmp_kid2, cmp_kid1, ops);
       rev_condition = TRUE;
       break;
     }
@@ -4562,7 +4656,7 @@ Exp_Select_And_VLdid(
   TN* tmp1 = Build_TN_Like(result);
   TN* tmp2 = Build_TN_Like(result);
 
-  Build_OP( is_rsize_double ? TOP_andpd : TOP_andps, tmp1, true_tn, vldid, &new_ops );
+  Build_OP( is_rsize_double ?  TOP_andpd : TOP_andps, tmp1, true_tn, vldid, &new_ops );
   Build_OP( is_rsize_double ? TOP_andnpd : TOP_andnps, tmp2, vldid, false_tn, &new_ops );
   Build_OP( is_rsize_double ? TOP_orpd : TOP_orps, result, tmp2, tmp1, &new_ops );
 
@@ -4733,7 +4827,7 @@ Exp_Select_And_Condition (
 		  tmp1, cmp_kid1, cmp_kid2, ctrl, &new_ops );
 	is_rsize_double = (select_type == MTYPE_V16F8) ? TRUE : FALSE;
       } else {
-	Build_OP(is_ssize_double ? TOP_cmpsd : TOP_cmpss,
+	Build_OP(is_ssize_double ?  TOP_cmpsd : TOP_cmpss,
 		 tmp1, cmp_kid1, cmp_kid2, ctrl, &new_ops );
         if (!is_ssize_double && is_rsize_double) {
 	  // cmpss sets the low-order 32 bits.  Extend these 32 bits to 64
@@ -4745,7 +4839,7 @@ Exp_Select_And_Condition (
 	  tmp1 = cmp_64bit_result;
 	}
       }
-      Build_OP( is_rsize_double ? TOP_andpd : TOP_andps, result, 
+      Build_OP( is_rsize_double ?  TOP_andpd : TOP_andps, result, 
       		false_tn, tmp1, &new_ops );
     
       if( Trace_Exp ){
@@ -4758,39 +4852,43 @@ Exp_Select_And_Condition (
     BOOL rev_condition = FALSE;
     if ( MTYPE_is_vector ( desc ) ) {
       if ( MTYPE_is_float ( desc ) ) {
-	Build_OP( ( select_type == MTYPE_V16F8 ) ? TOP_cmppd : TOP_cmpps,
-		  tmp1, cmp_kid1, cmp_kid2, ctrl, &new_ops );
-	is_rsize_double = (select_type == MTYPE_V16F8) ? TRUE : FALSE;
+	  	if(Target_AVX)
+		  Build_OP( (select_type == MTYPE_V16F8) ? TOP_vcmppd_f128_ofloat_float_float_simm8 : TOP_vcmpps_f128_ofloat_float_float_simm8,
+		    tmp1, cmp_kid1, cmp_kid2, ctrl, &new_ops);
+		else
+	      Build_OP( ( select_type == MTYPE_V16F8 ) ? TOP_cmppd : TOP_cmpps,
+		    tmp1, cmp_kid1, cmp_kid2, ctrl, &new_ops );
+	    is_rsize_double = (select_type == MTYPE_V16F8) ? TRUE : FALSE;
       }
       else {
 	FmtAssert(desc == MTYPE_V16I4,
 		  ("Expand_Select_And_COndition: unexpected vector type"));
 	switch( compare_opr ){
 	case OPR_EQ: 
-	  Build_OP(TOP_cmpeq128v32, tmp1, cmp_kid1, cmp_kid2, &new_ops);
+	  Build_OP( Target_AVX? TOP_vpcmpeqw_f128_ofloat_float_float : TOP_cmpeq128v32, tmp1, cmp_kid1, cmp_kid2, &new_ops);
 	  break;
 	case OPR_NE:
-	  Build_OP(TOP_cmpeq128v32, tmp1, cmp_kid1, cmp_kid2, &new_ops);
+	  Build_OP( Target_AVX? TOP_vpcmpeqw_f128_ofloat_float_float : TOP_cmpeq128v32, tmp1, cmp_kid1, cmp_kid2, &new_ops);
 	  rev_condition = TRUE;
 	  break;
 	case OPR_GT:
-	  Build_OP(TOP_cmpgt128v32, tmp1, cmp_kid1, cmp_kid2, &new_ops);
+	  Build_OP( Target_AVX? TOP_vpcmpgtw_f128_ofloat_float_float : TOP_cmpgt128v32, tmp1, cmp_kid1, cmp_kid2, &new_ops);
 	  break;
 	case OPR_LE: 
-	  Build_OP(TOP_cmpgt128v32, tmp1, cmp_kid1, cmp_kid2, &new_ops);
+	  Build_OP( Target_AVX? TOP_vpcmpgtw_f128_ofloat_float_float : TOP_cmpgt128v32, tmp1, cmp_kid1, cmp_kid2, &new_ops);
 	  rev_condition = TRUE;
 	  break;
 	case OPR_LT:
-	  Build_OP(TOP_cmpgt128v32, tmp1, cmp_kid2, cmp_kid1, &new_ops);
+	  Build_OP( Target_AVX? TOP_vpcmpgtw_f128_ofloat_float_float : TOP_cmpgt128v32, tmp1, cmp_kid2, cmp_kid1, &new_ops);
 	  break;
 	case OPR_GE:
-	  Build_OP(TOP_cmpgt128v32, tmp1, cmp_kid2, cmp_kid1, &new_ops);
+	  Build_OP( Target_AVX? TOP_vpcmpgtw_f128_ofloat_float_float : TOP_cmpgt128v32, tmp1, cmp_kid2, cmp_kid1, &new_ops);
 	  rev_condition = TRUE;
 	  break;
 	}
       }
     } else {
-      Build_OP(is_ssize_double ? TOP_cmpsd : TOP_cmpss,
+      Build_OP(is_ssize_double ?  TOP_cmpsd :  TOP_cmpss,
 	       tmp1, cmp_kid1, cmp_kid2, ctrl, &new_ops );
       if (!is_ssize_double && is_rsize_double) {
 	// cmpss sets the low-order 32 bits.  Extend these 32 bits to 64 bits.
@@ -4809,24 +4907,24 @@ Exp_Select_And_Condition (
 	 tmp3 := pand  <tmp1>, <tmp2>
 	 <result> := pxor <tmp3>, <false_tn>
       */
-      Build_OP(TOP_xor128v32, tmp2, true_tn, false_tn, &new_ops);
+      Build_OP( Target_AVX? TOP_vpxor_f128_ofloat_float_float : TOP_xor128v32, tmp2, true_tn, false_tn, &new_ops);
       if (! rev_condition) {
-	Build_OP(TOP_and128v32, tmp3, tmp1, tmp2, &new_ops);
-	Build_OP(TOP_xor128v32, result, tmp3, false_tn, &new_ops);
+	Build_OP( Target_AVX ? TOP_vpand_f128_ofloat_float_float : TOP_and128v32, tmp3, tmp1, tmp2, &new_ops);
+	Build_OP( Target_AVX ? TOP_vpxor_f128_ofloat_float_float : TOP_xor128v32, result, tmp3, false_tn, &new_ops);
       }
       else {
-	Build_OP(TOP_and128v32, tmp3, tmp1, tmp2, &new_ops);
-	Build_OP(TOP_xor128v32, result, tmp3, true_tn, &new_ops);
+	Build_OP( Target_AVX ? TOP_vpand_f128_ofloat_float_float : TOP_and128v32, tmp3, tmp1, tmp2, &new_ops);
+	Build_OP( Target_AVX ? TOP_vpxor_f128_ofloat_float_float : TOP_xor128v32, result, tmp3, true_tn, &new_ops);
       }
     }
     else {
       if (! rev_condition) {
-	Build_OP( is_rsize_double ? TOP_andpd : TOP_andps, tmp2, tmp1, true_tn, &new_ops );
-	Build_OP( is_rsize_double ? TOP_andnpd : TOP_andnps, tmp3, tmp1, false_tn, &new_ops );
+	Build_OP( is_rsize_double ?  TOP_andpd : TOP_andps, tmp2, tmp1, true_tn, &new_ops );
+	Build_OP( is_rsize_double ?  TOP_andnpd :  TOP_andnps, tmp3, tmp1, false_tn, &new_ops );
       }
       else {
-	Build_OP( is_rsize_double ? TOP_andnpd : TOP_andnps, tmp2, tmp1, true_tn, &new_ops );
-	Build_OP( is_rsize_double ? TOP_andpd : TOP_andps, tmp3, tmp1, false_tn, &new_ops );
+	Build_OP( is_rsize_double ?  TOP_andnpd : TOP_andnps, tmp2, tmp1, true_tn, &new_ops );
+	Build_OP( is_rsize_double ?  TOP_andpd :  TOP_andps, tmp3, tmp1, false_tn, &new_ops );
       }
       Build_OP( is_rsize_double ? TOP_orpd : TOP_orps, result, tmp3, tmp2, &new_ops );
     }
@@ -5142,7 +5240,7 @@ Expand_Fast_Sqrt (TN *result, TN *src, TYPE_ID mtype, OPS *ops)
     Build_OP( TOP_xzero32, tmp0, ops);
     Build_OP( TOP_cmpneqss, tmp1, tmp0, src, ops );
     Build_OP( TOP_rsqrtss, tmp2, src, ops );
-    Build_OP( TOP_fand128v32, tmp3, tmp2, tmp1, ops );
+    Build_OP( (Target_AVX? TOP_vandps_f128_ofloat_float_float : TOP_fand128v32), tmp3, tmp2, tmp1, ops );
     Build_OP( TOP_mulss, tmp4, tmp3, src, ops );
     Build_OP( TOP_mulss, tmp5, tmp4, tmp3, ops );
     Expand_Const( const0, Gen_Const_Symbol_TN( 0x40400000, 0.0, MTYPE_I4 ),
@@ -5153,28 +5251,33 @@ Expand_Fast_Sqrt (TN *result, TN *src, TYPE_ID mtype, OPS *ops)
 		  mtype, ops );
     Build_OP( TOP_mulss, result, tmp7, const1, ops );    
 
-  } else { // mtype == MTYPE_V16F4
-    Build_OP( TOP_xzero128v32, tmp0, ops);
-    Build_OP( TOP_cmpneqps, tmp1, tmp0, src, ops );
-    Build_OP( TOP_frsqrt128v32, tmp2, src, ops );
-    Build_OP( TOP_fand128v32, tmp3, tmp2, tmp1, ops );
-    Build_OP( TOP_fmul128v32, tmp4, tmp3, src, ops );
-    Build_OP( TOP_fmul128v32, tmp5, tmp4, tmp3, ops );
+  } else if(mtype == MTYPE_V16F4) { // mtype == MTYPE_V16F4
+    Build_OP( Target_AVX ? TOP_vxzero128v32 : TOP_xzero128v32, tmp0, ops);
+	if(Target_AVX)
+	  Build_OP(TOP_vcmpps_f128_ofloat_float_float_simm8, tmp1, tmp0, src, Gen_Literal_TN(4, 2), ops);
+	else
+      Build_OP( TOP_cmpneqps, tmp1, tmp0, src, ops );
+    Build_OP( Target_AVX ? TOP_vrsqrtps_f128_ofloat_float : TOP_frsqrt128v32, tmp2, src, ops );
+    Build_OP( Target_AVX ? TOP_vandps_f128_ofloat_float_float : TOP_fand128v32, tmp3, tmp2, tmp1, ops );
+    Build_OP( Target_AVX ? TOP_vmulps_f128_ofloat_float_float : TOP_fmul128v32, tmp4, tmp3, src, ops );
+    Build_OP( Target_AVX ? TOP_vmulps_f128_ofloat_float_float : TOP_fmul128v32, tmp5, tmp4, tmp3, ops );
     TCON then0 = Host_To_Targ (MTYPE_I4, 0x40400000);
     TCON now0  = Create_Simd_Const (MTYPE_V16F4, then0);
     ST *sym0 = New_Const_Sym (Enter_tcon (now0), Be_Type_Tbl(TCON_ty(now0)));
     Allocate_Object(sym0);
     TN *sym_tn0 = Gen_Symbol_TN(sym0, 0, 0);
     Exp_Load(mtype, mtype, const0, TN_var(sym_tn0), TN_offset(sym_tn0), ops, 0);
-    Build_OP( TOP_fsub128v32, tmp6, tmp5, const0, ops );
-    Build_OP( TOP_fmul128v32, tmp7, tmp6, tmp4, ops );
+    Build_OP( Target_AVX ? TOP_vsubps_f128_ofloat_float_float : TOP_fsub128v32, tmp6, tmp5, const0, ops );
+    Build_OP( Target_AVX ? TOP_vmulps_f128_ofloat_float_float : TOP_fmul128v32, tmp7, tmp6, tmp4, ops );
     TCON then1 = Host_To_Targ (MTYPE_I4, 0xbf000000);
     TCON now1  = Create_Simd_Const (MTYPE_V16F4, then1);
     ST *sym1 = New_Const_Sym (Enter_tcon (now1), Be_Type_Tbl(TCON_ty(now1)));
     Allocate_Object(sym1);
     TN *sym_tn1 = Gen_Symbol_TN(sym1, 0, 0);
     Exp_Load(mtype, mtype, const1, TN_var(sym_tn1), TN_offset(sym_tn1), ops, 0);
-    Build_OP( TOP_fmul128v32, result, tmp7, const1, ops );        
+    Build_OP( Target_AVX ? TOP_vmulps_f128_ofloat_float_float : TOP_fmul128v32, result, tmp7, const1, ops );        
+  }else{
+   FmtAssert(FALSE, ("NYI MAYBE V32F4 sqrt"));
   }
 
   return;
@@ -5195,11 +5298,17 @@ Expand_Sqrt (TN *result, TN *src, TYPE_ID mtype, OPS *ops)
 
   switch(mtype) {
   case MTYPE_V16F4:
-    Build_OP(TOP_fsqrt128v32, result, src, ops);
+    Build_OP( Target_AVX ? TOP_vsqrtps_f128_ofloat_float : TOP_fsqrt128v32, result, src, ops);
     break;
   case MTYPE_V16F8:
-    Build_OP(TOP_fsqrt128v64, result, src, ops);
+    Build_OP( Target_AVX ? TOP_vsqrtpd_f128_ofloat_float : TOP_fsqrt128v64, result, src, ops);
     break;
+  case MTYPE_V32F4:
+  	Build_OP(TOP_vsqrtps_f256_ofloat_float, result, src, ops);
+	break;
+  case MTYPE_V32F8:
+  	Build_OP(TOP_vsqrtpd_f128_ofloat_float, result, src, ops);
+	break;
   default:    
     if( MTYPE_is_quad(mtype) ||
 	!Is_Target_SSE2() )
@@ -5337,13 +5446,13 @@ static void Expand_Recip( TN* result, TN* src2, TYPE_ID mtype, OPS* ops )
     TN *tmp2 = Build_TN_Like(result);
     TN *tmp3 = Build_TN_Like(result);
     TN *tmp4 = Build_TN_Like(result);
-    Build_OP( TOP_frcp128v32, tmp1, src2, ops );
+    Build_OP( Target_AVX ? TOP_vrcpss_f128_ofloat_float_float : TOP_frcp128v32, tmp1, src2, ops );
     // Bug 7218 - add a Newton-Raphson iteration to recip computation.
-    Build_OP( TOP_fmul128v32, tmp2, src2, tmp1, ops );
-    Build_OP( TOP_fmul128v32, tmp3, tmp2, tmp1, ops );
-    Build_OP( TOP_fadd128v32, tmp4, tmp1, tmp1, ops );
+    Build_OP( Target_AVX ? TOP_vmulps_f128_ofloat_float_float : TOP_fmul128v32, tmp2, src2, tmp1, ops );
+    Build_OP( Target_AVX ? TOP_vmulps_f128_ofloat_float_float : TOP_fmul128v32, tmp3, tmp2, tmp1, ops );
+    Build_OP( Target_AVX ? TOP_vaddps_f128_ofloat_float_float : TOP_fadd128v32, tmp4, tmp1, tmp1, ops );
 #if 1
-    Build_OP( TOP_fsub128v32, result, tmp4, tmp3, ops );      
+    Build_OP( Target_AVX ? TOP_vsubps_f128_ofloat_float_float : TOP_fsub128v32, result, tmp4, tmp3, ops );      
 #else
     // multiply result by 1.0
     TN *tmp5 = Build_TN_Like(result);
@@ -5373,6 +5482,7 @@ static void Expand_Recip( TN* result, TN* src2, TYPE_ID mtype, OPS* ops )
 
   TCON tcon;
   ST* sym;
+  FmtAssert(!(mtype== MTYPE_V32F4|| mtype== MTYPE_V32F8),("handle it later"));
 
   if (mtype == MTYPE_V16F4)
     tcon = Create_Simd_Const ( MTYPE_V16F4,  
@@ -5397,11 +5507,12 @@ static void Expand_Recip( TN* result, TN* src2, TYPE_ID mtype, OPS* ops )
 
   const BOOL non_sse2_fp = MTYPE_is_quad(mtype) || !Is_Target_SSE2();
   if (mtype == MTYPE_V16F4)    
-    Build_OP( TOP_fdiv128v32, result, src1, src2, ops );
+    Build_OP( Target_AVX? TOP_vdivps_f128_ofloat_float_float : TOP_fdiv128v32, result, src1, src2, ops );
   else if (mtype == MTYPE_V16F8)
-    Build_OP( TOP_fdiv128v64, result, src1, src2, ops );
+    Build_OP( Target_AVX? TOP_vdivpd_f128_ofloat_float_float : TOP_fdiv128v64, result, src1, src2, ops );
   else
-    Build_OP( non_sse2_fp ? TOP_fdiv : ( is_double ? TOP_divsd : TOP_divss ),
+    Build_OP( non_sse2_fp ? TOP_fdiv : ( is_double ?  TOP_divsd : 
+                                                       TOP_divss ),
 	      result, src1, src2, ops );
 }
 
@@ -5417,12 +5528,12 @@ static void Expand_Complex_Multiply( OPCODE opcode, TN *result,
     TN* tmp4 = Build_TN_Like(src1);
     TN* tmp5 = Build_TN_Like(src1);
     
-    Build_OP(TOP_fmovsldup, tmp1, src2, ops);
-    Build_OP(TOP_fmul128v32, tmp2, tmp1, src1, ops);
-    Build_OP(TOP_fmovshdup,tmp3, src2, ops);
-    Build_OP(TOP_shufps, tmp4, src1, src1, Gen_Literal_TN(177, 1), ops);
-    Build_OP(TOP_fmul128v32, tmp5, tmp3, tmp4, ops);
-    Build_OP(TOP_faddsub128v32, result, tmp2, tmp5, ops);
+    Build_OP( Target_AVX? TOP_vmovsldup_f128_ofloat_float : TOP_fmovsldup, tmp1, src2, ops);
+    Build_OP( Target_AVX? TOP_vmulps_f128_ofloat_float_float: TOP_fmul128v32, tmp2, tmp1, src1, ops);
+    Build_OP( Target_AVX? TOP_vmovshdup_f128_ofloat_float : TOP_fmovshdup,tmp3, src2, ops);
+    Build_OP( Target_AVX? TOP_vshufps_f128_ofloat_float_float_simm8: TOP_shufps, tmp4, src1, src1, Gen_Literal_TN(177, 1), ops);
+    Build_OP( Target_AVX? TOP_vmulps_f128_ofloat_float_float: TOP_fmul128v32, tmp5, tmp3, tmp4, ops);
+    Build_OP( Target_AVX? TOP_vaddsubps_f128_ofloat_float_float: TOP_faddsub128v32, result, tmp2, tmp5, ops);
 
   } else { // OPC_V16C8MPY
     // The WN simplifier always orders a multiply between an iload and a ldid 
@@ -5441,13 +5552,13 @@ static void Expand_Complex_Multiply( OPCODE opcode, TN *result,
     TN* tmp5 = Build_TN_Like(src1);
     TN* tmp6 = Build_TN_Like(src1);
     
-    Build_OP(TOP_fmovddup, tmp1, src2_t, ops);
-    Build_OP(TOP_fmul128v64, tmp2, src1_t, tmp1, ops);
-    Build_OP(TOP_shufpd, tmp3, src1_t, src1_t, Gen_Literal_TN(1, 1), ops);
-    Build_OP(TOP_shufpd, tmp4, src2_t, src2_t, Gen_Literal_TN(1, 1), ops);
-    Build_OP(TOP_fmovddup, tmp5, tmp4, ops);
-    Build_OP(TOP_fmul128v64, tmp6, tmp3, tmp5, ops);
-    Build_OP(TOP_faddsub128v64, result, tmp2, tmp6, ops);
+    Build_OP( Target_AVX? TOP_vmovddup_f128_ofloat_float: TOP_fmovddup, tmp1, src2_t, ops);
+    Build_OP( Target_AVX? TOP_vmulpd_f128_ofloat_float_float : TOP_fmul128v64, tmp2, src1_t, tmp1, ops);
+    Build_OP( Target_AVX? TOP_vshufpd_f128_ofloat_float_float_simm8 : TOP_shufpd, tmp3, src1_t, src1_t, Gen_Literal_TN(1, 1), ops);
+    Build_OP( Target_AVX? TOP_vshufpd_f128_ofloat_float_float_simm8: TOP_shufpd, tmp4, src2_t, src2_t, Gen_Literal_TN(1, 1), ops);
+    Build_OP( Target_AVX? TOP_vmovddup_f128_ofloat_float : TOP_fmovddup, tmp5, tmp4, ops);
+    Build_OP( Target_AVX? TOP_vmulpd_f128_ofloat_float_float: TOP_fmul128v64, tmp6, tmp3, tmp5, ops);
+    Build_OP( Target_AVX? TOP_vaddsubpd_f128_ofloat_float_float : TOP_faddsub128v64, result, tmp2, tmp6, ops);
   }
   return;
 }
@@ -5487,35 +5598,35 @@ static void Expand_Complex_Divide( OPCODE opcode, TN *result,
     TN* tmp27 = Build_TN_Like(src1);
     TN* tmp28 = Build_TN_Like(src1);
     
-    Build_OP(TOP_cvtps2pd, tmp1, src1, ops);
-    Build_OP(TOP_cvtps2pd, tmp2, src2, ops);
-    Build_OP(TOP_fmul128v64, tmp3, tmp2, tmp2, ops);
-    Build_OP(TOP_fmovddup, tmp4, tmp2, ops);
-    Build_OP(TOP_unpckhpd, tmp5, tmp2, tmp2, ops);
-    Build_OP(TOP_fmul128v64, tmp6, tmp5, tmp1, ops);
-    Build_OP(TOP_shufpd, tmp7, tmp1, tmp1, Gen_Literal_TN(1, 1), ops);
-    Build_OP(TOP_fmul128v64, tmp8, tmp7, tmp4, ops);
-    Build_OP(TOP_fhadd128v64, tmp9, tmp3, tmp3, ops);
-    Build_OP(TOP_shufps, tmp10, src1, src1, Gen_Literal_TN(238, 1), ops);
-    Build_OP(TOP_cvtps2pd, tmp11, tmp10, ops);
-    Build_OP(TOP_faddsub128v64, tmp12, tmp8, tmp6, ops);
-    Build_OP(TOP_shufpd, tmp13, tmp12, tmp12, Gen_Literal_TN(1, 1), ops);
-    Build_OP(TOP_fdiv128v64, tmp14, tmp13, tmp9, ops);
-    Build_OP(TOP_cvtpd2ps, tmp15, tmp14, ops);
-    Build_OP(TOP_shufps, tmp16, src2, src2, Gen_Literal_TN(238, 1), ops);
-    Build_OP(TOP_cvtps2pd, tmp17, tmp16, ops);
-    Build_OP(TOP_fmul128v64, tmp18, tmp17, tmp17, ops);
-    Build_OP(TOP_fmovddup, tmp19, tmp17, ops);
-    Build_OP(TOP_unpckhpd, tmp20, tmp17, tmp17, ops);
-    Build_OP(TOP_fmul128v64, tmp21, tmp20, tmp11, ops);
-    Build_OP(TOP_shufpd, tmp22, tmp11, tmp11, Gen_Literal_TN(1, 1), ops);
-    Build_OP(TOP_fmul128v64, tmp23, tmp22, tmp19, ops);
-    Build_OP(TOP_fhadd128v64, tmp24, tmp18, tmp18, ops);
-    Build_OP(TOP_faddsub128v64, tmp25, tmp23, tmp21, ops);
-    Build_OP(TOP_shufpd, tmp26, tmp25, tmp25, Gen_Literal_TN(1, 1), ops);
-    Build_OP(TOP_fdiv128v64, tmp27, tmp26, tmp24, ops);
-    Build_OP(TOP_cvtpd2ps, tmp28, tmp27, ops);
-    Build_OP(TOP_movlhps, result, tmp28, ops);
+    Build_OP(Target_AVX? TOP_vcvtps2pd_f128_ofloat_float : TOP_cvtps2pd, tmp1, src1, ops);
+    Build_OP(Target_AVX? TOP_vcvtps2dq_f128_ofloat_float : TOP_cvtps2pd, tmp2, src2, ops);
+    Build_OP(Target_AVX? TOP_vmulpd_f128_ofloat_float_float : TOP_fmul128v64, tmp3, tmp2, tmp2, ops);
+    Build_OP(Target_AVX? TOP_vmovddup_f128_ofloat_float : TOP_fmovddup, tmp4, tmp2, ops);
+    Build_OP(Target_AVX? TOP_vunpckhpd_f128_ofloat_float_float : TOP_unpckhpd, tmp5, tmp2, tmp2, ops);
+    Build_OP(Target_AVX? TOP_vmulpd_f128_ofloat_float_float : TOP_fmul128v64, tmp6, tmp5, tmp1, ops);
+    Build_OP(Target_AVX? TOP_vshufpd_f128_ofloat_float_float_simm8 : TOP_shufpd, tmp7, tmp1, tmp1, Gen_Literal_TN(1, 1), ops);
+    Build_OP(Target_AVX? TOP_vmulpd_f128_ofloat_float_float : TOP_fmul128v64, tmp8, tmp7, tmp4, ops);
+    Build_OP(Target_AVX? TOP_vhaddpd_f128_ofloat_float_float: TOP_fhadd128v64, tmp9, tmp3, tmp3, ops);
+    Build_OP(Target_AVX? TOP_vshufps_f128_ofloat_float_float_simm8 : TOP_shufps, tmp10, src1, src1, Gen_Literal_TN(238, 1), ops);
+    Build_OP(Target_AVX? TOP_vcvtps2pd_f128_ofloat_float : TOP_cvtps2pd, tmp11, tmp10, ops);
+    Build_OP(Target_AVX? TOP_vaddsubpd_f128_ofloat_float_float: TOP_faddsub128v64, tmp12, tmp8, tmp6, ops);
+    Build_OP(Target_AVX? TOP_vshufpd_f128_ofloat_float_float_simm8: TOP_shufpd, tmp13, tmp12, tmp12, Gen_Literal_TN(1, 1), ops);
+    Build_OP(Target_AVX? TOP_vdivpd_f128_ofloat_float_float : TOP_fdiv128v64, tmp14, tmp13, tmp9, ops);
+    Build_OP(Target_AVX? TOP_vcvtpd2ps_f128_ofloat_float: TOP_cvtpd2ps, tmp15, tmp14, ops);
+    Build_OP(Target_AVX? TOP_vshufps_f128_ofloat_float_float_simm8: TOP_shufps, tmp16, src2, src2, Gen_Literal_TN(238, 1), ops);
+    Build_OP(Target_AVX? TOP_vcvtps2pd_f128_ofloat_float : TOP_cvtps2pd, tmp17, tmp16, ops);
+    Build_OP(Target_AVX? TOP_vmulpd_f128_ofloat_float_float: TOP_fmul128v64, tmp18, tmp17, tmp17, ops);
+    Build_OP(Target_AVX? TOP_vmovddup_f128_ofloat_float: TOP_fmovddup, tmp19, tmp17, ops);
+    Build_OP(Target_AVX? TOP_vunpckhpd_f128_ofloat_float_float : TOP_unpckhpd, tmp20, tmp17, tmp17, ops);
+    Build_OP(Target_AVX? TOP_vmulpd_f128_ofloat_float_float: TOP_fmul128v64, tmp21, tmp20, tmp11, ops);
+    Build_OP(Target_AVX? TOP_vshufpd_f128_ofloat_float_float_simm8: TOP_shufpd, tmp22, tmp11, tmp11, Gen_Literal_TN(1, 1), ops);
+    Build_OP(Target_AVX? TOP_vmulpd_f128_ofloat_float_float : TOP_fmul128v64, tmp23, tmp22, tmp19, ops);
+    Build_OP(Target_AVX? TOP_vhaddpd_f128_ofloat_float_float : TOP_fhadd128v64, tmp24, tmp18, tmp18, ops);
+    Build_OP(Target_AVX ? TOP_vaddsubpd_f128_ofloat_float_float : TOP_faddsub128v64, tmp25, tmp23, tmp21, ops);
+    Build_OP(Target_AVX ? TOP_vshufpd_f128_ofloat_float_float_simm8 : TOP_shufpd, tmp26, tmp25, tmp25, Gen_Literal_TN(1, 1), ops);
+    Build_OP(Target_AVX ? TOP_vdivpd_f128_ofloat_float_float : TOP_fdiv128v64, tmp27, tmp26, tmp24, ops);
+    Build_OP(Target_AVX ? TOP_vcvtpd2ps_f128_ofloat_float : TOP_cvtpd2ps, tmp28, tmp27, ops);
+	Build_OP(TOP_movlhps, result, tmp28, ops);
     Set_OP_cond_def_kind( OPS_last(ops), OP_ALWAYS_COND_DEF );
   }
 
@@ -5572,7 +5683,7 @@ void Expand_Flop( OPCODE opcode, TN *result, TN *src1, TN *src2, TN *src3, OPS *
   switch (opcode) {
   case OPC_F4ADD:
     if( Is_Target_SSE2() ){
-      opc = TOP_addss;
+      opc =  TOP_addss;
       break;
     }  /* fall thru */
   case OPC_F8ADD:
@@ -5585,23 +5696,30 @@ void Expand_Flop( OPCODE opcode, TN *result, TN *src1, TN *src2, TN *src3, OPS *
     break;
   case OPC_V16F4ADD:
   case OPC_V16C4ADD:
-    opc = TOP_fadd128v32;
+    opc = (Target_AVX? TOP_vaddps_f128_ofloat_float_float : TOP_fadd128v32);
     break;
   case OPC_V16F8ADD:
   case OPC_V16C8ADD:
-    opc = TOP_fadd128v64;
+    opc = (Target_AVX ? TOP_vaddpd_f128_ofloat_float_float : TOP_fadd128v64);
     break;
+  case OPC_V32F4ADD:
+  	FmtAssert(Target_AVX, ("AVX instruction met without -mavx"));
+  	opc= TOP_vaddps_f256_ofloat_float_float;
+	break;
+  case OPC_V32F8ADD:
+  	opc = TOP_vaddpd_f256_ofloat_float_float;
+	break;
   case OPC_V8F4ADD:
-    opc = TOP_fadd128v32;
+    opc = (Target_AVX ? TOP_vaddps_f128_ofloat_float_float : TOP_fadd128v32);
     break;
   case OPC_F4SUB:
     if( Is_Target_SSE2() ){
-      opc = TOP_subss;
+      opc = Target_AVX? TOP_vsubss_f128_ofloat_float_float : TOP_subss;
       break;
     }  /* fall thru */
   case OPC_F8SUB:
     if( Is_Target_SSE2() ){
-      opc = TOP_subsd;
+      opc = Target_AVX? TOP_vsubsd_f128_ofloat_float_float : TOP_subsd;
       break;
     }  /* fall thru */
   case OPC_FQSUB:
@@ -5609,15 +5727,21 @@ void Expand_Flop( OPCODE opcode, TN *result, TN *src1, TN *src2, TN *src3, OPS *
     break;
   case OPC_V16F4SUB:
   case OPC_V16C4SUB:
-    opc = TOP_fsub128v32;
+    opc = (Target_AVX ? TOP_vsubps_f128_ofloat_float_float : TOP_fsub128v32);
     break;
   case OPC_V16F8SUB:
   case OPC_V16C8SUB:
-    opc = TOP_fsub128v64;
+    opc = (Target_AVX ? TOP_vsubpd_f128_ofloat_float_float : TOP_fsub128v64);
     break;
+  case OPC_V32F4SUB:
+  	opc = TOP_vsubps_f256_ofloat_float_float;
+	break;
+  case OPC_V32F8SUB:
+  	opc = TOP_vsubpd_f256_ofloat_float_float;
+	break;
   case OPC_F4MPY:
     if( Is_Target_SSE2() ){
-      opc = TOP_mulss;
+      opc =  TOP_mulss;
       break;
     }  /* fall thru */
   case OPC_F8MPY:
@@ -5629,28 +5753,123 @@ void Expand_Flop( OPCODE opcode, TN *result, TN *src1, TN *src2, TN *src3, OPS *
     opc = TOP_fmul;
     break;
   case OPC_V16F4MPY:
-    opc = TOP_fmul128v32;
+    opc = (Target_AVX? TOP_vmulps_f128_ofloat_float_float: TOP_fmul128v32);
     break;
   case OPC_V16F8MPY:
-    opc = TOP_fmul128v64;
+    opc = (Target_AVX? TOP_vmulpd_f128_ofloat_float_float : TOP_fmul128v64);
     break;
+  case OPC_V32F4MPY:
+  	opc = TOP_vmulps_f256_ofloat_float_float;
+	break;
+  case OPC_V32F8MPY:
+  	opc = TOP_vmulpd_f256_ofloat_float_float;
+	break;
   case OPC_V16I2MPY:
-    opc = TOP_mul128v16;
+    opc = (Target_AVX? TOP_vpmullw_f128_ofloat_float_float : TOP_mul128v16);
     break;
   case OPC_M8I2MPY:
-    opc = TOP_pmullw;
+    opc = (Target_AVX? TOP_vpmullw_f128_ofloat_float_float : TOP_pmullw);
     break;
   case OPC_F4MADD:	// (src2 * src3) + src1
+    if(Is_Target_Orochi()){
+      opc = TOP_vfmaddss_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+    }
   case OPC_F4NMADD:	// -((src2 * src3) + src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmsubss_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+    }
   case OPC_F4MSUB:	// (src2 * src3) - src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmsubss_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
   case OPC_F4NMSUB:	// -((src2 * src3) - src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmaddss_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
   case OPC_F8MADD:	// (src2 * src3) + src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmaddsd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
   case OPC_F8NMADD:	// -((src2 * src3) + src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmsubsd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
   case OPC_F8MSUB:	// (src2 * src3) - src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmsubsd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
   case OPC_F8NMSUB:	// -((src2 * src3) - src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmaddsd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
+  case OPC_V16F4MADD:	// (src2 * src3) + src1
+    if(Is_Target_Orochi()){
+      opc = TOP_vfmaddps_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+    }
+  case OPC_V16F4NMADD:	// -((src2 * src3) + src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmsubps_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+    }
+  case OPC_V16F4MSUB:	// (src2 * src3) - src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmsubps_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
+  case OPC_V16F4NMSUB:	// -((src2 * src3) - src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmaddps_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
+  case OPC_V16F8MADD:	// (src2 * src3) + src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmaddpd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
+  case OPC_V16F8NMADD:	// -((src2 * src3) + src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmsubpd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
+  case OPC_V16F8MSUB:	// (src2 * src3) - src1
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfmsubpd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
+  case OPC_V16F8NMSUB:	// -((src2 * src3) - src1)
+    if(Is_Target_Orochi()){
+	  opc = TOP_vfnmaddpd_f128_oxmm_xmm_xmm_xmm;
+	  Build_OP(opc, result, src2, src3, src1, ops);
+	  return;
+	}
     FmtAssert( false,
 	       ("Expand_Flop: Unsupported opcode (%s)", OPCODE_name(opcode)) );
     break;
+  
   case OPC_F4DIV:
     if( Is_Target_SSE2() ){
       opc = TOP_divss;
@@ -5668,8 +5887,14 @@ void Expand_Flop( OPCODE opcode, TN *result, TN *src1, TN *src2, TN *src3, OPS *
     opc = TOP_fdiv128v32;
     break;
   case OPC_V16F8DIV:
-    opc = TOP_fdiv128v64;
+    opc = Target_AVX? TOP_vdivpd_f128_ofloat_float_float : TOP_fdiv128v64;
     break;
+  case OPC_V32F4DIV:
+  	opc = TOP_vdivps_f256_ofloat_float_float;
+	break;
+  case OPC_V32F8DIV:
+  	opc = TOP_vdivpd_f256_ofloat_float_float;
+	break;
   case OPC_F4RECIP:
   case OPC_F8RECIP:
   case OPC_FQRECIP:
@@ -5683,9 +5908,11 @@ void Expand_Flop( OPCODE opcode, TN *result, TN *src1, TN *src2, TN *src3, OPS *
     break;
   case OPC_V16F4RSQRT:
   case OPC_V16F4ATOMIC_RSQRT:	// bug 6123
-    opc = TOP_frsqrt128v32;
+    opc = Target_AVX? TOP_vrsqrtps_f128_ofloat_float : TOP_frsqrt128v32;
     break;
-
+  case OPC_V32F4RSQRT:
+  	opc = TOP_vrsqrtps_f256_ofloat_float;
+	break;
   case OPC_V16C4MPY:
   case OPC_V16C8MPY:
     Expand_Complex_Multiply(opcode, result, src1, src2, ops);
@@ -5701,7 +5928,7 @@ void Expand_Flop( OPCODE opcode, TN *result, TN *src1, TN *src2, TN *src3, OPS *
     #pragma mips_frequency_hint NEVER
     FmtAssert(FALSE, ("Unimplemented flop: %s", OPCODE_name(opcode)));
   }
-
+  
   Build_OP( opc, result, src1, src2, ops );
 }
 
@@ -5713,7 +5940,7 @@ Expand_Replicate (OPCODE op, TN *result, TN *op1, OPS *ops)
   switch (op) {
   case OPC_V16C4F8REPLICA:
     Expand_Copy(result, op1, MTYPE_C4, ops);
-    Build_OP(TOP_shufps, result, result, op1, Gen_Literal_TN(68, 4), ops);
+    Build_OP(Target_AVX? TOP_vshufps_f128_ofloat_float_float_simm8 : TOP_shufps, result, result, op1, Gen_Literal_TN(68, 4), ops);
     break;
   case OPC_V16I8I8REPLICA:
   {
@@ -5723,12 +5950,12 @@ Expand_Replicate (OPCODE op, TN *result, TN *op1, OPS *ops)
     Exp_Store( MTYPE_I8, op1, st, 0, ops, 0);
     Exp_Load( MTYPE_F8, MTYPE_F8, tmp, st, 0, ops, 0);
     Expand_Copy(result, tmp, MTYPE_F8, ops);
-    Build_OP(TOP_unpcklpd, result, result, tmp, ops);
+    Build_OP(Target_AVX? TOP_vunpcklpd_f128_ofloat_float_float : TOP_unpcklpd, result, result, tmp, ops);
     break;
   }
   case OPC_V16F8F8REPLICA:
     Expand_Copy(result, op1, MTYPE_F8, ops);
-    Build_OP(TOP_unpcklpd, result, result, op1, ops);
+    Build_OP(Target_AVX? TOP_vunpcklpd_f128_ofloat_float_float : TOP_unpcklpd, result, result, op1, ops);
     break;
   case OPC_V16I4I4REPLICA:
   case OPC_V16I4U4REPLICA:
@@ -5740,21 +5967,42 @@ Expand_Replicate (OPCODE op, TN *result, TN *op1, OPS *ops)
     Exp_Store( mtype, op1, st, 0, ops, 0);
     Exp_Load( MTYPE_F4, MTYPE_F4, tmp, st, 0, ops, 0);
     Expand_Copy(result, tmp, MTYPE_F4, ops);
-    Build_OP(TOP_unpcklps, result, result, tmp, ops);
-    Build_OP(TOP_unpcklps, result, result, result, ops);
+    Build_OP(Target_AVX? TOP_vunpcklps_f128_ofloat_float_float : TOP_unpcklps, result, result, tmp, ops);
+    Build_OP(Target_AVX? TOP_vunpcklps_f128_ofloat_float_float : TOP_unpcklps, result, result, result, ops);
     break;
   }
   case OPC_V16F4F4REPLICA:
     Expand_Copy(result, op1, MTYPE_F4, ops);
-    Build_OP(TOP_unpcklps, result, result, op1, ops);
-    Build_OP(TOP_unpcklps, result, result, result, ops);
+    Build_OP(Target_AVX? TOP_vunpcklps_f128_ofloat_float_float : TOP_unpcklps, result, result, op1, ops);
+    Build_OP(Target_AVX? TOP_vunpcklps_f128_ofloat_float_float : TOP_unpcklps, result, result, result, ops);
     break;
+  case OPC_V32F4F4REPLICA:
+  {
+    TN *tmp3 = Build_TN_Of_Mtype(MTYPE_V16F4);
+    Expand_Copy(tmp3, op1, MTYPE_F4, ops);
+    Build_OP(TOP_vunpcklps_f128_ofloat_float_float, tmp3, tmp3, op1, ops);
+	Build_OP(TOP_vunpcklps_f128_ofloat_float_float, tmp3, tmp3, tmp3, ops);
+	Build_OP(TOP_vxzero256v32, result, ops);
+	Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, tmp3, Gen_Literal_TN(0, 1), ops);
+	Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, tmp3, Gen_Literal_TN(1, 1), ops);
+  	break;
+  }
+  case OPC_V32F8F8REPLICA:
+  {
+  	TN *tmp3 = Build_TN_Of_Mtype(MTYPE_V16F8);
+	Expand_Copy(tmp3, op1, MTYPE_F8, ops);
+	Build_OP(TOP_vunpcklpd_f128_ofloat_float_float, tmp3, tmp3, op1, ops);
+	Build_OP(TOP_vxzero256v64, result, ops);
+	Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, tmp3, Gen_Literal_TN(0, 1), ops);
+	Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, tmp3, Gen_Literal_TN(1, 1), ops);
+	break;
+  }
   case OPC_V16I2I2REPLICA:     
   {
     TN* tmp_a = Build_TN_Like(result);
     Build_OP(TOP_movg2x, tmp, op1, ops);
-    Build_OP(TOP_punpcklwd, tmp_a, tmp, tmp, ops);
-    Build_OP(TOP_pshufd, result, tmp_a, Gen_Literal_TN(0, 1), ops);
+    Build_OP(Target_AVX? TOP_vpunpcklwd_f128_ofloat_float_float : TOP_punpcklwd, tmp_a, tmp, tmp, ops);
+    Build_OP(Target_AVX? TOP_vpshufd_f128_ofloat_float_simm8 : TOP_pshufd, result, tmp_a, Gen_Literal_TN(0, 1), ops);
     break;
   }
   case OPC_V16I1I1REPLICA:
@@ -5762,9 +6010,9 @@ Expand_Replicate (OPCODE op, TN *result, TN *op1, OPS *ops)
     TN* tmp_a = Build_TN_Like(result);
     TN* tmp_b = Build_TN_Like(result);
     Build_OP(TOP_movg2x, tmp, op1, ops);
-    Build_OP(TOP_punpcklbw, tmp_a, tmp, tmp, ops);
-    Build_OP(TOP_punpcklbw, tmp_b, tmp_a, tmp_a, ops);
-    Build_OP(TOP_pshufd, result, tmp_b, Gen_Literal_TN(0, 1), ops);
+    Build_OP(Target_AVX? TOP_vpunpcklbw_f128_ofloat_float_float : TOP_punpcklbw, tmp_a, tmp, tmp, ops);
+    Build_OP(Target_AVX? TOP_vpunpcklbw_f128_ofloat_float_float : TOP_punpcklbw, tmp_b, tmp_a, tmp_a, ops);
+    Build_OP(Target_AVX? TOP_vpshufb_f128_ofloat_float_float : TOP_pshufd, result, tmp_b, Gen_Literal_TN(0, 1), ops);
     break;
   }
   default:
@@ -5781,12 +6029,12 @@ Expand_Reduce_Add (OPCODE op, TN *result, TN *op1, OPS *ops)
   case OPC_F8V16F8REDUCE_ADD: 
   {
     TN* tmp = Build_TN_Like(op1);
-    Build_OP(TOP_movapd, tmp, op1, ops);
+    Build_OP(Target_AVX? TOP_vmovapd_f128_ofloat_float : TOP_movapd, tmp, op1, ops);
     if ( Is_Target_SSE3() ) {
-      Build_OP(TOP_fhadd128v64, result, tmp, tmp, ops);
+      Build_OP(Target_AVX? TOP_vhaddpd_f128_ofloat_float_float : TOP_fhadd128v64, result, tmp, tmp, ops);
     } else {
       TN* tmp_a = Build_TN_Like(op1);
-      Build_OP(TOP_unpckhpd, tmp_a, tmp, op1, ops);
+      Build_OP(Target_AVX? TOP_vunpckhpd_f128_ofloat_float_float : TOP_unpckhpd, tmp_a, tmp, op1, ops);
       Build_OP(TOP_addsd, result, tmp, tmp_a, ops);
     }
     break;
@@ -5794,22 +6042,46 @@ Expand_Reduce_Add (OPCODE op, TN *result, TN *op1, OPS *ops)
   case OPC_F4V16F4REDUCE_ADD: 
   {
     TN* tmp = Build_TN_Like(op1);
-    Build_OP(TOP_movaps, tmp, op1, ops);
+    Build_OP(Target_AVX? TOP_vmovaps_f128_ofloat_float : TOP_movaps, tmp, op1, ops);
     if ( Is_Target_SSE3() ) {
-      Build_OP(TOP_fhadd128v32, tmp, op1, op1, ops);
-      Build_OP(TOP_fhadd128v32, result, tmp, tmp, ops);
+      Build_OP(Target_AVX? TOP_vhaddps_f128_ofloat_float_float : TOP_fhadd128v32, tmp, op1, op1, ops);
+      Build_OP(Target_AVX? TOP_vhaddps_f128_ofloat_float_float : TOP_fhadd128v32, result, tmp, tmp, ops);
     } else {
       TN* tmp_a = Build_TN_Like(op1);
       TN* tmp_b = Build_TN_Like(op1);
       TN* tmp_c = Build_TN_Like(op1);
       TN* tmp_d = Build_TN_Like(op1);
       Build_OP(TOP_movhlps, tmp_a, tmp, ops);
-      Build_OP(TOP_fadd128v32, tmp_b, tmp, tmp_a, ops);
-      Build_OP(TOP_movaps, tmp_c, tmp_b, ops);
-      Build_OP(TOP_shufps, tmp_d, tmp_c, tmp_c, Gen_Literal_TN(1, 1), ops);
+      Build_OP(Target_AVX? TOP_vaddps_f128_ofloat_float_float : TOP_fadd128v32, tmp_b, tmp, tmp_a, ops);
+      Build_OP(Target_AVX? TOP_vmovaps_f128_ofloat_float : TOP_movaps, tmp_c, tmp_b, ops);
+      Build_OP(Target_AVX? TOP_vshufps_f128_ofloat_float_float_simm8 : TOP_shufps, tmp_d, tmp_c, tmp_c, Gen_Literal_TN(1, 1), ops);
       Build_OP(TOP_addss, result, tmp_b, tmp_d, ops);
     }
     break;
+  }
+  case OPC_F4V32F4REDUCE_ADD:
+  {
+  	TN *tmp_a = Build_TN_Like(op1);
+	TN *tmp_low = Build_TN_Like(result);
+	TN *tmp_high = Build_TN_Like(result);
+	Build_OP(TOP_vmovaps_f256_ofloat_float, tmp_a, op1, ops);
+	Build_OP(TOP_vhaddps_f256_ofloat_float_float, tmp_a, op1, op1, ops);
+	Build_OP(TOP_vhaddps_f256_ofloat_float_float, tmp_a, tmp_a, tmp_a, ops);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8,  tmp_low, tmp_a, Gen_Literal_TN(0, 1), ops);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8,  tmp_high, tmp_a, Gen_Literal_TN(1, 1), ops);
+	Build_OP(TOP_vaddss_f128_ofloat_float_float, result, tmp_low, tmp_high, ops);
+	break;
+  }
+  case OPC_F8V32F8REDUCE_ADD:
+  {
+  	TN *tmp_a = Build_TN_Like(op1);
+	TN *tmp_l = Build_TN_Like(result);
+	TN *tmp_h = Build_TN_Like(result);
+  	Build_OP(TOP_vhaddpd_f256_ofloat_float_float, tmp_a, op1, op1, ops);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_h, tmp_a, Gen_Literal_TN(1, 1), ops);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_l, tmp_a, Gen_Literal_TN(0, 1), ops);
+	Build_OP(TOP_vaddsd_f128_ofloat_float_float, result, tmp_h, tmp_l, ops);
+	break;
   }
   case OPC_I4V16I1REDUCE_ADD:
   {
@@ -5825,19 +6097,19 @@ Expand_Reduce_Add (OPCODE op, TN *result, TN *op1, OPS *ops)
     TN* tmp_i = Build_TN_Like(op1);
     TN* tmp_j = Build_TN_Like(op1);
     TN* tmp_k = Build_TN_Like(op1);
-    Build_OP(TOP_movdq, tmp, op1, ops);
-    Build_OP(TOP_psrldq, tmp_a, tmp, Gen_Literal_TN(8, 1), ops);
-    Build_OP(TOP_add128v8, tmp_b, tmp, tmp_a, ops);
-    Build_OP(TOP_movdq, tmp_c, tmp_b, ops);
-    Build_OP(TOP_psrldq, tmp_d, tmp_c, Gen_Literal_TN(4, 1), ops);
-    Build_OP(TOP_add128v8, tmp_e, tmp_c, tmp_d, ops);
-    Build_OP(TOP_movdq, tmp_f, tmp_e, ops);
-    Build_OP(TOP_psrldq, tmp_g, tmp_f, Gen_Literal_TN(2, 1), ops);
-    Build_OP(TOP_add128v8, tmp_h, tmp_f, tmp_g, ops);
-    Build_OP(TOP_movdq, tmp_i, tmp_h, ops);
-    Build_OP(TOP_psrldq, tmp_j, tmp_i, Gen_Literal_TN(1, 1), ops);
-    Build_OP(TOP_add128v8, tmp_k, tmp_i, tmp_j, ops);
-    Build_OP(TOP_movx2g, result, tmp_k, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float: TOP_movdq, tmp, op1, ops);
+    Build_OP(Target_AVX? TOP_vpsrldq_f128_ofloat_float_simm8 : TOP_psrldq, tmp_a, tmp, Gen_Literal_TN(8, 1), ops);
+    Build_OP(Target_AVX? TOP_vpaddb_f128_ofloat_float_float : TOP_add128v8, tmp_b, tmp, tmp_a, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp_c, tmp_b, ops);
+    Build_OP(Target_AVX? TOP_vpsrldq_f128_ofloat_float_simm8 : TOP_psrldq, tmp_d, tmp_c, Gen_Literal_TN(4, 1), ops);
+    Build_OP(Target_AVX? TOP_vpaddb_f128_ofloat_float_float : TOP_add128v8, tmp_e, tmp_c, tmp_d, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp_f, tmp_e, ops);
+    Build_OP(Target_AVX? TOP_vpsrldq_f128_ofloat_float_simm8 : TOP_psrldq, tmp_g, tmp_f, Gen_Literal_TN(2, 1), ops);
+    Build_OP(Target_AVX? TOP_vpaddb_f128_ofloat_float_float : TOP_add128v8, tmp_h, tmp_f, tmp_g, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp_i, tmp_h, ops);
+    Build_OP(Target_AVX? TOP_vpsrldq_f128_ofloat_float_simm8 : TOP_psrldq, tmp_j, tmp_i, Gen_Literal_TN(1, 1), ops);
+    Build_OP(Target_AVX? TOP_vpaddb_f128_ofloat_float_float : TOP_add128v8, tmp_k, tmp_i, tmp_j, ops);
+    Build_OP((Target_AVX? TOP_vmovd_int32_oint32_float: TOP_movx2g), result, tmp_k, ops);
     break;
   }
   case OPC_I4V16I2REDUCE_ADD:
@@ -5854,16 +6126,16 @@ Expand_Reduce_Add (OPCODE op, TN *result, TN *op1, OPS *ops)
     TN* tmp_i = Build_TN_Like(op1);
     TN* tmp_j = Build_TN_Like(op1);
     TN* tmp_k = Build_TN_Like(op1);
-    Build_OP(TOP_movdq, tmp, op1, ops);
-    Build_OP(TOP_psrldq, tmp_a, tmp, Gen_Literal_TN(8, 1), ops);
-    Build_OP(TOP_add128v16, tmp_b, tmp, tmp_a, ops);
-    Build_OP(TOP_movdq, tmp_c, tmp_b, ops);
-    Build_OP(TOP_psrldq, tmp_d, tmp_c, Gen_Literal_TN(4, 1), ops);
-    Build_OP(TOP_add128v16, tmp_e, tmp_c, tmp_d, ops);
-    Build_OP(TOP_movdq, tmp_f, tmp_e, ops);
-    Build_OP(TOP_psrldq, tmp_g, tmp_f, Gen_Literal_TN(2, 1), ops);
-    Build_OP(TOP_add128v16, tmp_h, tmp_f, tmp_g, ops);
-    Build_OP(TOP_movx2g, result, tmp_h, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp, op1, ops);
+    Build_OP(Target_AVX? TOP_vpsrldq_f128_ofloat_float_simm8 : TOP_psrldq, tmp_a, tmp, Gen_Literal_TN(8, 1), ops);
+    Build_OP(Target_AVX? TOP_vpaddw_f128_ofloat_float_float : TOP_add128v16, tmp_b, tmp, tmp_a, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp_c, tmp_b, ops);
+    Build_OP(Target_AVX? TOP_vpsrldq_f128_ofloat_float_simm8 : TOP_psrldq, tmp_d, tmp_c, Gen_Literal_TN(4, 1), ops);
+    Build_OP(Target_AVX? TOP_vpaddw_f128_ofloat_float_float : TOP_add128v16, tmp_e, tmp_c, tmp_d, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp_f, tmp_e, ops);
+    Build_OP(Target_AVX? TOP_vpsrld_f128_ofloat_float_float : TOP_psrldq, tmp_g, tmp_f, Gen_Literal_TN(2, 1), ops);
+    Build_OP(Target_AVX? TOP_vpaddw_f128_ofloat_float_float : TOP_add128v16, tmp_h, tmp_f, tmp_g, ops);
+    Build_OP((Target_AVX? TOP_vmovd_int32_oint32_float: TOP_movx2g), result, tmp_h, ops);
     break;
   }
   case OPC_I4V16I4REDUCE_ADD:
@@ -5874,13 +6146,13 @@ Expand_Reduce_Add (OPCODE op, TN *result, TN *op1, OPS *ops)
     TN* tmp_c = Build_TN_Like(op1);
     TN* tmp_d = Build_TN_Like(op1);
     TN* tmp_e = Build_TN_Like(op1);
-    Build_OP(TOP_movdq, tmp, op1, ops);
-    Build_OP(TOP_psrldq, tmp_a, tmp, Gen_Literal_TN(8, 1), ops);
-    Build_OP(TOP_add128v32, tmp_b, tmp, tmp_a, ops);
-    Build_OP(TOP_movdq, tmp_c, tmp_b, ops);
-    Build_OP(TOP_psrldq, tmp_d, tmp_c, Gen_Literal_TN(4, 1), ops);
-    Build_OP(TOP_add128v32, tmp_e, tmp_c, tmp_d, ops);
-    Build_OP(TOP_movx2g, result, tmp_e, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp, op1, ops);
+    Build_OP(Target_AVX? TOP_vpsrldq_f128_ofloat_float_simm8 : TOP_psrldq, tmp_a, tmp, Gen_Literal_TN(8, 1), ops);
+    Build_OP(Target_AVX? TOP_vpaddd_f128_ofloat_float_float : TOP_add128v32, tmp_b, tmp, tmp_a, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp_c, tmp_b, ops);
+    Build_OP(Target_AVX? TOP_vpsrldq_f128_ofloat_float_simm8 : TOP_psrldq, tmp_d, tmp_c, Gen_Literal_TN(4, 1), ops);
+    Build_OP(Target_AVX? TOP_vpaddd_f128_ofloat_float_float : TOP_add128v32, tmp_e, tmp_c, tmp_d, ops);
+    Build_OP((Target_AVX? TOP_vmovd_int32_oint32_float : TOP_movx2g), result, tmp_e, ops);
     break;
   }
   case OPC_I8V16I8REDUCE_ADD:
@@ -5888,17 +6160,17 @@ Expand_Reduce_Add (OPCODE op, TN *result, TN *op1, OPS *ops)
     TN* tmp = Build_TN_Like(op1);
     TN* tmp_a = Build_TN_Like(op1);
     TN* tmp_b = Build_TN_Like(op1);
-    Build_OP(TOP_movdq, tmp, op1, ops);
-    Build_OP(TOP_psrldq, tmp_a, tmp, Gen_Literal_TN(8, 1), ops);
-    Build_OP(TOP_add128v64, tmp_b, tmp, tmp_a, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp, op1, ops);
+    Build_OP(Target_AVX? TOP_vpsrldq_f128_ofloat_float_simm8 : TOP_psrldq, tmp_a, tmp, Gen_Literal_TN(8, 1), ops);
+    Build_OP(Target_AVX? TOP_vpaddq_f128_ofloat_float_float : TOP_add128v64, tmp_b, tmp, tmp_a, ops);
     if (Is_Target_64bit())
       Build_OP(TOP_movx2g64, result, tmp_b, ops);
     else {
       TN* result_hi = Create_TN_Pair(result, MTYPE_I8);      
       TN *tmp_c = Build_TN_Like(op1);
-      Build_OP(TOP_movx2g, result, tmp_b, ops);      
-      Build_OP(TOP_psrlq128v64, tmp_c, tmp_b, Gen_Literal_TN(32, 4), ops);
-      Build_OP(TOP_movx2g, result_hi, tmp_c, ops);      
+      Build_OP((Target_AVX? TOP_vmovd_int32_oint32_float : TOP_movx2g), result, tmp_b, ops);      
+      Build_OP(Target_AVX? TOP_vpsrlq_f128_ofloat_float_simm8 : TOP_psrlq128v64, tmp_c, tmp_b, Gen_Literal_TN(32, 4), ops);
+      Build_OP((Target_AVX? TOP_vmovd_int32_oint32_float : TOP_movx2g), result_hi, tmp_c, ops);      
     }
     break;
   }
@@ -5916,9 +6188,9 @@ Expand_Reduce_Mpy (OPCODE op, TN *result, TN *op1, OPS *ops)
   {
     TN* tmp = Build_TN_Like(op1);
     TN* tmp_a = Build_TN_Like(op1);
-    Build_OP(TOP_movapd, tmp, op1, ops);
-    Build_OP(TOP_unpckhpd, tmp_a, tmp, tmp, ops);
-    Build_OP(TOP_mulsd, result, tmp_a, tmp, ops);
+    Build_OP(Target_AVX? TOP_vmovapd_f128_ofloat_float : TOP_movapd, tmp, op1, ops);
+    Build_OP(Target_AVX? TOP_vunpckhpd_f128_ofloat_float_float : TOP_unpckhpd, tmp_a, tmp, tmp, ops);
+    Build_OP(Target_AVX? TOP_vmulsd_f128_ofloat_float_float : TOP_mulsd, result, tmp_a, tmp, ops);
     break;
   }
   case OPC_F4V16F4REDUCE_MPY:
@@ -5928,13 +6200,52 @@ Expand_Reduce_Mpy (OPCODE op, TN *result, TN *op1, OPS *ops)
     TN* tmp_b = Build_TN_Like(op1);
     TN* tmp_c = Build_TN_Like(op1);
     TN* tmp_d = Build_TN_Like(op1);
-    Build_OP(TOP_movaps, tmp, op1, ops);
-    Build_OP(TOP_movhlps, tmp_a, tmp, ops);
-    Build_OP(TOP_fmul128v32, tmp_b, tmp, tmp_a, ops);
-    Build_OP(TOP_movaps, tmp_c, tmp_b, ops);
-    Build_OP(TOP_shufps, tmp_d, tmp_c, tmp_c, Gen_Literal_TN(1, 1), ops);
-    Build_OP(TOP_mulss, result, tmp_b, tmp_d, ops);
+    Build_OP(Target_AVX? TOP_vmovaps_f128_ofloat_float : TOP_movaps, tmp, op1, ops);
+	if(Target_AVX)
+	  Build_OP(TOP_vmovhlps_f128_ofloat_float_float, tmp_a, tmp, tmp, ops);
+	else
+      Build_OP(TOP_movhlps, tmp_a, tmp, ops);
+    Build_OP(Target_AVX? TOP_vmulps_f128_ofloat_float_float : TOP_fmul128v32, tmp_b, tmp, tmp_a, ops);
+    Build_OP(Target_AVX? TOP_vmovaps_f128_ofloat_float : TOP_movaps, tmp_c, tmp_b, ops);
+    Build_OP(Target_AVX? TOP_vshufps_f128_ofloat_float_float_simm8 : TOP_shufps, tmp_d, tmp_c, tmp_c, Gen_Literal_TN(1, 1), ops);
+    Build_OP(Target_AVX? TOP_vmulss_f128_ofloat_float_float : TOP_mulss, result, tmp_b, tmp_d, ops);
     break;
+  }
+  case OPC_F4V32F4REDUCE_MPY:
+  {
+  	TN* tmp_h = Build_TN_Of_Mtype(MTYPE_V16F4);
+	TN* tmp_l = Build_TN_Of_Mtype(MTYPE_V16F4);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_h, op1, Gen_Literal_TN(1, 1), ops);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_l, op1, Gen_Literal_TN(1, 1), ops);
+	Build_OP(TOP_vmulps_f128_ofloat_float_float, tmp_l, tmp_h, tmp_l, ops);
+
+	TN *tmp = Build_TN_Like(tmp_l);
+	TN *tmp_a = Build_TN_Like(tmp_l);
+	TN* tmp_b = Build_TN_Like(tmp_l);
+    TN* tmp_c = Build_TN_Like(tmp_l);
+    TN* tmp_d = Build_TN_Like(tmp_l);
+    Build_OP(TOP_vmovaps_f128_ofloat_float, tmp, tmp_l, ops);
+	Build_OP(TOP_vmovhlps_f128_ofloat_float_float, tmp_a, tmp, tmp, ops);
+    Build_OP(TOP_vmulps_f128_ofloat_float_float ,tmp_b, tmp, tmp_a, ops);
+    Build_OP(TOP_vmovaps_f128_ofloat_float, tmp_c, tmp_b, ops);
+    Build_OP(TOP_vshufps_f128_ofloat_float_float_simm8, tmp_d, tmp_c, tmp_c, Gen_Literal_TN(1, 1), ops);
+    Build_OP(TOP_vmulss_f128_ofloat_float_float, result, tmp_b, tmp_d, ops);
+    break;
+	
+  }
+  case OPC_F8V32F8REDUCE_MPY:
+  {
+  	TN* tmp = Build_TN_Like(op1);
+	TN* tmp_a = Build_TN_Like(op1);
+	TN* tmp_h = Build_TN_Like(result);
+	TN* tmp_l = Build_TN_Like(result);
+	Build_OP(TOP_vmovapd_f256_ofloat_float, tmp, op1, ops);
+	Build_OP(TOP_vunpckhpd_f256_ofloat_float_float, tmp, op1,op1, ops);
+	Build_OP(TOP_vmulpd_f256_ofloat_float_float, tmp_a, tmp, op1, ops);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_h, tmp_a, Gen_Literal_TN(1, 1), ops);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_l, tmp_a, Gen_Literal_TN(0, 1), ops);
+	Build_OP(TOP_vmulsd_f128_ofloat_float_float, result, tmp_h, tmp_l, ops);
+	break;
   }
   case OPC_I4V16I2REDUCE_MPY:
   {
@@ -5947,16 +6258,16 @@ Expand_Reduce_Mpy (OPCODE op, TN *result, TN *op1, OPS *ops)
     TN* tmp_f = Build_TN_Like(op1);
     TN* tmp_g = Build_TN_Like(op1);
     TN* tmp_h = Build_TN_Like(op1);
-    Build_OP(TOP_movdq, tmp, op1, ops);
-    Build_OP(TOP_psrldq, tmp_a, tmp, Gen_Literal_TN(8, 1), ops); 
-    Build_OP(TOP_mul128v16, tmp_b, tmp, tmp_a, ops);
-    Build_OP(TOP_movdq, tmp_c, tmp_b, ops);
-    Build_OP(TOP_psrldq, tmp_d, tmp_c, Gen_Literal_TN(4, 1), ops);
-    Build_OP(TOP_mul128v16, tmp_e, tmp_c, tmp_d, ops);
-    Build_OP(TOP_movdq, tmp_f, tmp_e, ops);
-    Build_OP(TOP_psrldq, tmp_g, tmp_f, Gen_Literal_TN(2, 1), ops);
-    Build_OP(TOP_mul128v16, tmp_h, tmp_f, tmp_g, ops); 
-    Build_OP(TOP_movx2g, result, tmp_h, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp, op1, ops);
+    Build_OP(Target_AVX? TOP_vpsrldq_f128_ofloat_float_simm8 : TOP_psrldq, tmp_a, tmp, Gen_Literal_TN(8, 1), ops); 
+    Build_OP(Target_AVX? TOP_vpmullw_f128_ofloat_float_float : TOP_mul128v16, tmp_b, tmp, tmp_a, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp_c, tmp_b, ops);
+    Build_OP(Target_AVX? TOP_vpsrldq_f128_ofloat_float_simm8 : TOP_psrldq, tmp_d, tmp_c, Gen_Literal_TN(4, 1), ops);
+    Build_OP(Target_AVX? TOP_vpmullw_f128_ofloat_float_float : TOP_mul128v16, tmp_e, tmp_c, tmp_d, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp_f, tmp_e, ops);
+    Build_OP(Target_AVX? TOP_vpsrldq_f128_ofloat_float_simm8 : TOP_psrldq, tmp_g, tmp_f, Gen_Literal_TN(2, 1), ops);
+    Build_OP(Target_AVX? TOP_vpmullw_f128_ofloat_float_float : TOP_mul128v16, tmp_h, tmp_f, tmp_g, ops); 
+    Build_OP((TOP_movx2g), result, tmp_h, ops);
     break;
   }
   default:
@@ -5974,10 +6285,20 @@ Expand_Reduce_Max (OPCODE op, TN *result, TN *op1, OPS *ops)
   {
     TN* tmp = Build_TN_Like(op1);
     TN* tmp_a = Build_TN_Like(op1);
-    Build_OP(TOP_movapd, tmp, op1, ops);
-    Build_OP(TOP_unpckhpd, tmp_a, tmp, tmp, ops);
-    Build_OP(TOP_maxsd, result, tmp_a, tmp, ops);
+    Build_OP(Target_AVX? TOP_vmovapd_f128_ofloat_float : TOP_movapd, tmp, op1, ops);
+    Build_OP(Target_AVX? TOP_vunpckhpd_f128_ofloat_float_float : TOP_unpckhpd, tmp_a, tmp, tmp, ops);
+    Build_OP((Target_AVX? TOP_vmaxsd_f128_ofloat_float_float : TOP_maxsd), result, tmp_a, tmp, ops);
     break;
+  }
+  case OPC_F8V32F8REDUCE_MAX:
+  {
+  	TN *tmp_h = Build_TN_Of_Mtype(MTYPE_V16F8);
+	TN *tmp_l = Build_TN_Like(tmp_h);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_h, op1, Gen_Literal_TN(1, 1), ops);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_l, op1, Gen_Literal_TN(0, 1), ops);
+	Build_OP(TOP_vmaxpd_f128_ofloat_float_float, tmp_l, tmp_h, tmp_l,ops);
+	Expand_Reduce_Max(OPC_F8V16F8REDUCE_MAX, result, tmp_l, ops);
+	break;
   }
   case OPC_F4V16F4REDUCE_MAX:
   {
@@ -5986,13 +6307,26 @@ Expand_Reduce_Max (OPCODE op, TN *result, TN *op1, OPS *ops)
     TN* tmp_b = Build_TN_Like(op1);
     TN* tmp_c = Build_TN_Like(op1);
     TN* tmp_d = Build_TN_Like(op1);
-    Build_OP(TOP_movaps, tmp, op1, ops);
-    Build_OP(TOP_movhlps, tmp_a, tmp, ops);
-    Build_OP(TOP_fmax128v32, tmp_b, tmp, tmp_a, ops);
-    Build_OP(TOP_movaps, tmp_c, tmp_b, ops);
-    Build_OP(TOP_shufps, tmp_d, tmp_c, tmp_c, Gen_Literal_TN(1, 1), ops);
-    Build_OP(TOP_maxss, result, tmp_c, tmp_d, ops);
+    Build_OP(Target_AVX? TOP_vmovaps_f128_ofloat_float : TOP_movaps, tmp, op1, ops);
+	if(Target_AVX)
+	 Build_OP(TOP_vmovhlps_f128_ofloat_float_float, tmp_a, tmp, tmp, ops);
+	else
+     Build_OP(TOP_movhlps, tmp_a, tmp, ops);
+    Build_OP(Target_AVX? TOP_vmaxps_f128_ofloat_float_float : TOP_fmax128v32, tmp_b, tmp, tmp_a, ops);
+    Build_OP(Target_AVX? TOP_vmovaps_f128_ofloat_float : TOP_movaps, tmp_c, tmp_b, ops);
+    Build_OP(Target_AVX? TOP_vshufps_f128_ofloat_float_float_simm8 : TOP_shufps, tmp_d, tmp_c, tmp_c, Gen_Literal_TN(1, 1), ops);
+    Build_OP((Target_AVX? TOP_vmaxss_f128_ofloat_float_float : TOP_maxss), result, tmp_c, tmp_d, ops);
     break;
+  }
+  case OPC_F4V32F4REDUCE_MAX:
+  {
+  	TN *tmp_h = Build_TN_Of_Mtype(MTYPE_V16F4);
+	TN *tmp_l = Build_TN_Of_Mtype(MTYPE_V16F4);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_h, op1, Gen_Literal_TN(1, 1), ops);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_l, op1, Gen_Literal_TN(0, 1), ops);
+	Build_OP(TOP_vmaxps_f128_ofloat_float_float, tmp_l, tmp_h, tmp_l,ops);
+	Expand_Reduce_Max(OPC_F4V16F4REDUCE_MAX, result, tmp_l, ops);
+	break;
   }
   case OPC_I4V16I4REDUCE_MAX:
   {
@@ -6010,21 +6344,21 @@ Expand_Reduce_Max (OPCODE op, TN *result, TN *op1, OPS *ops)
     TN* tmp12 = Build_TN_Like(op1);
     TN* tmp13 = Build_TN_Like(op1);
     TN* tmp14 = Build_TN_Like(op1);
-    Build_OP(TOP_movdq, tmp1, op1, ops);
-    Build_OP(TOP_movdq, tmp2, op1, ops);
-    Build_OP(TOP_psrldq, tmp3, tmp1, Gen_Literal_TN(8, 1), ops);
-    Build_OP(TOP_xor128v32, tmp4, op1, tmp3, ops);
-    Build_OP(TOP_cmpgt128v32, tmp5, tmp2, tmp3, ops);
-    Build_OP(TOP_and128v32, tmp6, tmp5, tmp4, ops);
-    Build_OP(TOP_xor128v32, tmp7, tmp6, tmp3, ops);
-    Build_OP(TOP_movdq, tmp8, tmp7, ops);
-    Build_OP(TOP_movdq, tmp9, tmp7, ops);
-    Build_OP(TOP_psrldq, tmp10, tmp8, Gen_Literal_TN(4, 1), ops);
-    Build_OP(TOP_xor128v32, tmp11, tmp7, tmp10, ops);
-    Build_OP(TOP_cmpgt128v32, tmp12, tmp9, tmp10, ops);
-    Build_OP(TOP_and128v32, tmp13, tmp12, tmp11, ops);
-    Build_OP(TOP_xor128v32, tmp14, tmp13, tmp10, ops);
-    Build_OP(TOP_movx2g, result, tmp14, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp1, op1, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp2, op1, ops);
+    Build_OP(Target_AVX? TOP_vpsrldq_f128_ofloat_float_simm8 : TOP_psrldq, tmp3, tmp1, Gen_Literal_TN(8, 1), ops);
+    Build_OP(Target_AVX? TOP_vpxor_f128_ofloat_float_float : TOP_xor128v32, tmp4, op1, tmp3, ops);
+    Build_OP(Target_AVX? TOP_vpcmpgtd_f128_ofloat_float_float : TOP_cmpgt128v32, tmp5, tmp2, tmp3, ops);
+    Build_OP(Target_AVX? TOP_vpand_f128_ofloat_float_float: TOP_and128v32, tmp6, tmp5, tmp4, ops);
+    Build_OP(Target_AVX? TOP_vpxor_f128_ofloat_float_float : TOP_xor128v32, tmp7, tmp6, tmp3, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp8, tmp7, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float: TOP_movdq, tmp9, tmp7, ops);
+    Build_OP(Target_AVX? TOP_vpsrldq_f128_ofloat_float_simm8 : TOP_psrldq, tmp10, tmp8, Gen_Literal_TN(4, 1), ops);
+    Build_OP(Target_AVX? TOP_vpxor_f128_ofloat_float_float : TOP_xor128v32, tmp11, tmp7, tmp10, ops);
+    Build_OP(Target_AVX? TOP_vpcmpgtd_f128_ofloat_float_float : TOP_cmpgt128v32, tmp12, tmp9, tmp10, ops);
+    Build_OP(Target_AVX? TOP_vpand_f128_ofloat_float_float : TOP_and128v32, tmp13, tmp12, tmp11, ops);
+    Build_OP(Target_AVX? TOP_vpor_f128_ofloat_float_float : TOP_xor128v32, tmp14, tmp13, tmp10, ops);
+    Build_OP((Target_AVX? TOP_vmovd_int32_oint32_float : TOP_movx2g), result, tmp14, ops);
     break;
   }
   default: 
@@ -6042,10 +6376,20 @@ Expand_Reduce_Min (OPCODE op, TN *result, TN *op1, OPS *ops)
   {
     TN* tmp = Build_TN_Like(op1);
     TN* tmp_a = Build_TN_Like(op1);
-    Build_OP(TOP_movapd, tmp, op1, ops);
-    Build_OP(TOP_unpckhpd, tmp_a, tmp, tmp, ops);
-    Build_OP(TOP_minsd, result, tmp_a, tmp, ops);
+    Build_OP(Target_AVX? TOP_vmovapd_f128_ofloat_float : TOP_movapd, tmp, op1, ops);
+    Build_OP(Target_AVX? TOP_vunpckhpd_f128_ofloat_float_float : TOP_unpckhpd, tmp_a, tmp, tmp, ops);
+    Build_OP(Target_AVX? TOP_vminsd_f128_ofloat_float_float : TOP_minsd, result, tmp_a, tmp, ops);
     break;
+  }
+  case OPC_F8V32F8REDUCE_MIN:
+  {
+  	TN *tmp_h = Build_TN_Of_Mtype(MTYPE_V16F8);
+	TN *tmp_l = Build_TN_Like(tmp_h);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_h, op1, Gen_Literal_TN(1, 1), ops);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_l, op1, Gen_Literal_TN(0, 1), ops);
+	Build_OP(TOP_vminpd_f128_ofloat_float_float, tmp_l, tmp_h, tmp_l,ops);
+	Expand_Reduce_Min(OPC_F8V16F8REDUCE_MIN, result, tmp_l, ops);
+	break;
   }
   case OPC_F4V16F4REDUCE_MIN:
   {
@@ -6054,13 +6398,26 @@ Expand_Reduce_Min (OPCODE op, TN *result, TN *op1, OPS *ops)
     TN* tmp_b = Build_TN_Like(op1);
     TN* tmp_c = Build_TN_Like(op1);
     TN* tmp_d = Build_TN_Like(op1);
-    Build_OP(TOP_movaps, tmp, op1, ops);
-    Build_OP(TOP_movhlps, tmp_a, tmp, ops);
-    Build_OP(TOP_fmin128v32, tmp_b, tmp, tmp_a, ops);
-    Build_OP(TOP_movaps, tmp_c, tmp_b, ops);
-    Build_OP(TOP_shufps, tmp_d, tmp_c, tmp_c, Gen_Literal_TN(1, 1), ops);
-    Build_OP(TOP_minss, result, tmp_c, tmp_d, ops);
+    Build_OP(Target_AVX? TOP_vmovaps_f128_ofloat_float : TOP_movaps, tmp, op1, ops);
+	if(Target_AVX)
+	  Build_OP(TOP_vmovhlps_f128_ofloat_float_float, tmp_a, tmp, tmp, ops);
+	else
+      Build_OP(TOP_movhlps, tmp_a, tmp, ops);
+    Build_OP(Target_AVX? TOP_vminps_f128_ofloat_float_float : TOP_fmin128v32, tmp_b, tmp, tmp_a, ops);
+    Build_OP(Target_AVX? TOP_vmovaps_f128_ofloat_float : TOP_movaps, tmp_c, tmp_b, ops);
+    Build_OP(Target_AVX? TOP_vshufps_f128_ofloat_float_float_simm8 : TOP_shufps, tmp_d, tmp_c, tmp_c, Gen_Literal_TN(1, 1), ops);
+    Build_OP(Target_AVX? TOP_vminss_f128_ofloat_float_float : TOP_minss, result, tmp_c, tmp_d, ops);
     break;
+  }
+  case OPC_F4V32F4REDUCE_MIN:
+  {
+  	TN *tmp_h = Build_TN_Of_Mtype(MTYPE_V16F4);
+	TN *tmp_l = Build_TN_Of_Mtype(MTYPE_V16F4);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_h, op1, Gen_Literal_TN(1, 1), ops);
+	Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_l, op1, Gen_Literal_TN(0, 1), ops);
+	Build_OP(TOP_vminps_f128_ofloat_float_float, tmp_l, tmp_h, tmp_l,ops);
+	Expand_Reduce_Min(OPC_F4V16F4REDUCE_MIN, result, tmp_l, ops);
+	break;
   }
   case OPC_I4V16I4REDUCE_MIN:
   {    
@@ -6078,21 +6435,21 @@ Expand_Reduce_Min (OPCODE op, TN *result, TN *op1, OPS *ops)
     TN* tmp12 = Build_TN_Like(op1);
     TN* tmp13 = Build_TN_Like(op1);
     TN* tmp14 = Build_TN_Like(op1);
-    Build_OP(TOP_movdq, tmp1, op1, ops);
-    Build_OP(TOP_movdq, tmp2, op1, ops);
-    Build_OP(TOP_psrldq, tmp3, tmp1, Gen_Literal_TN(8, 1), ops);
-    Build_OP(TOP_cmpgt128v32, tmp4, tmp2, tmp3, ops);   
-    Build_OP(TOP_xor128v32, tmp5, tmp3, op1, ops);
-    Build_OP(TOP_and128v32, tmp6, tmp5, tmp4, ops);
-    Build_OP(TOP_xor128v32, tmp7, tmp6, op1, ops);
-    Build_OP(TOP_movdq, tmp8, tmp7, ops);
-    Build_OP(TOP_movdq, tmp9, tmp7, ops);
-    Build_OP(TOP_psrldq, tmp10, tmp8, Gen_Literal_TN(4, 1), ops);
-    Build_OP(TOP_cmpgt128v32, tmp11, tmp9, tmp10, ops);    
-    Build_OP(TOP_xor128v32, tmp12, tmp7, tmp10, ops);
-    Build_OP(TOP_and128v32, tmp13, tmp12, tmp11, ops);
-    Build_OP(TOP_xor128v32, tmp14, tmp13, tmp7, ops);
-    Build_OP(TOP_movx2g, result, tmp14, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp1, op1, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp2, op1, ops);
+    Build_OP(Target_AVX? TOP_vpsrldq_f128_ofloat_float_simm8 : TOP_psrldq, tmp3, tmp1, Gen_Literal_TN(8, 1), ops);
+    Build_OP(Target_AVX? TOP_vpcmpgtd_f128_ofloat_float_float : TOP_cmpgt128v32, tmp4, tmp2, tmp3, ops);   
+    Build_OP(Target_AVX? TOP_vpxor_f128_ofloat_float_float : TOP_xor128v32, tmp5, tmp3, op1, ops);
+    Build_OP(Target_AVX? TOP_vpand_f128_ofloat_float_float : TOP_and128v32, tmp6, tmp5, tmp4, ops);
+    Build_OP(Target_AVX? TOP_vpxor_f128_ofloat_float_float : TOP_xor128v32, tmp7, tmp6, op1, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp8, tmp7, ops);
+    Build_OP(Target_AVX? TOP_vmovdqa_f128_ofloat_float : TOP_movdq, tmp9, tmp7, ops);
+    Build_OP(Target_AVX? TOP_vpsrldq_f128_ofloat_float_simm8 : TOP_psrldq, tmp10, tmp8, Gen_Literal_TN(4, 1), ops);
+    Build_OP(Target_AVX? TOP_vpcmpgtd_f128_ofloat_float_float : TOP_cmpgt128v32, tmp11, tmp9, tmp10, ops);    
+    Build_OP(Target_AVX? TOP_vpxor_f128_ofloat_float_float : TOP_xor128v32, tmp12, tmp7, tmp10, ops);
+    Build_OP(Target_AVX? TOP_vpandn_f128_ofloat_float_float : TOP_and128v32, tmp13, tmp12, tmp11, ops);
+    Build_OP(Target_AVX? TOP_vpxor_f128_ofloat_float_float : TOP_xor128v32, tmp14, tmp13, tmp7, ops);
+    Build_OP((Target_AVX? TOP_vmovd_int32_oint32_float : TOP_movx2g), result, tmp14, ops);
     break;
   }
   default: 
@@ -6112,15 +6469,18 @@ Expand_Shuffle (OPCODE opc, TN* result, TN* op1, VARIANT variant, OPS *ops)
     break;    
   case OPC_V16F4V16F4SHUFFLE:
   case OPC_V16I4V16I4SHUFFLE:
-    Build_OP(TOP_pshufd, result, op1, Gen_Literal_TN(0x1B, 1), ops);
+    Build_OP(Target_AVX? TOP_vpshufd_f128_ofloat_float_simm8 : TOP_pshufd, result, op1, Gen_Literal_TN(0x1B, 1), ops);
     break;
   case OPC_V8F4V8F4SHUFFLE:
   case OPC_V8I4V8I4SHUFFLE:
-    Build_OP(TOP_pshufd, result, op1, Gen_Literal_TN(0xE1, 1), ops);
+    Build_OP(Target_AVX? TOP_vpshufd_f128_ofloat_float_simm8 : TOP_pshufd, result, op1, Gen_Literal_TN(0xE1, 1), ops);
     break;
   case OPC_V16I8V16I8SHUFFLE:
   case OPC_V16F8V16F8SHUFFLE:
-    Build_OP(TOP_movhlps, result, op1, ops);
+  	if(Target_AVX)
+	  Build_OP(TOP_vmovhlps_f128_ofloat_float_float, result, op1, op1, ops);
+	else
+      Build_OP(TOP_movhlps, result, op1, ops);
     Build_OP(TOP_movlhps, result, op1, ops);
     Set_OP_cond_def_kind( OPS_last(ops), OP_ALWAYS_COND_DEF );
     break;    
@@ -6131,10 +6491,42 @@ Expand_Shuffle (OPCODE opc, TN* result, TN* op1, VARIANT variant, OPS *ops)
       Build_OP(TOP_movhlps, tmp1, op1, ops);
       Build_OP(TOP_movlhps, tmp1, op1, ops);
       Set_OP_cond_def_kind( OPS_last(ops), OP_ALWAYS_COND_DEF );
-      Build_OP(TOP_pshuflw, tmp2, tmp1, Gen_Literal_TN(0x1B, 1), ops);
-      Build_OP(TOP_pshufhw, result, tmp2, Gen_Literal_TN(0x1B, 1), ops);
+      Build_OP(Target_AVX? TOP_vpshuflw_f128_ofloat_float_simm8 : TOP_pshuflw, tmp2, tmp1, Gen_Literal_TN(0x1B, 1), ops);
+      Build_OP(Target_AVX? TOP_vpshufhw_f128_ofloat_float_simm8 : TOP_pshufhw, result, tmp2, Gen_Literal_TN(0x1B, 1), ops);
       break;
     }
+  case OPC_V32F4V32F4SHUFFLE:
+  	{
+	  TN* tmp_hi = Build_TN_Of_Mtype(MTYPE_V16F4);
+	  TN* tmp_low = Build_TN_Like(tmp_hi);
+	  TN* dest_hi = Build_TN_Like(tmp_hi);
+	  TN* dest_low = Build_TN_Like(dest_hi);
+	  Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_hi, op1, Gen_Literal_TN(0,1), ops);
+	  Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_low, op1, Gen_Literal_TN(1,1), ops);
+	  Build_OP(TOP_vpshufd_f128_ofloat_float_simm8, dest_hi, tmp_hi, Gen_Literal_TN(0x1B,1), ops);
+	  Build_OP(TOP_vpshufd_f128_ofloat_float_simm8, dest_low, tmp_low, Gen_Literal_TN(0x1B,1), ops);
+	  Build_OP(TOP_vxzero256v32, result, ops);
+	  Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, dest_low, Gen_Literal_TN(0,1),ops);
+	  Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, dest_hi, Gen_Literal_TN(1,1), ops);
+	  break;
+  	}
+  case OPC_V32F8V32F8SHUFFLE:
+  	{
+	  TN* tmp_hi = Build_TN_Of_Mtype(MTYPE_V16F4);
+	  TN* tmp_low = Build_TN_Like(tmp_hi);
+	  TN* dest_hi = Build_TN_Like(tmp_hi);
+	  TN* dest_low = Build_TN_Like(dest_hi);
+	  Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_hi, op1, Gen_Literal_TN(0,1), ops);
+	  Build_OP(TOP_vextractf128_f256_ofloat_float_simm8, tmp_low, op1, Gen_Literal_TN(1,1), ops);
+	  Build_OP(TOP_vmovhlps_f128_ofloat_float_float, dest_hi, tmp_hi, tmp_hi, ops);
+	  Build_OP(TOP_vmovlhps_f128_ofloat_float_float, dest_hi, dest_hi, tmp_hi,ops);
+	  Build_OP(TOP_vmovhlps_f128_ofloat_float_float, dest_low, tmp_low, tmp_low, ops);
+	  Build_OP(TOP_vmovlhps_f128_ofloat_float_float, dest_low, dest_low, tmp_low, ops);
+	  Build_OP(TOP_vxzero256v64, result, ops);
+	  Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, dest_low, Gen_Literal_TN(0, 1), ops);
+	  Build_OP(TOP_vinsertf128_f256_ofloat_float_float_simm8, result, result, dest_hi, Gen_Literal_TN(1, 1), ops);
+	  break;
+  	}
   default:
     FmtAssert(FALSE, ("NYI"));
   }
@@ -6282,6 +6674,7 @@ Exp_COPY (TN *tgt_tn, TN *src_tn, OPS *ops, BOOL copy_pair)
 			  (TN_size(src_tn) == 8) :
 			  (TN_size(src_tn) == 8 && TN_size(tgt_tn) == 8);
   const BOOL is_128bit = (TN_size(src_tn) == 16);
+  const BOOL is_256bit = (TN_size(src_tn) == 32);
 
   if( TN_is_constant(src_tn) ){
     FmtAssert (TN_has_value(src_tn), ("Exp_COPY: illegal source tn"));
@@ -6317,8 +6710,19 @@ Exp_COPY (TN *tgt_tn, TN *src_tn, OPS *ops, BOOL copy_pair)
       }
     } else if (tgt_rc == src_rc && tgt_rc == ISA_REGISTER_CLASS_float) {
       /* dedicated TNs always have size 8, so need to check both TNs */
-      Build_OP(is_128bit ? TOP_movdq: (is_64bit ? TOP_movsd : TOP_movss), 
+	  if(Target_AVX ){
+	  	if(is_256bit)
+		  Build_OP(TOP_vmovdqa_f256_ofloat_float, tgt_tn, src_tn, ops);
+	  	else if(is_128bit)
+		  Build_OP(TOP_vmovdqa_f128_ofloat_float, tgt_tn, src_tn, ops);
+		else
+		  Build_OP(is_64bit ? TOP_movsd: TOP_movss, tgt_tn, src_tn,src_tn, ops);
+	  }	
+	  else{
+	  	FmtAssert(!is_256bit,("no way to handle 256 bits in copy in no AVX"));
+        Build_OP(is_128bit ? TOP_movdq: (is_64bit ?  TOP_movsd : TOP_movss), 
 	       tgt_tn, src_tn, ops);
+	  }
       Set_OP_copy (OPS_last(ops));
 
     } else if( tgt_rc == src_rc && tgt_rc == ISA_REGISTER_CLASS_x87 ){
@@ -6344,7 +6748,7 @@ Exp_COPY (TN *tgt_tn, TN *src_tn, OPS *ops, BOOL copy_pair)
 
     } else if( tgt_rc == ISA_REGISTER_CLASS_integer &&
 	       src_rc == ISA_REGISTER_CLASS_float ){
-      Build_OP (TOP_movx2g64, tgt_tn, src_tn, ops);
+      Build_OP ( TOP_movx2g64, tgt_tn, src_tn, ops);
     } else if( src_rc == ISA_REGISTER_CLASS_integer &&
 	       tgt_rc == ISA_REGISTER_CLASS_mmx) {
       // mov int64 to mmx
@@ -6450,10 +6854,10 @@ static void Expand_INTRN_ANINT( TN* result, TN* src, TYPE_ID mtype, OPS* ops )
     Build_OP( TOP_andpd, tmp3, tmp3, tmp2, ops );
     Build_OP( TOP_cmpsd, tmp6,
 	      tmp6, point_5, Generate_Cmp_Ctrl_TN(OPR_GT), ops );
-    Build_OP( TOP_andpd, tmp6, tmp6, tmp2, ops );
-    Build_OP( TOP_subsd, result, tmp7, tmp6, ops );
+    Build_OP(  TOP_andpd, tmp6, tmp6, tmp2, ops );
+    Build_OP(  TOP_subsd, result, tmp7, tmp6, ops );
     Build_OP( TOP_addsd, result, result, tmp3, ops );
-    Build_OP( TOP_orpd,  result, result, tmp0, ops );
+    Build_OP(  TOP_orpd,  result, result, tmp0, ops );
   }
 }
 
@@ -6521,12 +6925,12 @@ Expand_Count_Leading_Zeros (TN *result, TN *op, TYPE_ID mtype,
 		     MTYPE_I4, ops );
 }
 
-void Expand_Intrinsic_Imm_Param5(TOP opc, struct tn* result, struct tn *op0,
+void Expand_Intrinsic_Imm_Param5(TOP opc, struct tn* result, struct tn* result2, struct tn *op0,
 										struct tn *op1, struct tn *op2, struct tn *op3, struct tn *op4,  OPS *ops, int op_count)
 {
 
 	   if(TN_is_constant(op2))
-		   Build_OP(opc, result, op0, op1, op2, op3,op4, ops);
+		   Build_OP(opc, result, result2, op0, op1, op2, op3,op4, ops);
 	   else
 	   {
 		   OP *op = NULL;
@@ -6543,16 +6947,16 @@ void Expand_Intrinsic_Imm_Param5(TOP opc, struct tn* result, struct tn *op0,
 		   	   if(TN_is_constant(OP_opnd(op,0)))
 		   	   {
 			     tn = Gen_Literal_TN( TN_value(OP_opnd(op, 0)), 1);
-			     Build_OP(opc, result, op0, op1, tn, op3, op4, ops);
+			     Build_OP(opc, result, result2, op0, op1, tn, op3, op4, ops);
 		   	   }
 			   else
-			   	Build_OP(opc, result, op0, op1, Gen_Literal_TN(0,1), op3,op4,ops);
+			   	Build_OP(opc, result, result2, op0, op1, Gen_Literal_TN(0,1), op3,op4,ops);
 			   	
 		   }
 		   else
 		   {
 			   tn = Gen_Literal_TN(0, 1);
-			   Build_OP(opc, result, op0, op1, tn, op3, op4, ops);
+			   Build_OP(opc, result, result2, op0, op1, tn, op3, op4, ops);
 		   }
 		 }
 }
@@ -6631,6 +7035,512 @@ void Expand_Intrinsic_Imm_Param(TOP opc, struct tn* result, struct tn *op0,
 		   }
 	   }
 }
+
+
+
+static void
+Expand_Mov_Int_To_vector(TN *result, TN* src, OPS *ops){
+  if(TN_is_constant(src)){
+  	TN *tni = Build_TN_Of_Mtype(MTYPE_I4);
+  	Build_OP(TOP_ldc32, tni , src, ops);
+	Build_OP(TOP_movg2x, result, tni, ops );
+  }else
+    Build_OP(TOP_movg2x, result, src, ops);
+}
+
+static UINT32
+Gen_Uint_By_Char(UINT v1, UINT v2, UINT v3, UINT v4){
+  return (v1 & 0x000000ff) +((v2 & 0x000000ff)<<8) + 
+  	((v3 & 0x000000ff) << 16) + ((v4 & 0x000000ff)<<24);
+}
+static UINT32
+Gen_Uint_By_Short(UINT v1, UINT v2){
+  return (v1 & 0x0000ffff) + ((v2 & 0x0000ffff) <<16);
+}
+static UINT64
+Gen_Uint64_By_Short(UINT v1, UINT v2, UINT v3, UINT v4){
+  return (((UINT64) v1) & 0x000000000000ffff) + ((((UINT64) v2) & 0x000000000000ffff) << 16)
+  	+ ((((UINT64) v3) & 0x000000000000ffff)<<32) + ((((UINT64) v4) & 0x000000000000ffff) << 48);
+}
+static UINT64
+Gen_Uint64_By_Uint(UINT v1, UINT v2){
+  return (((UINT64) v1) & 0x00000000ffffffff) + ((((UINT64) v2) & 0x00000000ffffffff) << 32);
+}
+
+void Exp_Intrinsic_Op_SETE(
+	    INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, TN *op4,
+	    TN *op5, TN *op6, TN *op7, TN *op8, TN *op9,
+	    TN *op10, TN *op11, TN *op12, TN *op13, TN *op14, TN *op15,
+	    TYPE_ID mtype, OPS *ops)
+{
+  switch(id){
+  	case INTRN_SETREPI8:{
+	 if(TN_is_constant(op0) && TN_is_constant(op1) && TN_is_constant(op2) && TN_is_constant(op3)
+	 	&& TN_is_constant(op4) && TN_is_constant(op5) && TN_is_constant(op6)
+	 	&& TN_is_constant(op7) && TN_is_constant(op8) && TN_is_constant(op9)
+	 	&& TN_is_constant(op10) && TN_is_constant(op11) && TN_is_constant(op12)
+	 	&& TN_is_constant(op13) && TN_is_constant(op14) && TN_is_constant(op15)){
+	 	UINT32 tval1, tval2, tval3, tval4;
+		tval1 = Gen_Uint_By_Char( TN_value(op0),TN_value(op1), TN_value(op2) ,TN_value(op3));
+		tval2 = Gen_Uint_By_Char( TN_value(op4),TN_value(op5), TN_value(op6) ,TN_value(op7));
+		tval3 = Gen_Uint_By_Char( TN_value(op8),TN_value(op9), TN_value(op10) ,TN_value(op11));
+		tval4 = Gen_Uint_By_Char( TN_value(op12),TN_value(op13), TN_value(op14) ,TN_value(op15));
+		TCON tcon = Host_To_Targ(MTYPE_V16I4, 0);
+		TCON_v0(tcon) = tval1;
+		TCON_v1(tcon) = tval2;
+		TCON_v2(tcon) = tval3;
+		TCON_v3(tcon) = tval4;
+		ST *sym = New_Const_Sym(Enter_tcon(tcon),Be_Type_Tbl(TCON_ty(tcon)));
+		Allocate_Object(sym);
+		Exp_Load(MTYPE_V16I4, MTYPE_V16I4, result , sym, 0, ops, 0);
+		
+	 }else if( TN_is_constant(op8) && TN_is_constant(op9)
+	 	&& TN_is_constant(op10) && TN_is_constant(op11) && TN_is_constant(op12)
+	 	&& TN_is_constant(op13) && TN_is_constant(op14) && TN_is_constant(op15)){
+	 	UINT32 tval891011 = Gen_Uint_By_Char( TN_value(op8),TN_value(op9), TN_value(op10) ,TN_value(op11));
+		UINT32 tval12131415 = Gen_Uint_By_Char( TN_value(op12),TN_value(op13), TN_value(op14) ,TN_value(op15));
+		TCON tcon1 = Host_To_Targ(MTYPE_V16I4, 0);
+		TCON_v0(tcon1) = tval891011;
+		TCON_v1(tcon1) = tval12131415;
+		TCON_v2(tcon1) = 0x000000ff;
+		TCON_v2(tcon1) = 0x00000000;
+		ST *sym1 = New_Const_Sym(Enter_tcon(tcon1), Be_Type_Tbl(TCON_ty(tcon1)));
+		Allocate_Object(sym1);
+		TN *tnxmm89101112131415 = Build_TN_Like(result);
+		Exp_Load(MTYPE_V16I4, MTYPE_V16I4, tnxmm89101112131415, sym1, 0, ops, 0);
+
+		if(TN_is_constant(op0) && TN_is_constant(op1) && TN_is_constant(op2) && TN_is_constant(op3)){
+		  UINT32 tval0123 = Gen_Uint_By_Char(TN_value(op0),TN_value(op1), TN_value(op2) ,TN_value(op3));
+		  TCON tcon0123 = Host_To_Targ(MTYPE_V16I4, 0);
+		  TCON_v0(tcon0123) = tval0123;
+		  TCON_v1(tcon0123) = TCON_v2(tcon0123) = TCON_v3(tcon0123) = 0xff000000;
+		  ST *sym0123 = New_Const_Sym(Enter_tcon(tcon0123), Be_Type_Tbl(TCON_ty(tcon0123)));
+		  Allocate_Object(sym0123);
+		  TN *tnxmm0123 =Build_TN_Like(result);
+		  Exp_Load(MTYPE_V16I4, MTYPE_V16I4, tnxmm0123, sym0123, 0, ops, 0);
+		  TN *tnxmm4 = Build_TN_Like(result);
+	      TN *tnxmm5 = Build_TN_Like(result);
+	      TN *tnxmm6 = Build_TN_Like(result);
+	      TN *tnxmm7 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm4, op4, ops);
+	      Expand_Mov_Int_To_vector(tnxmm5, op5, ops);
+	      Expand_Mov_Int_To_vector(tnxmm6, op6, ops);
+	      Expand_Mov_Int_To_vector(tnxmm7, op7, ops);
+		  Build_OP(TOP_punpcklbw128, tnxmm4, tnxmm4, tnxmm5, ops);
+	      Build_OP(TOP_punpcklbw128, tnxmm6, tnxmm6, tnxmm7, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm4, tnxmm4, tnxmm6, ops);
+		  Build_OP(TOP_punpckldq, tnxmm0123, tnxmm0123, tnxmm4,ops);
+		  Build_OP(TOP_punpcklqdq, result,tnxmm0123, tnxmm89101112131415, ops);
+		}
+		else if(TN_is_constant(op4) && TN_is_constant(op5) && TN_is_constant(op6)&& TN_is_constant(op7)){
+		  UINT32 tval4567 = Gen_Uint_By_Char( TN_value(op4),TN_value(op5), TN_value(op6) ,TN_value(op7));
+		  TCON tcon0 = Host_To_Targ(MTYPE_V16I4, 0);	
+		  TCON_v0(tcon0) = tval4567;
+		  TCON_v1(tcon0) = TCON_v2(tcon0) = TCON_v3(tcon0) = 0xff000000;
+		  ST *sym0 = New_Const_Sym(Enter_tcon(tcon0), Be_Type_Tbl(TCON_ty(tcon0)));
+		  Allocate_Object(sym0);
+		  TN *tnxmm4567 =Build_TN_Like(result);
+		  Exp_Load(MTYPE_V16I4, MTYPE_V16I4, tnxmm4567, sym0, 0, ops, 0);
+		  TN *tnxmm0 = Build_TN_Like(result);
+	      TN *tnxmm1 = Build_TN_Like(result);
+	      TN *tnxmm2 = Build_TN_Like(result);
+	      TN *tnxmm3 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm0, op0, ops);
+	      Expand_Mov_Int_To_vector(tnxmm1, op1, ops);
+	      Expand_Mov_Int_To_vector(tnxmm2, op2, ops);
+	      Expand_Mov_Int_To_vector(tnxmm3, op3, ops);
+		  Build_OP(TOP_punpcklbw128, tnxmm0, tnxmm0, tnxmm1, ops);
+		  Build_OP(TOP_punpcklbw128, tnxmm2, tnxmm2, tnxmm3, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm0, tnxmm0, tnxmm2, ops);
+		  Build_OP(TOP_punpckldq, tnxmm0, tnxmm0, tnxmm4567,ops);
+		  Build_OP(TOP_punpcklqdq, result,tnxmm0, tnxmm89101112131415, ops);
+		}
+		else{
+		  TN *tnxmm0 = Build_TN_Like(result);
+	      TN *tnxmm1 = Build_TN_Like(result);
+	      TN *tnxmm2 = Build_TN_Like(result);
+	      TN *tnxmm3 = Build_TN_Like(result);
+	      TN *tnxmm4 = Build_TN_Like(result);
+	      TN *tnxmm5 = Build_TN_Like(result);
+	      TN *tnxmm6 = Build_TN_Like(result);
+	      TN *tnxmm7 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm0, op0, ops);
+	      Expand_Mov_Int_To_vector(tnxmm1, op1, ops);
+	      Expand_Mov_Int_To_vector(tnxmm2, op2, ops);
+	      Expand_Mov_Int_To_vector(tnxmm3, op3, ops);
+	      Expand_Mov_Int_To_vector(tnxmm4, op4, ops);
+	      Expand_Mov_Int_To_vector(tnxmm5, op5, ops);
+	      Expand_Mov_Int_To_vector(tnxmm6, op6, ops);
+	      Expand_Mov_Int_To_vector(tnxmm7, op7, ops);
+		  Build_OP(TOP_punpcklbw128, tnxmm0, tnxmm0, tnxmm1, ops);
+	      Build_OP(TOP_punpcklbw128, tnxmm2, tnxmm2, tnxmm3, ops);
+	      Build_OP(TOP_punpcklbw128, tnxmm4, tnxmm4, tnxmm5, ops);
+	      Build_OP(TOP_punpcklbw128, tnxmm6, tnxmm6, tnxmm7, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm0, tnxmm0, tnxmm2, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm4, tnxmm4, tnxmm6, ops);
+		  Build_OP(TOP_punpckldq, tnxmm0, tnxmm0, tnxmm4,ops);
+		  Build_OP(TOP_punpcklqdq, result, tnxmm0, tnxmm89101112131415, ops);
+		}
+	 }
+	 else if(TN_is_constant(op0) && TN_is_constant(op1) && TN_is_constant(op2) && TN_is_constant(op3)
+	 	&& TN_is_constant(op4) && TN_is_constant(op5) && TN_is_constant(op6)&& TN_is_constant(op7)){
+	 	UINT32 tval0123 = Gen_Uint_By_Char( TN_value(op0),TN_value(op1), TN_value(op2) ,TN_value(op3));
+		UINT32 tval4567 = Gen_Uint_By_Char( TN_value(op4),TN_value(op5), TN_value(op6) ,TN_value(op7));
+		TCON tcon0 = Host_To_Targ(MTYPE_V16I4, 0);
+		TCON_v0(tcon0) = tval0123;
+		TCON_v1(tcon0) = tval4567;
+		TCON_v2(tcon0) = 0x000000ff;
+		TCON_v3(tcon0) = 0x00000000;
+		ST *sym1 = New_Const_Sym(Enter_tcon(tcon0), Be_Type_Tbl(TCON_ty(tcon0)));
+		Allocate_Object(sym1);
+		TN *tnxmm0_7 = Build_TN_Like(result);
+		Exp_Load(MTYPE_V16I4, MTYPE_V16I4, tnxmm0_7, sym1, 0, ops, 0);
+		if(TN_is_constant(op8) && TN_is_constant(op9) && TN_is_constant(op10) && TN_is_constant(op11)){
+		  UINT32 tval891011 = Gen_Uint_By_Char(TN_value(op8),TN_value(op9), TN_value(op10) ,TN_value(op11));
+		  TCON tcon891011 = Host_To_Targ(MTYPE_V16I4, 0);
+		  TCON_v0(tcon891011) = tval891011;
+		  TCON_v1(tcon891011) = TCON_v2(tcon891011) = TCON_v3(tcon891011) = 0xff000000;
+		  ST *sym0123 = New_Const_Sym(Enter_tcon(tcon891011), Be_Type_Tbl(TCON_ty(tcon891011)));
+		  Allocate_Object(sym0123);
+		  TN *tnxmm891011 =Build_TN_Like(result);
+		  Exp_Load(MTYPE_V16I4, MTYPE_V16I4, tnxmm891011, sym0123, 0, ops, 0);
+		  TN *tnxmm12 = Build_TN_Like(result);
+	      TN *tnxmm13 = Build_TN_Like(result);
+	      TN *tnxmm14 = Build_TN_Like(result);
+	      TN *tnxmm15 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm12, op12, ops);
+	      Expand_Mov_Int_To_vector(tnxmm13, op13, ops);
+	      Expand_Mov_Int_To_vector(tnxmm14, op14, ops);
+	      Expand_Mov_Int_To_vector(tnxmm15, op15, ops);
+		  Build_OP(TOP_punpcklbw128, tnxmm12, tnxmm12, tnxmm13, ops);
+	      Build_OP(TOP_punpcklbw128, tnxmm14, tnxmm14, tnxmm15, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm12, tnxmm12, tnxmm14, ops);
+		  Build_OP(TOP_punpckldq, tnxmm891011, tnxmm891011, tnxmm12,ops);
+		  Build_OP(TOP_punpcklqdq, result,tnxmm0_7, tnxmm891011, ops);
+		}
+		else if(TN_is_constant(op12) && TN_is_constant(op13) && TN_is_constant(op14)&& TN_is_constant(op15)){
+		  UINT32 tval12131415 = Gen_Uint_By_Char( TN_value(op12),TN_value(op13), TN_value(op14) ,TN_value(op15));
+		  TCON tcon0 = Host_To_Targ(MTYPE_V16I4, 0);	
+		  TCON_v0(tcon0) = tval12131415;
+		  TCON_v1(tcon0) = TCON_v2(tcon0) = TCON_v3(tcon0) = 0xff000000;
+		  ST *sym0 = New_Const_Sym(Enter_tcon(tcon0), Be_Type_Tbl(TCON_ty(tcon0)));
+		  Allocate_Object(sym0);
+		  TN *tnxmm12131415 =Build_TN_Like(result);
+		  Exp_Load(MTYPE_V16I4, MTYPE_V16I4, tnxmm12131415, sym0, 0, ops, 0);
+		  TN *tnxmm8 = Build_TN_Like(result);
+	      TN *tnxmm9 = Build_TN_Like(result);
+	      TN *tnxmm10 = Build_TN_Like(result);
+	      TN *tnxmm11 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm8, op8, ops);
+	      Expand_Mov_Int_To_vector(tnxmm9, op9, ops);
+	      Expand_Mov_Int_To_vector(tnxmm10, op10, ops);
+	      Expand_Mov_Int_To_vector(tnxmm11, op11, ops);
+		  Build_OP(TOP_punpcklbw128, tnxmm8, tnxmm8, tnxmm9, ops);
+		  Build_OP(TOP_punpcklbw128, tnxmm10, tnxmm10, tnxmm11, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm8, tnxmm8, tnxmm10, ops);
+		  Build_OP(TOP_punpckldq, tnxmm8, tnxmm8, tnxmm12131415,ops);
+		  Build_OP(TOP_punpcklqdq, result,tnxmm0_7, tnxmm8, ops);
+		}
+		else{
+		  TN *tnxmm8 = Build_TN_Like(result);
+	      TN *tnxmm9 = Build_TN_Like(result);
+	      TN *tnxmm10 = Build_TN_Like(result);
+	      TN *tnxmm11 = Build_TN_Like(result);
+	      TN *tnxmm12 = Build_TN_Like(result);
+	      TN *tnxmm13 = Build_TN_Like(result);
+	      TN *tnxmm14 = Build_TN_Like(result);
+	      TN *tnxmm15 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm8, op8, ops);
+	      Expand_Mov_Int_To_vector(tnxmm9, op9, ops);
+	      Expand_Mov_Int_To_vector(tnxmm10, op10, ops);
+	      Expand_Mov_Int_To_vector(tnxmm11, op11, ops);
+	      Expand_Mov_Int_To_vector(tnxmm12, op12, ops);
+	      Expand_Mov_Int_To_vector(tnxmm13, op13, ops);
+	      Expand_Mov_Int_To_vector(tnxmm14, op14, ops);
+	      Expand_Mov_Int_To_vector(tnxmm15, op15, ops);
+		  Build_OP(TOP_punpcklbw128, tnxmm8, tnxmm8, tnxmm9, ops);
+	      Build_OP(TOP_punpcklbw128, tnxmm10, tnxmm10, tnxmm11, ops);
+	      Build_OP(TOP_punpcklbw128, tnxmm12, tnxmm12, tnxmm13, ops);
+	      Build_OP(TOP_punpcklbw128, tnxmm14, tnxmm14, tnxmm15, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm8, tnxmm8, tnxmm10, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm12, tnxmm12, tnxmm14, ops);
+		  Build_OP(TOP_punpckldq, tnxmm8, tnxmm8, tnxmm12,ops);
+		  Build_OP(TOP_punpcklqdq, result, tnxmm0_7, tnxmm8,ops);
+		}
+	 }
+	 else{
+	  TN *tnxmm0 = Build_TN_Like(result);
+	  TN *tnxmm1 = Build_TN_Like(result);
+	  TN *tnxmm2 = Build_TN_Like(result);
+	  TN *tnxmm3 = Build_TN_Like(result);
+	  TN *tnxmm4 = Build_TN_Like(result);
+	  TN *tnxmm5 = Build_TN_Like(result);
+	  TN *tnxmm6 = Build_TN_Like(result);
+	  TN *tnxmm7 = Build_TN_Like(result);
+	  TN *tnxmm8 = Build_TN_Like(result);
+	  TN *tnxmm9 = Build_TN_Like(result);
+	  TN *tnxmm10 = Build_TN_Like(result);
+	  TN *tnxmm11 = Build_TN_Like(result);
+	  TN *tnxmm12 = Build_TN_Like(result);
+	  TN *tnxmm13 = Build_TN_Like(result);
+	  TN *tnxmm14 = Build_TN_Like(result);
+	  TN *tnxmm15 = Build_TN_Like(result);
+	  Expand_Mov_Int_To_vector(tnxmm0, op0, ops);
+	  Expand_Mov_Int_To_vector(tnxmm1, op1, ops);
+	  Expand_Mov_Int_To_vector(tnxmm2, op2, ops);
+	  Expand_Mov_Int_To_vector(tnxmm3, op3, ops);
+	  Expand_Mov_Int_To_vector(tnxmm4, op4, ops);
+	  Expand_Mov_Int_To_vector(tnxmm5, op5, ops);
+	  Expand_Mov_Int_To_vector(tnxmm6, op6, ops);
+	  Expand_Mov_Int_To_vector(tnxmm7, op7, ops);
+	  Expand_Mov_Int_To_vector(tnxmm8, op8, ops);
+	  Expand_Mov_Int_To_vector(tnxmm9, op9, ops);
+	  Expand_Mov_Int_To_vector(tnxmm10, op10, ops);
+	  Expand_Mov_Int_To_vector(tnxmm11, op11, ops);
+	  Expand_Mov_Int_To_vector(tnxmm12, op12, ops);
+	  Expand_Mov_Int_To_vector(tnxmm13, op13, ops);
+	  Expand_Mov_Int_To_vector(tnxmm14, op14, ops);
+	  Expand_Mov_Int_To_vector(tnxmm15, op15, ops);
+	  Build_OP(TOP_punpcklbw128, tnxmm0, tnxmm0, tnxmm1, ops);
+	  Build_OP(TOP_punpcklbw128, tnxmm2, tnxmm2, tnxmm3, ops);
+	  Build_OP(TOP_punpcklbw128, tnxmm4, tnxmm4, tnxmm5, ops);
+	  Build_OP(TOP_punpcklbw128, tnxmm6, tnxmm6, tnxmm7, ops);
+	  Build_OP(TOP_punpcklbw128, tnxmm8, tnxmm8, tnxmm9, ops);
+	  Build_OP(TOP_punpcklbw128, tnxmm10, tnxmm10, tnxmm11, ops);
+	  Build_OP(TOP_punpcklbw128, tnxmm12, tnxmm12, tnxmm13, ops);
+	  Build_OP(TOP_punpcklbw128, tnxmm14, tnxmm14, tnxmm15, ops);
+	  Build_OP(TOP_punpcklwd128, tnxmm0, tnxmm0, tnxmm2, ops);
+	  Build_OP(TOP_punpcklwd128, tnxmm4, tnxmm4, tnxmm6, ops);
+	  Build_OP(TOP_punpcklwd128, tnxmm8, tnxmm8, tnxmm10, ops);
+	  Build_OP(TOP_punpcklwd128, tnxmm12, tnxmm12, tnxmm14, ops);
+	  Build_OP(TOP_punpcklqdq, tnxmm0, tnxmm0, tnxmm4, ops);
+	  Build_OP(TOP_punpcklqdq, tnxmm8, tnxmm8, tnxmm12, ops);
+	  Build_OP(TOP_shufps, result, tnxmm0, tnxmm8, Gen_Literal_TN(136, 1),ops);
+	 }
+	  break;
+  	}
+	case INTRN_SETREPI16:{
+	  if(TN_is_constant(op0) && TN_is_constant(op1) && TN_is_constant(op2) && TN_is_constant(op3)
+	 	&& TN_is_constant(op4) && TN_is_constant(op5) && TN_is_constant(op6)&& TN_is_constant(op7))
+	  {
+	    UINT32 tval1, tval2, tval3, tval4;
+		tval1 = Gen_Uint_By_Short( TN_value(op0),TN_value(op1));
+		tval2 = Gen_Uint_By_Short( TN_value(op2),TN_value(op3));
+		tval3 = Gen_Uint_By_Short( TN_value(op4),TN_value(op5));
+		tval4 = Gen_Uint_By_Short( TN_value(op6),TN_value(op7));
+		TCON tcon = Host_To_Targ(MTYPE_V16I4, 0);
+		TCON_v0(tcon) = tval1;
+		TCON_v1(tcon) = tval2;
+		TCON_v2(tcon) = tval3;
+		TCON_v3(tcon) = tval4;
+		ST *sym = New_Const_Sym(Enter_tcon(tcon),Be_Type_Tbl(TCON_ty(tcon)));
+		Allocate_Object(sym);
+		Exp_Load(MTYPE_V16I4, MTYPE_V16I4, result , sym, 0, ops, 0);
+	  }else if (TN_is_constant(op0) && TN_is_constant(op1) && TN_is_constant(op2) && TN_is_constant(op3)){
+	    UINT64 tval0123 = Gen_Uint64_By_Short(TN_value(op0), TN_value(op1), TN_value(op2), TN_value(op3));
+		TN *tn64_tmp = Build_TN_Of_Mtype(MTYPE_U8);
+		TN *tnxmm0123 = Build_TN_Like(result);
+		Build_OP(TOP_ldc64, tn64_tmp, Gen_Literal_TN(tval0123, 8), ops);
+		Build_OP(TOP_movg2x64, tnxmm0123, tn64_tmp, ops);
+		if(TN_is_constant(op4) && TN_is_constant(op5)){
+		  TN *tnxmm45 = Build_TN_Like(result);
+		  UINT32 tval45 = Gen_Uint_By_Short(TN_value(op4), TN_value(op5));
+		  Expand_Mov_Int_To_vector(tnxmm45, Gen_Literal_TN(tval45, 4),ops);
+		  TN *tnxmm6 = Build_TN_Like(result);
+	      TN *tnxmm7 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm6, op6, ops);
+		  Expand_Mov_Int_To_vector(tnxmm7, op7, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm6, tnxmm6, tnxmm7, ops);
+		  Build_OP(TOP_punpckldq, tnxmm45, tnxmm45, tnxmm6, ops);
+		  Build_OP(TOP_punpcklqdq, result, tnxmm0123, tnxmm45, ops);
+		}else if(TN_is_constant(op6) && TN_is_constant(op7)){
+		  TN *tnxmm67 = Build_TN_Like(result);
+		  UINT32 tval67 = Gen_Uint_By_Short(TN_value(op6), TN_value(op7));
+		  Expand_Mov_Int_To_vector(tnxmm67, Gen_Literal_TN(tval67, 4),ops);
+		  TN *tnxmm4 = Build_TN_Like(result);
+	      TN *tnxmm5 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm4, op4, ops);
+		  Expand_Mov_Int_To_vector(tnxmm5, op5, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm4, tnxmm4, tnxmm5, ops);
+		  Build_OP(TOP_punpckldq, tnxmm4, tnxmm4, tnxmm67, ops);
+		  Build_OP(TOP_punpcklqdq, result, tnxmm0123, tnxmm4, ops);
+		}else{
+		  TN *tnxmm4 = Build_TN_Like(result);
+	      TN *tnxmm5 = Build_TN_Like(result);
+	      TN *tnxmm6 = Build_TN_Like(result);
+	      TN *tnxmm7 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm4, op4, ops);
+	      Expand_Mov_Int_To_vector(tnxmm5, op5, ops);
+	      Expand_Mov_Int_To_vector(tnxmm6, op6, ops);
+	      Expand_Mov_Int_To_vector(tnxmm7, op7, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm4, tnxmm4, tnxmm5, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm6, tnxmm6, tnxmm7, ops);
+		  Build_OP(TOP_punpckldq, tnxmm4, tnxmm4, tnxmm6, ops);
+		  Build_OP(TOP_punpcklqdq, result, tnxmm0123, tnxmm4, ops);
+		}
+	  }
+	  else if(TN_is_constant(op4) && TN_is_constant(op5) && TN_is_constant(op6) && TN_is_constant(op7)){
+	  	UINT64 tval4567 = Gen_Uint64_By_Short(TN_value(op4), TN_value(op5), TN_value(op6), TN_value(op7));
+		TN *tn64_tmp = Build_TN_Of_Mtype(MTYPE_U8);
+		TN *tnxmm4567 = Build_TN_Like(result);
+		Build_OP(TOP_ldc64, tn64_tmp, Gen_Literal_TN(tval4567, 8), ops);
+		Build_OP(TOP_movg2x64, tnxmm4567, tn64_tmp, ops);
+		if(TN_is_constant(op0) && TN_is_constant(op1)){
+		  TN *tnxmm01 = Build_TN_Like(result);
+		  UINT32 tval01 = Gen_Uint_By_Short(TN_value(op0), TN_value(op1));
+		  Expand_Mov_Int_To_vector(tnxmm01, Gen_Literal_TN(tval01, 4),ops);
+		  TN *tnxmm2 = Build_TN_Like(result);
+	      TN *tnxmm3 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm2, op2, ops);
+		  Expand_Mov_Int_To_vector(tnxmm3, op3, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm2, tnxmm2, tnxmm3, ops);
+		  Build_OP(TOP_punpckldq, tnxmm01, tnxmm01, tnxmm2, ops);
+		  Build_OP(TOP_punpcklqdq, result, tnxmm01, tnxmm4567, ops);
+		}else if(TN_is_constant(op2) && TN_is_constant(op3)){
+		  TN *tnxmm23 = Build_TN_Like(result);
+		  UINT32 tval23 = Gen_Uint_By_Short(TN_value(op2), TN_value(op3));
+		  Expand_Mov_Int_To_vector(tnxmm23, Gen_Literal_TN(tval23, 4),ops);
+		  TN *tnxmm0 = Build_TN_Like(result);
+	      TN *tnxmm1 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm0, op0, ops);
+		  Expand_Mov_Int_To_vector(tnxmm1, op1, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm0, tnxmm0, tnxmm1, ops);
+		  Build_OP(TOP_punpckldq, tnxmm0, tnxmm0, tnxmm23, ops);
+		  Build_OP(TOP_punpcklqdq, result, tnxmm0, tnxmm4567, ops);
+		}else{
+		  TN *tnxmm0 = Build_TN_Like(result);
+	      TN *tnxmm1 = Build_TN_Like(result);
+	      TN *tnxmm2 = Build_TN_Like(result);
+	      TN *tnxmm3 = Build_TN_Like(result);
+		  Expand_Mov_Int_To_vector(tnxmm0, op0, ops);
+	      Expand_Mov_Int_To_vector(tnxmm1, op1, ops);
+	      Expand_Mov_Int_To_vector(tnxmm2, op2, ops);
+	      Expand_Mov_Int_To_vector(tnxmm3, op3, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm0, tnxmm0, tnxmm1, ops);
+		  Build_OP(TOP_punpcklwd128, tnxmm2, tnxmm2, tnxmm3, ops);
+		  Build_OP(TOP_punpckldq, tnxmm0, tnxmm0, tnxmm2, ops);
+		  Build_OP(TOP_punpcklqdq, result, tnxmm0, tnxmm4567, ops);
+		}
+	  }
+	  else{
+	     TN *tnxmm0 = Build_TN_Like(result);
+	     TN *tnxmm1 = Build_TN_Like(result);
+	     TN *tnxmm2 = Build_TN_Like(result);
+	     TN *tnxmm3 = Build_TN_Like(result);
+	     TN *tnxmm4 = Build_TN_Like(result);
+	     TN *tnxmm5 = Build_TN_Like(result);
+	     TN *tnxmm6 = Build_TN_Like(result);
+	     TN *tnxmm7 = Build_TN_Like(result);
+		 Expand_Mov_Int_To_vector(tnxmm0, op0, ops);
+	     Expand_Mov_Int_To_vector(tnxmm1, op1, ops);
+	     Expand_Mov_Int_To_vector(tnxmm2, op2, ops);
+	     Expand_Mov_Int_To_vector(tnxmm3, op3, ops);
+	     Expand_Mov_Int_To_vector(tnxmm4, op4, ops);
+	     Expand_Mov_Int_To_vector(tnxmm5, op5, ops);
+	     Expand_Mov_Int_To_vector(tnxmm6, op6, ops);
+	     Expand_Mov_Int_To_vector(tnxmm7, op7, ops);
+		 Build_OP(TOP_punpcklwd128, tnxmm0, tnxmm0, tnxmm1, ops);
+		 Build_OP(TOP_punpcklwd128, tnxmm2, tnxmm2, tnxmm3, ops);
+		 Build_OP(TOP_punpcklwd128, tnxmm4, tnxmm4, tnxmm5, ops);
+		 Build_OP(TOP_punpcklwd128, tnxmm6, tnxmm6, tnxmm7, ops);
+		 Build_OP(TOP_punpcklqdq, tnxmm0, tnxmm0, tnxmm2, ops);
+		 Build_OP(TOP_punpcklqdq, tnxmm4, tnxmm4, tnxmm6, ops);
+		 Build_OP(TOP_shufps, result, tnxmm0, tnxmm4, Gen_Literal_TN(136, 1),ops); 
+	  }
+	}
+	break;
+	case INTRN_SETREPI32:{
+	  if(TN_is_constant(op0) && TN_is_constant(op1) && TN_is_constant(op2) && TN_is_constant(op3)){
+		TCON tcon = Host_To_Targ(MTYPE_V16I4, 0);
+		TCON_v0(tcon) = TN_value(op0);
+		TCON_v1(tcon) = TN_value(op1);
+		TCON_v2(tcon) = TN_value(op2);
+		TCON_v3(tcon) = TN_value(op3);
+		ST *sym = New_Const_Sym(Enter_tcon(tcon),Be_Type_Tbl(TCON_ty(tcon)));
+		Allocate_Object(sym);
+		Exp_Load(MTYPE_V16I4, MTYPE_V16I4, result , sym, 0, ops, 0);
+	  }else if(TN_is_constant(op0) && TN_is_constant(op1)){
+	    UINT64 tval01 = Gen_Uint64_By_Uint(TN_value(op0), TN_value(op1));
+		TN *tnxmm01 = Build_TN_Like(result);
+		TN *tn64_tmp = Build_TN_Of_Mtype(MTYPE_U8);
+		Build_OP(TOP_ldc64, tn64_tmp, Gen_Literal_TN(tval01, 8), ops);
+		Build_OP(TOP_movg2x64, tnxmm01, tn64_tmp, ops);
+		TN *tnxmm2 = Build_TN_Like(result);
+		TN *tnxmm3 = Build_TN_Like(result);
+		Expand_Mov_Int_To_vector(tnxmm2, op2, ops);
+	    Expand_Mov_Int_To_vector(tnxmm3, op3, ops);
+		Build_OP(TOP_punpckldq, tnxmm2, tnxmm2, tnxmm3, ops);
+		Build_OP(TOP_punpcklqdq, result, tnxmm01, tnxmm2, ops);
+	  }
+	  else if(TN_is_constant(op2) && TN_is_constant(op3)){
+	  	UINT64 tval23 = Gen_Uint64_By_Uint(TN_value(op2), TN_value(op3));
+		TN *tnxmm23 = Build_TN_Like(result);
+		TN *tn64_tmp = Build_TN_Of_Mtype(MTYPE_U8);
+		Build_OP(TOP_ldc64, tn64_tmp, Gen_Literal_TN(tval23, 8), ops);
+		Build_OP(TOP_movg2x64, tnxmm23, tn64_tmp, ops);
+		TN *tnxmm0 = Build_TN_Like(result);
+		TN *tnxmm1 = Build_TN_Like(result);
+		Expand_Mov_Int_To_vector(tnxmm0, op0, ops);
+	    Expand_Mov_Int_To_vector(tnxmm1, op1, ops);
+		Build_OP(TOP_punpckldq, tnxmm0, tnxmm0, tnxmm1, ops);
+		Build_OP(TOP_punpcklqdq, result, tnxmm0, tnxmm23, ops);
+	  }
+	  else{
+	  	TN *tnxmm0 = Build_TN_Like(result);
+	    TN *tnxmm1 = Build_TN_Like(result);
+	    TN *tnxmm2 = Build_TN_Like(result);
+	    TN *tnxmm3 = Build_TN_Like(result);
+		Expand_Mov_Int_To_vector(tnxmm0, op0, ops);
+	    Expand_Mov_Int_To_vector(tnxmm1, op1, ops);
+	    Expand_Mov_Int_To_vector(tnxmm2, op2, ops);
+	    Expand_Mov_Int_To_vector(tnxmm3, op3, ops);
+		Build_OP(TOP_punpcklqdq, tnxmm0, tnxmm0, tnxmm1, ops);
+		Build_OP(TOP_punpcklqdq, tnxmm2, tnxmm2, tnxmm3, ops);
+		Build_OP(TOP_shufps, result, tnxmm0, tnxmm2, Gen_Literal_TN(136, 1),ops);
+	  }
+	  break;
+	}
+	default:
+	  FmtAssert(FALSE, ("not yet i"));
+  }
+}
+
+
+void Expand_Intrinsic_Imm_Param_2result(TOP opc, struct tn* result, struct tn* result2, struct tn *op0,
+										struct tn *op1, struct tn *op2, OPS *ops, int op_count)
+{
+
+	   if(TN_is_constant(op2))
+		   Build_OP(opc, result, result2, op0, op1, op2, ops);
+	   else
+	   {
+		   OP *op = NULL;
+		   TN *tn;
+		   int tick_count = 0;
+		   FOR_ALL_OPS_OPs_REV(ops, op)
+		   {
+			   tick_count++;
+			   if(tick_count == op_count)
+				   break;
+		   }
+		   if(tick_count == op_count)
+		   {
+		   	   if(TN_is_constant(OP_opnd(op,0)))
+		   	   {
+			     tn = Gen_Literal_TN( TN_value(OP_opnd(op, 0)), 1);
+			     Build_OP(opc, result, result2, op0, op1, tn, ops);
+		   	   }
+			   else
+			   	Build_OP(opc, result, result2, op0, op1, Gen_Literal_TN(0,1), ops);
+		   }
+		   else
+		   {
+			   tn = Gen_Literal_TN(0, 1);
+			   Build_OP(opc, result, result2, op0, op1, tn, ops);
+		   }
+	   }
+}
+
 
 void
 Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, TN *op4, TYPE_ID mtype, OPS *ops)
@@ -7017,6 +7927,12 @@ Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, 
   case INTRN_PMINSW128:
     Build_OP( TOP_min128v16, result, op0, op1, ops );
     break;
+  case INTRN_PMULUDQ:
+    Build_OP( TOP_pmuludq, result, op0, op1, ops);
+    break;
+  case INTRN_PMULUDQ128:
+    Build_OP( TOP_pmuludq128, result, op0, op1, ops);
+    break;
   case INTRN_PMOVMSKB:
     Build_OP( TOP_pmovmskb, result, op0, ops );
     break;
@@ -7357,9 +8273,12 @@ Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, 
     Build_OP( TOP_for128v64, result, op0, op1, ops );
     break;
   case INTRN_LOADLPD:
-    Build_OP( TOP_ldsd, result, op1, Gen_Literal_TN (0,4), ops );
+    Build_OP( TOP_movapd, result, op0, ops );
+    Build_OP( TOP_ldlpd, result, op1, Gen_Literal_TN (0,4), ops );
+    Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
     break;
   case INTRN_LOADHPD:
+    Build_OP( TOP_movapd, result, op0, ops );
     Build_OP( TOP_ldhpd, result, op1, Gen_Literal_TN (0,4), ops );
     break;
   case INTRN_UNPCKLPD:
@@ -7582,10 +8501,13 @@ Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, 
     Build_OP( TOP_ldupd, result, op0, Gen_Literal_TN (0,4), ops );
     break;
   case INTRN_LOADHPS:
+    Build_OP( TOP_movaps, result, op0, ops );
     Build_OP( TOP_ldhps, result, op1, Gen_Literal_TN (0,4), ops );
     break;
   case INTRN_LOADLPS:
+    Build_OP( TOP_movaps, result, op0, ops );
     Build_OP( TOP_ldlps, result, op1, Gen_Literal_TN (0,4), ops );
+    Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
     break;
   case INTRN_MOVMSKPS:
     Build_OP( TOP_movmskps, result, op0, ops );
@@ -7642,14 +8564,31 @@ Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, 
    	Expand_Intrinsic_Imm_Param(TOP_blendps, result, op0, op1, op2, ops, 5);
 	break;
    case INTRN_PBLENDVB128:
-	Build_OP(TOP_pblendvb, result, op0, op1, op2, ops);
+   	if(TN_is_dedicated(result) && TN_is_float(result) && TN_register(result) == 1){
+	  TN *tmp = Build_TN_Like(op0);
+	  Build_OP(TOP_pblendvb, tmp, op0, op1, op2, ops);
+	  Build_OP(TOP_movaps, result, tmp,ops);
+   	}else
+	  Build_OP(TOP_pblendvb, result, op0, op1, op2, ops);
 	break;
    case INTRN_BLENDVPD:
-	Build_OP(TOP_blendvpd, result, op0, op1, op2, ops);
+   	if(TN_is_dedicated(result) && TN_is_float(result) && TN_register(result) == 1){
+	  TN *tmp = Build_TN_Like(op0);
+	  Build_OP(TOP_blendvpd, tmp, op0, op1, op2, ops);
+	  Build_OP(TOP_movaps, result, tmp,ops);
+   	}else
+	  Build_OP(TOP_blendvpd, result, op0, op1, op2, ops);
 	break;
-   case INTRN_BLENDVPS:
-	Build_OP(TOP_blendvps, result, op0, op1, op2, ops);
+   case INTRN_BLENDVPS:{
+   	if(TN_is_dedicated(result) && TN_is_float(result) && TN_register(result) == 1){
+	//when the result processed xmm0, then the opnd2 can't be allocated xmm0
+	  TN *tmp = Build_TN_Like(op0);
+	  Build_OP(TOP_blendvps, tmp, op0, op1, op2, ops);
+	  Build_OP(TOP_movaps, result, tmp,ops);
+   	}else
+	  Build_OP(TOP_blendvps, result, op0, op1, op2, ops);
 	break;
+   }
   case INTRN_ROUNDPD:
    	Expand_Intrinsic_Imm_Param(TOP_roundpd, result, op0, op0, op1, ops, 4);
 	break;
@@ -7737,9 +8676,9 @@ Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, 
    	Expand_Intrinsic_Imm_Param(TOP_pextrq, result, tn, op0, op1, ops, 4);
     break;
 	 }
-   case INTRN_EXTRACTPS:
+   case INTRN_VEC_EXT_V4SF:
 	 {
-	 	FmtAssert(TN_is_constant(op1),("INTRN_EXTRACTPS should be constant!"));
+	 	FmtAssert(TN_is_constant(op1),("INTRN_VEC_EXT_V4SF should be constant!"));
 		INT32 imm = TN_value(op1);
 		switch(imm){
 		  case 0:
@@ -7760,6 +8699,12 @@ Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, 
 		}
 		break;
 	 }
+    case INTRN_EXTRACTPS:
+	{
+		INT32 imm = TN_value(op1);
+		Build_OP(TOP_extractps, result, op0, Gen_Literal_TN(imm,1),ops);
+		break;
+    }
 	 case INTRN_PINSRB:
    	Expand_Intrinsic_Imm_Param(TOP_pinsrb, result, op0, op1, op2, ops, 5);
 	 break;
@@ -7807,9 +8752,10 @@ Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, 
 		TN *tneax = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RAX, 4);
 		TN *tn0 = Gen_Literal_TN(0,4);
 		Build_OP(TOP_ldc32, tneax, tn0, ops);
-    Build_OP(TOP_ptest, op0, op1, ops );
-		TN *tnal = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RAX, 2);
 		TN *rflags = Rflags_TN();
+    Build_OP(TOP_ptest,rflags, op0, op1, ops );
+		TN *tnal = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RAX, 2);
+		
 		Build_OP(TOP_setb, tnal, rflags , ops);
 		Build_OP(TOP_mov32, result, tneax, tn0, ops);
     break;
@@ -7819,9 +8765,10 @@ Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, 
 		TN *tneax = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RAX, 4);
 		TN *tn0 = Gen_Literal_TN(0,4);
 		Build_OP(TOP_ldc32, tneax, tn0, ops);
-    Build_OP(TOP_ptest, op0, op1, ops );
-		TN *tnal = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RAX, 2);
 		TN *rflags = Rflags_TN();
+    Build_OP(TOP_ptest, rflags, op0, op1, ops );
+		TN *tnal = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RAX, 2);
+		
 		Build_OP(TOP_seta, tnal, rflags , ops);
 		Build_OP(TOP_mov32, result, tneax, tn0, ops);
     break;
@@ -7831,86 +8778,123 @@ Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, 
 		TN *tneax = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RAX, 4);
 		TN *tn0 = Gen_Literal_TN(0,4);
 		Build_OP(TOP_ldc32, tneax, tn0, ops);
-    Build_OP(TOP_ptest, op0, op1, ops );
-		TN *tnal = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RAX, 2);
 		TN *rflags = Rflags_TN();
+        Build_OP(TOP_ptest,rflags, op0, op1, ops );
+		TN *tnal = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RAX, 2);
+		
 		Build_OP(TOP_sete, tnal, rflags , ops);
 		Build_OP(TOP_mov32, result, tneax, tn0, ops);
     break;
 	 }
+   case INTRN_PCMPESTRI128:{
+	 TN *rflags = Rflags_TN();
+	 TN *cont1 = Build_TN_Of_Mtype(MTYPE_I4);
+	 TN *cont2 = Build_TN_Of_Mtype(MTYPE_I4);
+	 Exp_COPY(cont1, op1, ops, 0);
+	 Exp_COPY(cont2, op3, ops, 0);
+	 Expand_Intrinsic_Imm_Param5(TOP_pcmpestriintr, result, rflags, op0, op2, op4, cont1, cont2, ops, 9);
+   break;
+   	}
+   case INTRN_PCMPESTRM128:
+	 {
+		 TN *rflags = Rflags_TN();
+		 TN *cont1 = Build_TN_Of_Mtype(MTYPE_I4);
+	     TN *cont2 = Build_TN_Of_Mtype(MTYPE_I4);
+		 Exp_COPY(cont1, op1, ops, 0);
+	     Exp_COPY(cont2, op3, ops, 0);
+		 Expand_Intrinsic_Imm_Param5(TOP_pcmpestrmintr, result,rflags, op0, op2, op4, cont1, cont2, ops, 9);
+	 	 break;
+	 }
+   case INTRN_PCMPISTRI128:{
+   	    TN *rflags = Rflags_TN();
+		Expand_Intrinsic_Imm_Param_2result(TOP_pcmpistriintr, result, rflags, op0, op1, op2, ops, 5);
+	 	break;
+   	}
+   case INTRN_PCMPISTRM128:
+	 {
+		TN *rflags = Rflags_TN();
+		Expand_Intrinsic_Imm_Param_2result(TOP_pcmpistrmintr, result, rflags, op0, op1, op2, ops, 5);
+		break;
+	 }
    case INTRN_PCMPESTRIA128:
    case INTRN_PCMPESTRIC128:
-   case INTRN_PCMPESTRI128:
    case INTRN_PCMPESTRIO128:
    case INTRN_PCMPESTRIS128:
    case INTRN_PCMPESTRIZ128:
 	 {
-		 TN *tneax = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RAX, 4);
-		 TN *tnedx = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RDX, 4);
-		 Build_OP(TOP_mov32, tneax, op1, ops);
-		 Build_OP(TOP_mov32, tnedx, op3, ops);
+	 	TOP cmov_top;
+		TN *cmov_reg = Build_TN_Of_Mtype(MTYPE_I4);
+		TN *cont1 = Build_TN_Of_Mtype(MTYPE_I4);
+	    TN *cont2 = Build_TN_Of_Mtype(MTYPE_I4); 
+		Exp_COPY(cont1, op1, ops, 0);
+	    Exp_COPY(cont2, op3, ops, 0);
+		switch(id){
+		  case INTRN_PCMPESTRIA128:
+		  	cmov_top = TOP_cmova;
+			break;
+   		  case INTRN_PCMPESTRIC128:
+		  	cmov_top = TOP_cmovb;
+			break;
+   		  case INTRN_PCMPESTRIO128:
+		  	cmov_top = TOP_cmovo;
+			break;
+   		  case INTRN_PCMPESTRIS128:
+		  	cmov_top = TOP_cmovs;
+			break;
+   		  case INTRN_PCMPESTRIZ128:
+		  	cmov_top = TOP_cmove;
+			break;
+		}
+		Build_OP(TOP_ldc64, cmov_reg, Gen_Literal_TN(1,8), ops);
+		TN *tmp_tn = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, R12,4);
+		 Build_OP(TOP_zero32, tmp_tn, ops);
 		 TN *rflags = Rflags_TN();
-		 Expand_Intrinsic_Imm_Param5(TOP_pcmpestri, tneax, op0, op2, op4, tnedx,tneax, ops, 9);
-		 Expand_Intrinsic_Imm_Param5(TOP_pcmpestrm, op0, op0, op2, op4, tneax,tnedx, ops, 10);
-		 Set_OP_volatile(OPS_last(ops));
-		 Build_OP(TOP_ldc32, tneax, Gen_Literal_TN(0,4), ops);
-		 Set_OP_volatile(OPS_last(ops));
-		 TN *tnal = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RAX, 2);
-		 Build_OP(TOP_seta,tnal, rflags, ops);
-		 Build_OP(TOP_mov32, result, tneax, Gen_Literal_TN(0,4), ops);
+		 Expand_Intrinsic_Imm_Param5(TOP_pcmpestriintr, result,rflags, op0, op2, op4, cont1, cont2, ops, 9);
+		 Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+		 Build_OP(cmov_top, tmp_tn, cmov_reg, rflags, ops);
+		 Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+		 Exp_COPY(result, tmp_tn, ops, 0);
 	 	break;
-	 }
-   case INTRN_PCMPESTRM128:
-	 {
-		 TN *tneax = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RAX, 4);
-		 TN *tnedx = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RDX, 4);
-		 Build_OP(TOP_mov32, tneax, op1, ops);
-		 Build_OP(TOP_mov32, tnedx, op3, ops);
-		 TN *rflags = Rflags_TN();
-		 Expand_Intrinsic_Imm_Param5(TOP_pcmpestri, tneax, op0, op2, op4, tnedx,tneax, ops, 9);
-		 Expand_Intrinsic_Imm_Param5(TOP_pcmpestrm, op0, op0, op2, op4, tneax,tnedx, ops, 10);
-		 Build_OP(TOP_movdq,result, op0, ops);
-	 	 break;
-	 }
-	 break;
+   	}
    case INTRN_PCMPGTQ128:
     Build_OP(TOP_pcmpgtq, result, op0, op1, ops );
     break;
    case INTRN_PCMPISTRIA128:
    case INTRN_PCMPISTRIC128:
-   case INTRN_PCMPISTRI128:
    case INTRN_PCMPISTRIO128:
    case INTRN_PCMPISTRIS128:
    case INTRN_PCMPISTRIZ128:
 	 {
-		 TN *tneax = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RAX, 4);
-		 TN *rflags = Rflags_TN();
-		 Expand_Intrinsic_Imm_Param(TOP_pcmpistri, result, op0, op1, op2, ops, 5);
-		 Set_OP_volatile(OPS_last(ops));
-		 Expand_Intrinsic_Imm_Param(TOP_pcmpistrm, result, op0, op1, op2, ops, 6);
-		 Set_OP_volatile(OPS_last(ops));
-		 Build_OP(TOP_ldc32, tneax, Gen_Literal_TN(0,1), ops);
-		 Set_OP_volatile(OPS_last(ops));
-		 Build_OP(TOP_seta, Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RAX, 2), rflags , ops);
-		 Set_OP_volatile(OPS_last(ops));
-		 Build_OP(TOP_mov32, result, tneax, ops);
+	 	TOP cmov_top;
+		switch(id){
+		  case INTRN_PCMPISTRIA128:
+		  	cmov_top = TOP_cmova;
+			break;
+   		  case INTRN_PCMPISTRIC128:
+		  	cmov_top = TOP_cmovb;
+			break;
+   		  case INTRN_PCMPISTRIO128:
+		  	cmov_top = TOP_cmovo;
+			break;
+   		  case INTRN_PCMPISTRIS128:
+		  	cmov_top = TOP_cmovs;
+			break;
+   		  case INTRN_PCMPISTRIZ128:
+		  	cmov_top = TOP_cmove;
+			break;
+		}
+		TN *cmov_reg = Build_TN_Of_Mtype(MTYPE_I4);
+		Build_OP(TOP_ldc64, cmov_reg, Gen_Literal_TN(1,8), ops);
+		TN *tmp_tn = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, R12,4);
+		Build_OP(TOP_zero32, tmp_tn, ops);
+		TN *rflags = Rflags_TN();
+		Expand_Intrinsic_Imm_Param_2result(TOP_pcmpistriintr, result, rflags, op0, op1, op2, ops, 5);
+		Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+		Build_OP(cmov_top, tmp_tn, cmov_reg, rflags, ops);
+		Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+		Exp_COPY(result, tmp_tn, ops, 0);
     break;
-	 }
-   case INTRN_PCMPISTRM128:
-	 {
-		 TN *tneax = Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RAX, 4);
-		 TN *rflags = Rflags_TN();
-		 Expand_Intrinsic_Imm_Param(TOP_pcmpistri, tneax, op0, op1, op2, ops, 5);
-		 Set_OP_volatile(OPS_last(ops));
-		 Expand_Intrinsic_Imm_Param(TOP_pcmpistrm, tneax, op0, op1, op2, ops, 6);
-		 Set_OP_volatile(OPS_last(ops));
-		 Build_OP(TOP_ldc32, tneax, Gen_Literal_TN(0,1), ops);
-		 Set_OP_volatile(OPS_last(ops));
-		 Build_OP(TOP_seta, Build_Dedicated_TN(ISA_REGISTER_CLASS_integer, RAX, 2), rflags , ops);
-		 Set_OP_volatile(OPS_last(ops));
-		 Build_OP(TOP_movdq, result, op0, ops);
-		break;
-	 }
+	 }  
   case INTRN_CRC32B:
 	 Build_OP(TOP_crc32b,result, op0, op1, ops);
 	 break;
@@ -7930,6 +8914,10 @@ Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, 
 	 Build_OP(popcnt_top,result, op0, ops);
 	 break;
 	}
+  case INTRN_SETREPI8:
+  	{
+	  break;
+  	}
   case INTRN_PHADDW128:
     Build_OP(TOP_phaddw128, result, op0, op1, ops );
     break;
@@ -8011,6 +8999,48 @@ Exp_Intrinsic_Op (INTRINSIC id, TN *result, TN *op0, TN *op1, TN *op2, TN *op3, 
   case INTRN_PSHUFB:
     Build_OP(TOP_pshufb, result, op0, op1, ops );
     break;
+ /*AES*/
+  case INTRN_AESDEC:
+  	Build_OP(TOP_aesmov, result, op0, ops);
+  	Build_OP(TOP_aesdec_f128_oxmm_xmm, result, op1, ops);
+	Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+  	break;
+  case	INTRN_AESENC:
+  	Build_OP(TOP_aesmov, result, op0, ops);
+  	Build_OP(TOP_aesenc_f128_oxmm_xmm, result, op1, ops);
+	Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+  	break;
+  case INTRN_AESDECLAST:
+  	//Build_OP(TOP_fmovddup, result, op0, ops);
+	//Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+	Build_OP(TOP_aesmov, result, op0, ops);
+	Build_OP(TOP_aesdeclast_f128_oxmm_xmm, result, op1, ops);
+	Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+	break;
+  case	INTRN_AESENCLAST:
+  	Build_OP(TOP_aesmov, result, op0, ops);
+  	Build_OP(TOP_aesenclast_f128_oxmm_xmm, result, op1, ops);
+	Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+  	break;
+  case	INTRN_AESIMC:
+  	Build_OP(TOP_aesimc_f128_oxmm_xmm, result, op0, ops);
+	Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+  	break;
+  case	INTRN_AESKEYGENASSIST:{
+  	INT32 imm = TN_value(op1); 
+  	Build_OP(TOP_aesmov, result, op0, ops);
+	Build_OP(TOP_aeskeygenassist_f128_oxmm_xmm_simm8, result, op0, Gen_Literal_TN(imm, 1), ops);
+	Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+  	break;
+  	}
+  /*PCLMUL*/
+  case	INTRN_PCLMULDQD:{
+  	INT32 imm = TN_value(op2);
+  	Build_OP(TOP_aesmov, result, op0, ops);
+  	Build_OP(TOP_pclmulqdq_f128_oxmm_xmm_simm8, result, op1, Gen_Literal_TN(imm, 1), ops);
+	Set_OP_cond_def_kind(OPS_last(ops), OP_ALWAYS_COND_DEF);
+  	break;
+  	}
   case INTRN_PAND128:
     Build_OP(TOP_pand128, result, op0, op1, ops );
     break;
@@ -8386,7 +9416,19 @@ Exp_Intrinsic_Call (WN *intrncall, TN *op0, TN *op1, TN *op2,
   case INTRN_VMASKMOVPS256ST:
     Build_OP(TOP_vmaskmovps_f256_obase64_simm32_float_float,op1,op2, op0, Gen_Literal_TN(0,1),ops);
   break;
-  default:  
+  case INTRN_VMOVAPD256:
+  	Build_OP(TOP_vmovupd_f256_obase64_simm32_float, op1, op0, Gen_Literal_TN(0,4), ops);
+  break;
+  case INTRN_VMOVAPS256:
+  	Build_OP(TOP_vmovups_f256_obase64_simm32_float, op1, op0, Gen_Literal_TN(0,4), ops);
+  break;
+  case INTRN_VMOVNTPD256:
+  	Build_OP(TOP_vmovntpd_f256_obase64_simm32_float, op1, op0, Gen_Literal_TN(0,4), ops);
+  break; 
+  case INTRN_VMOVNTPS256:
+  	Build_OP(TOP_vmovntps_f256_obase64_simm32_float, op1, op0, Gen_Literal_TN(0,4), ops);
+  break;
+  default:
     FmtAssert(FALSE, ("Exp_Intrinsic_Call: unimplemented"));
   }
   return result;
@@ -8566,21 +9608,33 @@ void Expand_Const (TN *dest, TN *src, TYPE_ID mtype, OPS *ops)
 
     // Must use Targ_Is_Zero to check for positive zero.  Bug 9734.
     if (TCON_ty(tcon) == MTYPE_F4 && Targ_Is_Zero(tcon)) {
-      FmtAssert(TCON_ty(tcon) == mtype || mtype == MTYPE_V16F4, 
+      FmtAssert(TCON_ty(tcon) == mtype || mtype == MTYPE_V16F4 || mtype == MTYPE_V32F4, 
 		("Expand_Const: inconsistent mtypes"));
-      if ( Is_Target_SSE2() )
-	Build_OP( mtype == MTYPE_V16F4?TOP_xzero128v32:TOP_xzero32, dest, ops);
-      else
-	Build_OP( TOP_fldz, dest, ops);
+	  if(mtype != MTYPE_V32F4){
+       if ( Is_Target_SSE2() ){
+	      Build_OP( mtype == MTYPE_V16F4?TOP_xzero128v32:TOP_xzero32, dest, ops);
+       }
+       else
+ 	    Build_OP( TOP_fldz, dest, ops);
+	  }
+	  else{
+	  	FmtAssert( Target_AVX, ("Expand_Const no -mavx but met MTYPE_V32F4"));
+		Build_OP(TOP_vxzero256v32, dest, ops);
+	  }
       return;
     }
     if (TCON_ty(tcon) == MTYPE_F8 && Targ_Is_Zero(tcon)) {
-      FmtAssert(TCON_ty(tcon) == mtype || mtype == MTYPE_V16F8, 
+      FmtAssert(TCON_ty(tcon) == mtype || mtype == MTYPE_V16F8 || mtype == MTYPE_V32F8, 
 		("Expand_Const: inconsistent mtypes"));
-      if ( Is_Target_SSE2() )
-	Build_OP( mtype == MTYPE_V16F8?TOP_xzero128v64:TOP_xzero64, dest, ops);
-      else
-	Build_OP( TOP_fldz, dest, ops);
+	  if(mtype != MTYPE_V32F8){
+       if ( Is_Target_SSE2() ){
+	      Build_OP( mtype == MTYPE_V16F8?(Target_AVX? TOP_vxzero128v64: TOP_xzero128v64): TOP_xzero64, dest, ops);
+       }
+       else
+	    Build_OP( TOP_fldz, dest, ops);
+	  }else{
+	    Build_OP(TOP_vxzero256v64, dest, ops);
+	  }
       return;
     }
     if (TCON_ty(tcon) == MTYPE_V16F4 && Targ_Is_Zero(tcon)) {
@@ -8593,6 +9647,18 @@ void Expand_Const (TN *dest, TN *src, TYPE_ID mtype, OPS *ops)
       FmtAssert(TCON_ty(tcon) == mtype && Is_Target_SSE2(),
 		("Expand_Const: inconsistent mtypes"));
       Build_OP( TOP_xzero128v64, dest, ops);
+      return;
+    }
+	if (TCON_ty(tcon) == MTYPE_V32F4 && Targ_Is_Zero(tcon)) {
+      FmtAssert(TCON_ty(tcon) == mtype && Is_Target_SSE2(),
+		("Expand_Const: inconsistent mtypes"));
+      Build_OP( TOP_vxzero256v32, dest, ops);
+      return;
+    }
+    if (TCON_ty(tcon) == MTYPE_V32F8 && Targ_Is_Zero(tcon)) {
+      FmtAssert(TCON_ty(tcon) == mtype && Is_Target_SSE2(),
+		("Expand_Const: inconsistent mtypes"));
+      Build_OP( TOP_vxzero256v64, dest, ops);
       return;
     }
   }
@@ -9484,7 +10550,7 @@ void Expand_Conv_To_Vector (TN * dest, TN * src, TYPE_ID desc, TYPE_ID rtype,
   else {
   	// desc, rtype: vector
   	if(MTYPE_is_long_vector(desc) && MTYPE_is_long_vector(rtype))
-		Build_OP(TOP_vmovdqa_f256_ofloat_float, dest, src, ops);
+		Build_OP(TOP_vmovdqu_f256_ofloat_float, dest, src, ops);
 	else
     	Build_OP (TOP_movdq, dest, src, ops);
   }
@@ -9506,8 +10572,22 @@ void Expand_Conv_From_Vector(TN * dest, TN * src, TYPE_ID desc, TYPE_ID rtype,
   else {
     if (MTYPE_byte_size(rtype) == 8)
       Build_OP (TOP_movx2g64, dest, src, ops);
-    else Build_OP (TOP_movx2g, dest, src, ops);
+    else Build_OP ( TOP_movx2g, dest, src, ops);
   }
 }
 
+void Expand_Madd(TN *dest, TN* src1, TN* src2, TN *src3, TYPE_ID mtype, OPS *ops)
+{
+  if(mtype == MTYPE_V16I4){//dest = (src2 * src3) + src1
+  	Build_OP(TOP_vpmacsdd_f128_oxmm_xmm_xmm_xmm, dest, src2, src3, src1, ops);
+  }else if(mtype == MTYPE_I4){
+    TN* tmp = Build_TN_Like(src1);
+    Expand_Multiply(tmp, src2, src3, mtype, ops);
+    Expand_Add(dest, src1, tmp,mtype, ops);// src1 and dest may be alias
+    //Build_OP(TOP_imul32, dest, src2, src3, ops);
+	//Build_OP(TOP_add32, dest, src1, dest, ops);
+  }else{
+    FmtAssert(FALSE, ("no such instructions about madd"));
+  }
+}
 

@@ -84,7 +84,7 @@ boolean parse_lhs (opnd_type *, int);
 \******************************************************************************/
 
 int pp_operand(opnd_type *opnd) {
-int idx;
+int idx, sub_idx;
 
     if (opnd->fld == AT_Tbl_Idx)
 	return AT_OBJ_CLASS(opnd->idx) == Data_Obj &&
@@ -95,14 +95,21 @@ int idx;
 
     idx = opnd->idx;
 
-    if (IR_OPR(idx) == Call_Opr && IR_FLD_L(idx) == AT_Tbl_Idx &&
-	AT_OBJ_CLASS(IR_IDX_L(idx)) == Pgm_Unit &&
-	ATP_PGM_UNIT(IR_IDX_L(idx)) == Function) {
+    if (IR_OPR(idx) == Call_Opr && IR_FLD_L(idx) == AT_Tbl_Idx) {
+	sub_idx = IR_IDX_L(idx);
 
-	idx = ATP_RSLT_IDX(IR_IDX_L(idx));
+	if (AT_OBJ_CLASS(sub_idx) == Interface &&
+	    ATI_DEFINED_OPR(sub_idx) == Null_Opr)
+	    return 1;
 
-	return (ATD_CLASS(idx) == Function_Result &&
-		TYP_LINEAR(ATD_TYPE_IDX(idx)) == Proc_Ptr);
+	if (AT_OBJ_CLASS(sub_idx) == Pgm_Unit &&
+	    ATP_PGM_UNIT(sub_idx) == Function) {
+
+	    idx = ATP_RSLT_IDX(sub_idx);
+
+	    return (ATD_CLASS(idx) == Function_Result &&
+		    TYP_LINEAR(ATD_TYPE_IDX(idx)) == Proc_Ptr);
+	}
     }
 
     if (IR_OPR(idx) != Struct_Opr || IR_FLD_R(idx) != AT_Tbl_Idx)

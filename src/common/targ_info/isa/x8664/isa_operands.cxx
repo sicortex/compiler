@@ -58,7 +58,7 @@
 #include "topcode.h"
 #include "isa_operands_gen.h"
 
-main()
+int main()
 {
   ISA_Operands_Begin("x8664");
 
@@ -315,6 +315,7 @@ main()
   Instruction_Group( "vector arithmetic",
   		     TOP_mul128v16,
   		     TOP_mulhw128v16,
+		     TOP_pmuludq128,
 				 TOP_pavgb128,
 				 TOP_pavgw128,
 				 TOP_psadbw128,
@@ -1151,6 +1152,7 @@ main()
 		    TOP_cmovg,
 		    TOP_cmovs,
 		    TOP_cmovns,
+		    TOP_cmovo,
 		    TOP_UNDEFINED);
   Result(0, int64);
   Operand(0, int64,  opnd1);
@@ -1487,10 +1489,6 @@ main()
 		    TOP_ldhps_n32,
 		    TOP_ldlpd_n32,
 		    TOP_ldhpd_n32,
-		    /*AVX instructions*/
-		    TOP_vlddqa_n32,
-		    TOP_vldaps_n32,
-		    TOP_vldapd_n32,
 		    TOP_UNDEFINED);
   Result(0, fp128);
   Operand(0, simm32, offset);
@@ -1509,10 +1507,6 @@ main()
 		    TOP_fmovsldupx,
 		    TOP_fmovshdupx,
 		    TOP_fmovddupx,
-		    /*AVX instructions*/
-		    TOP_vldapd,
-		    TOP_vldaps,
-		    TOP_vlddqa,
 		    TOP_UNDEFINED);
   Result(0, fp128);
   Operand(0, int64, base);
@@ -1550,9 +1544,6 @@ main()
 		    TOP_sthps_n32,
 		    TOP_stlpd_n32,
 		    TOP_sthpd_n32,
-		    TOP_vstdqa_n32,
-		    TOP_vstaps_n32,
-		    TOP_vstapd_n32,
 		    TOP_UNDEFINED);
   Operand(0, fp128, storeval);
   Operand(1, simm32, offset);
@@ -1572,10 +1563,6 @@ main()
 		    TOP_stntps,
 		    TOP_storenti128,
 		    TOP_storelpd,
-		    /*AVX instructions*/
-		    TOP_vstdqa,
-		    TOP_vstapd,
-		    TOP_vstaps,
 		    TOP_UNDEFINED);
   Operand(0, fp128, storeval);
   Operand(1, int64, base);
@@ -1819,11 +1806,18 @@ main()
 
   Instruction_Group("xmm to xmm",
 		    TOP_movdq,
+		    TOP_aesmov,
 		    TOP_movapd,
 		    TOP_movaps,
 		    TOP_fmovsldup,
 		    TOP_fmovshdup,
 		    TOP_fmovddup,
+		    /*AVX*/
+            TOP_sivmovdqa,
+  	        TOP_sivmovdqu,
+  	        TOP_sivmovups,
+  	        TOP_sivmovupd,
+  	        TOP_sivmovapd,
 		    TOP_UNDEFINED);
   Result(0, fp128);
   Operand(0, fp128, opnd1);
@@ -2368,14 +2362,111 @@ main()
 				TOP_pblendw,
 				TOP_blendpd,
 				TOP_blendps,
+				TOP_pcmpestri,
+				TOP_pcmpestrm,
+				TOP_pcmpistri,
+				TOP_pcmpistrm,
 				TOP_UNDEFINED);
 	Result(0, fp128);
 	Operand(0, fp128, opnd1);
 	Operand(1, fp128, opnd2);
 	Operand(2, simm8, opnd3);
 
+	Instruction_Group("Blending condition x",
+				TOP_pblendwx,
+				TOP_blendpdx,
+				TOP_blendpsx,
+				TOP_dppdx,
+				TOP_dppsx,
+				TOP_insertpsx,
+				TOP_mpsadbwx,
+				TOP_pcmpestrix,
+				TOP_pcmpestrmx,
+				TOP_pcmpistrix,
+				TOP_pcmpistrmx,
+				TOP_pinsrbx,
+				TOP_pinsrdx,
+				TOP_pinsrqx,
+				TOP_roundpdx,
+				TOP_roundpsx,
+				TOP_roundsdx,
+				TOP_roundssx,
+				TOP_UNDEFINED);
+	Result(0, fp128);
+	Operand(0, fp128, opnd1);
+	Operand(1, int64, base);
+	Operand(2, simm32,offset);
+	Operand(3, simm8, opnd3);
 
-	Instruction_Group("Blending condition no imm",
+	Instruction_Group("Blending condition xx",
+				TOP_pblendwxx,
+				TOP_blendpdxx,
+				TOP_blendpsxx,
+				TOP_dppdxx,
+				TOP_dppsxx,
+				TOP_insertpsxx,
+				TOP_mpsadbwxx,
+				TOP_pcmpestrixx,
+				TOP_pcmpestrmxx,
+				TOP_pcmpistrixx,
+				TOP_pcmpistrmxx,
+				TOP_pinsrbxx,
+				TOP_pinsrdxx,
+				TOP_pinsrqxx,
+				TOP_roundpdxx,
+				TOP_roundpsxx,
+				TOP_roundsdxx,
+				TOP_roundssxx,
+				TOP_UNDEFINED);
+	Result(0, fp128);
+	Operand(0, fp128, opnd1);
+	Operand(1, int64, base);
+	Operand(2, int64, index);
+	Operand(3, uimm8, scale);
+	Operand(4, simm32, offset);
+	Operand(5, simm8, opnd3);
+
+	Instruction_Group("Blending condition xxx",
+				TOP_pblendwxxx,
+				TOP_blendpdxxx,
+				TOP_blendpsxxx,
+				TOP_dppdxxx,
+				TOP_dppsxxx,
+				TOP_insertpsxxx,
+				TOP_mpsadbwxxx,
+				TOP_pcmpestrixxx,
+				TOP_pcmpestrmxxx,
+				TOP_pcmpistrixxx,
+				TOP_pcmpistrmxxx,
+				TOP_pinsrbxxx,
+				TOP_pinsrdxxx,
+				TOP_pinsrqxxx,
+				TOP_roundpdxxx,
+				TOP_roundpsxxx,
+				TOP_roundsdxxx,
+				TOP_roundssxxx,
+				TOP_UNDEFINED);
+	Result(0, fp128);
+	Operand(0, fp128, opnd1);
+	Operand(1, int64, base);
+	Operand(2, uimm8, scale);
+	Operand(3, simm32,offset);
+	Operand(4, simm8, opnd3);
+
+
+
+	Instruction_Group("Blending condition no imm x",
+				TOP_pblendvbx,
+				TOP_blendvpdx,
+				TOP_blendvpsx,
+				TOP_UNDEFINED);
+	Result(0, fp128);
+	Operand(0, fp128,opnd1);
+	Operand(1, int64, base);
+	Operand(2, simm32,offset);
+	Operand(3, xmm0);
+
+	Instruction_Group("Blending condition no imm ",
 				TOP_pblendvb,
 				TOP_blendvpd,
 				TOP_blendvps,
@@ -2383,6 +2474,31 @@ main()
 	Result(0, fp128);
 	Operand(0, fp128,opnd1);
 	Operand(1, fp128, opnd2);
+	Operand(2, xmm0);
+
+	Instruction_Group("Blending condition no imm xx",
+				TOP_pblendvbxx,
+				TOP_blendvpdxx,
+				TOP_blendvpsxx,
+				TOP_UNDEFINED);
+	Result(0, fp128);
+	Operand(0, fp128,opnd1);
+	Operand(1, int64, base);
+	Operand(2, int64, index);
+	Operand(3, uimm8, scale);
+	Operand(4, simm32, offset);
+	Operand(5, xmm0);
+
+	Instruction_Group("Blending condition no imm  xxx",
+				TOP_pblendvbxxx,
+				TOP_blendvpdxxx,
+				TOP_blendvpsxxx,
+				TOP_UNDEFINED);
+	Result(0, fp128);
+	Operand(0, fp128,opnd1);
+	Operand(1, int64, base);
+	Operand(2, uimm8, scale);
+	Operand(3, simm32, offset);
 	Operand(2, xmm0);
 	
 	Instruction_Group("round",
@@ -2447,10 +2563,49 @@ main()
 	Instruction_Group("extractps fp32",
 				TOP_extractps,
 				TOP_UNDEFINED);
-	Result(0,fp64);
-	Operand(0,int32,opnd1);
-	Operand(1,fp128,opnd2);
-	Operand(2,uimm8,opnd3);
+	Result(0,int64);
+	Operand(0,fp128,opnd1);
+	Operand(1,uimm8,opnd2);
+
+	Instruction_Group("extractps fp32 x",
+				TOP_extractpsx,
+				TOP_pextrbx,
+				TOP_pextrdx,
+				TOP_pextrqx,
+				TOP_pextrwx,
+				TOP_UNDEFINED);
+	Operand(0, fp128, opnd1);
+    Operand(1, simm8, opnd2);
+    Operand(2, int64, base);
+    Operand(3, simm32, offset);
+
+	Instruction_Group("extractps fp32 xx",
+				TOP_extractpsxx,
+				TOP_pextrbxx,
+				TOP_pextrdxx,
+				TOP_pextrqxx,
+				TOP_pextrwxx,
+				TOP_UNDEFINED);
+	Operand(0, fp128, opnd1);
+    Operand(1, simm8, opnd2);
+    Operand(2, int64, base);
+    Operand(3, simm32, offset);
+    Operand(4, int64, index);
+    Operand(5, uimm8, scale);
+
+	Instruction_Group("extractps fp32 xxx",
+				TOP_extractpsxxx,
+				TOP_pextrbxxx,
+				TOP_pextrdxxx,
+				TOP_pextrqxxx,
+				TOP_pextrwxxx,
+				TOP_UNDEFINED);
+	Operand(0, fp128, opnd1);
+	Operand(1, simm8, opnd2);
+	Operand(2, int64, index);
+	Operand(3, uimm8, scale);
+	Operand(4, simm32, offset);
+
 
 	Instruction_Group("insertps fp32",
 				TOP_insertps,
@@ -2461,21 +2616,6 @@ main()
 	Operand(2,simm32,opnd3);
 
 
-  Instruction_Group("qi vector compare implicit length returns index",
-          TOP_pcmpistri,      
-          TOP_UNDEFINED);
-  Result(0, int32);
-  Operand(0, fp128,  opnd1);
-  Operand(1, fp128,  opnd2);
-  Operand(2, simm8, opnd3);
-
-  Instruction_Group("qi vector compare implicit length returns mask",
-            TOP_pcmpistrm,
-		    TOP_UNDEFINED);
-  Result(0, int32);
-  Operand(0, fp128,  opnd1);
-  Operand(1, fp128,  opnd2);
-  Operand(2, simm8, opnd3);
 
 	Instruction_Group("ssse3 instructions 128",
 						TOP_phaddw128,
@@ -2491,6 +2631,102 @@ main()
 	Result(0,fp128);
 	Operand(0, fp128, opnd1);
 	Operand(1, fp128, opnd2);
+
+	Instruction_Group("ssse3 instructions 128x",
+						TOP_phaddwx128,
+						TOP_phadddx128,
+						TOP_phaddswx128,
+						TOP_phsubwx128,
+						TOP_phsubdx128,
+						TOP_phsubswx128,
+						TOP_pmaddubswx128,
+						TOP_pmulhrswx128,
+						TOP_pshufbx128,
+						/*some sse4 suitable for this*/
+		                TOP_packusdwx,
+		                TOP_pmaxsbx,
+		                TOP_pmaxsdx,
+		                TOP_pmaxudx,
+		                TOP_pmaxuwx,
+		                TOP_pminsbx,
+		                TOP_pminsdx,
+		                TOP_pminudx,
+		                TOP_pminuwx,
+		                TOP_pmuldqx,
+						TOP_pmulldx,
+						TOP_pcmpeqqx,
+					    TOP_pcmpgtqx,
+					    TOP_phminposuwx,
+						TOP_UNDEFINED);
+	Result(0,fp128);
+	Operand(0, fp128, opnd1);
+	Operand(1, int64, base);
+	Operand(2, simm32, offset);
+
+	Instruction_Group("ssse3 instructions 128xx",
+						TOP_phaddwxx128,
+						TOP_phadddxx128,
+						TOP_phaddswxx128,
+						TOP_phsubwxx128,
+						TOP_phsubdxx128,
+						TOP_phsubswxx128,
+						TOP_pmaddubswxx128,
+						TOP_pmulhrswxx128,
+						TOP_pshufbxx128,
+						/*some sse4 suitable for this*/
+	                    TOP_packusdwxx,
+	                    TOP_pmaxsbxx,
+		                TOP_pmaxsdxx,
+		                TOP_pmaxudxx,
+		                TOP_pmaxuwxx,
+		                TOP_pminsbxx,
+		                TOP_pminsdxx,
+		                TOP_pminudxx,
+		                TOP_pminuwxx,
+		                TOP_pmuldqxx,
+						TOP_pmulldxx,
+						TOP_pcmpeqqxx,
+					    TOP_pcmpgtqxx,
+					    TOP_phminposuwxx,
+						TOP_UNDEFINED);
+	Result(0,fp128);
+	Operand(0, fp128, opnd1);
+	Operand(1, int64, base);
+	Operand(2, int64, index);
+	Operand(3, uimm8, scale);
+	Operand(4, simm32, offset);
+
+	Instruction_Group("ssse3 instructions 128xxx",
+						TOP_phaddwxxx128,
+						TOP_phadddxxx128,
+						TOP_phaddswxxx128,
+						TOP_phsubwxxx128,
+						TOP_phsubdxxx128,
+						TOP_phsubswxxx128,
+						TOP_pmaddubswxxx128,
+						TOP_pmulhrswxxx128,
+						TOP_pshufbxxx128,
+						/*some sse4 suitable for this*/
+	                    TOP_packusdwxxx,
+	                    TOP_pmaxsbxxx,
+		                TOP_pmaxsdxxx,
+		                TOP_pmaxudxxx,
+		                TOP_pmaxuwxxx,
+		                TOP_pminsbxxx,
+		                TOP_pminsdxxx,
+		                TOP_pminudxxx,
+		                TOP_pminuwxxx,
+		                TOP_pmuldqxxx,
+						TOP_pmulldxxx,
+						TOP_pcmpeqqxxx,
+					    TOP_pcmpgtqxxx,
+					    TOP_phminposuwxxx,
+						TOP_UNDEFINED);
+	Result(0,fp128);
+	Operand(0, fp128, opnd1);
+	Operand(1, int64, index);
+	Operand(2, uimm8, scale);
+	Operand(3, simm32, offset);
 	
 	Instruction_Group("ssse3 instructions 64",
 						TOP_phaddw,
@@ -2506,22 +2742,196 @@ main()
 	Result(0,mmx);
 	Operand(0, mmx, opnd1);
 	Operand(1, mmx, opnd2);
+
+	Instruction_Group("ssse3 instructions 64kx",
+						TOP_phaddwx,
+						TOP_phadddx,
+						TOP_phaddswx,
+						TOP_phsubwx,
+						TOP_phsubdx,
+						TOP_phsubswx,
+						TOP_pmaddubswx,
+						TOP_pmulhrswx,
+						TOP_pshufbx,
+						TOP_UNDEFINED);
+	Result(0,mmx);
+	Operand(0, mmx, opnd1);
+	Operand(1, int64, base);
+	Operand(2, simm32, offset);
+
+	Instruction_Group("ssse3 instructions 64xx",
+						TOP_phaddwxx,
+						TOP_phadddxx,
+						TOP_phaddswxx,
+						TOP_phsubwxx,
+						TOP_phsubdxx,
+						TOP_phsubswxx,
+						TOP_pmaddubswxx,
+						TOP_pmulhrswxx,
+						TOP_pshufbxx,
+						TOP_UNDEFINED);
+	Result(0,mmx);
+	Operand(0, mmx, opnd1);
+	Operand(1, int64, base);
+	Operand(2, int64, index);
+	Operand(3, uimm8, scale);
+	Operand(4, simm32, offset);
+
+	Instruction_Group("ssse3 instructions 64xxx",
+						TOP_phaddwxxx,
+						TOP_phadddxxx,
+						TOP_phaddswxxx,
+						TOP_phsubwxxx,
+						TOP_phsubdxxx,
+						TOP_phsubswxxx,
+						TOP_pmaddubswxxx,
+						TOP_pmulhrswxxx,
+						TOP_pshufbxxx,
+						TOP_UNDEFINED);
+	Result(0,mmx);
+	Operand(0, mmx, opnd1);
+	Operand(1, int64, index);
+	Operand(2, uimm8, scale);
+	Operand(3, simm32, offset);
 	
 	Instruction_Group("ssse3 instructions 128 one operand",
 						TOP_pabsb128,
 						TOP_pabsw128,
 						TOP_pabsd128,
+						TOP_psignb128,
+					    TOP_psignw128,
+					    TOP_psignd128,
 						TOP_UNDEFINED);
 	Result(0,fp128);
 	Operand(0, fp128, opnd1);
+
+	Instruction_Group("ssse3 instructions 128 one operandx",
+						TOP_pabsbx128,
+						TOP_pabswx128,
+						TOP_pabsdx128,
+	                    TOP_psignbx128,
+					    TOP_psignwx128,
+					    TOP_psigndx128,
+					    /*SSE4 suitable*/
+					    TOP_pmovsxbwx,
+						TOP_pmovsxbdx,
+						TOP_pmovsxbqx,
+						TOP_pmovsxwdx,
+						TOP_pmovsxwqx,
+						TOP_pmovsxdqx,
+						TOP_pmovzxbwx,
+						TOP_pmovzxbdx,
+						TOP_pmovzxbqx,
+						TOP_pmovzxwdx,
+						TOP_pmovzxwqx,
+						TOP_pmovzxdqx,
+						TOP_UNDEFINED);
+	Result(0,fp128);
+	Operand(0, int64, base);
+	Operand(1, simm32, offset);
+
+	Instruction_Group("ssse3 instructions 128 one operandxx",
+						TOP_pabsbxx128,
+						TOP_pabswxx128,
+						TOP_pabsdxx128,
+						TOP_psignbxx128,
+					    TOP_psignwxx128,
+					    TOP_psigndxx128,
+					    /*SSE4 suitable*/
+					     TOP_pmovsxbwxx,
+						TOP_pmovsxbdxx,
+						TOP_pmovsxbqxx,
+						TOP_pmovsxwdxx,
+						TOP_pmovsxwqxx,
+						TOP_pmovsxdqxx,
+						TOP_pmovzxbwxx,
+						TOP_pmovzxbdxx,
+						TOP_pmovzxbqxx,
+						TOP_pmovzxwdxx,
+						TOP_pmovzxwqxx,
+						TOP_pmovzxdqxx,
+						TOP_UNDEFINED);
+	Result(0,fp128);
+	Operand(0, int64, base);
+	Operand(1, int64, index);
+	Operand(2, uimm8, scale);
+	Operand(3, simm32, offset);
+
+	Instruction_Group("ssse3 instructions 128 one operandxxx",
+						TOP_pabsbxxx128,
+						TOP_pabswxxx128,
+						TOP_pabsdxxx128,
+						TOP_psignbxxx128,
+					    TOP_psignwxxx128,
+					    TOP_psigndxxx128,
+					    /*SSE4 suitable*/
+					     TOP_pmovsxbwxxx,
+						TOP_pmovsxbdxxx,
+						TOP_pmovsxbqxxx,
+						TOP_pmovsxwdxxx,
+						TOP_pmovsxwqxxx,
+						TOP_pmovsxdqxxx,
+						TOP_pmovzxbwxxx,
+						TOP_pmovzxbdxxx,
+						TOP_pmovzxbqxxx,
+						TOP_pmovzxwdxxx,
+						TOP_pmovzxwqxxx,
+						TOP_pmovzxdqxxx,
+						TOP_UNDEFINED);
+	Result(0,fp128);
+	Operand(0, int64, base);
+	Operand(1, uimm8, scale);
+	Operand(2, simm32, offset);
 	
 	Instruction_Group("ssse3 instructions 64 one operand",
 						TOP_pabsb,
 						TOP_pabsw,
 						TOP_pabsd,
+						TOP_psignb,
+					    TOP_psignw,
+					    TOP_psignd,
 						TOP_UNDEFINED);
 	Result(0,mmx);
 	Operand(0, mmx, opnd1);
+
+	Instruction_Group("ssse3 instructions 64 one operand x",
+						TOP_pabsbx,
+						TOP_pabswx,
+						TOP_pabsdx,
+						TOP_psignbx,
+					    TOP_psignwx,
+					    TOP_psigndx,
+						TOP_UNDEFINED);
+	Result(0,mmx);
+	Operand(0, int64, base);
+	Operand(1, simm32, offset);
+
+	Instruction_Group("ssse3 instructions 64 one operand xx",
+						TOP_pabsbxx,
+						TOP_pabswxx,
+						TOP_pabsdxx,
+						TOP_psignbxx,
+					    TOP_psignwxx,
+					    TOP_psigndxx,
+						TOP_UNDEFINED);
+	Result(0,mmx);
+	Operand(0, int64, base);
+	Operand(1, int64, index);
+	Operand(2, uimm8, scale);
+	Operand(3, simm32, offset);
+
+	Instruction_Group("ssse3 instructions 64 one operand xxx",
+						TOP_pabsbxxx,
+						TOP_pabswxxx,
+						TOP_pabsdxxx,
+						TOP_psignbxxx,
+					    TOP_psignwxxx,
+					    TOP_psigndxxx,
+						TOP_UNDEFINED);
+	Result(0,mmx);
+	Operand(0, int64, base);
+	Operand(1, uimm8, scale);
+	Operand(2, simm32, offset);
 
 	Instruction_Group("ssse3 two fp128 and a const",
 						TOP_palignr128,
@@ -2530,6 +2940,36 @@ main()
 	Operand(0, fp128, opnd1);
 	Operand(1, fp128, opnd2);
 	Operand(2, simm8, opnd3);
+
+	Instruction_Group("ssse3 two fp128 and a const x",
+						TOP_palignrx128,
+						TOP_UNDEFINED);
+	Result(0, fp128);
+	Operand(0, fp128, opnd1);
+	Operand(1, int64, base);
+	Operand(2, simm32, offset);
+	Operand(3, simm8, opnd2);
+
+	Instruction_Group("ssse3 two fp128 and a const xx",
+						TOP_palignrxx128,
+						TOP_UNDEFINED);
+	Result(0, fp128);
+	Operand(0, fp128, opnd1);
+	Operand(1, int64, base);
+	Operand(2, int64, index);
+	Operand(3, uimm8, scale);
+	Operand(4, simm32, offset);
+	Operand(5, simm8, opnd2);
+
+	Instruction_Group("ssse3 two fp128 and a const xxx",
+						TOP_palignrxxx128,
+						TOP_UNDEFINED);
+	Result(0, fp128);
+	Operand(0, fp128, opnd1);
+	Operand(1, int64, index);
+	Operand(2, uimm8, scale);
+	Operand(3, simm32, offset);
+	Operand(4, simm8, opnd2);
 	
 	Instruction_Group("ssse3 two mmx and a const",
 						TOP_palignr,
@@ -2539,15 +2979,75 @@ main()
 	Operand(1, mmx, opnd2);
 	Operand(2, simm8, opnd3);
 
-  Instruction_Group("qi vector compare explicit length retruns index",
-		    TOP_pcmpestri,
+	Instruction_Group("ssse3 two mmx and a const x",
+						TOP_palignrx,
+						TOP_UNDEFINED);
+	Result(0, mmx);
+	Operand(0, mmx, opnd1);
+	Operand(1, int64, base);
+	Operand(2, simm32, offset);
+	Operand(3, simm8, opnd3);
+
+	Instruction_Group("ssse3 two mmx and a const xx",
+						TOP_palignrxx,
+						TOP_UNDEFINED);
+	Result(0, mmx);
+	Operand(0, mmx, opnd1);
+	Operand(1, int64, base);
+	Operand(2, int64, index);
+	Operand(3, uimm8, scale);
+	Operand(4, simm32, offset);
+	Operand(5, simm8, opnd3);
+
+	Instruction_Group("ssse3 two mmx and a const xxx",
+						TOP_palignrxxx,
+						TOP_UNDEFINED);
+	Result(0, mmx);
+	Operand(0, mmx, opnd1);
+	Operand(1, int64, index);
+	Operand(2, uimm8, scale);
+	Operand(3, simm32, offset);
+	Operand(4, simm8, opnd3);
+
+   Instruction_Group("qi vector compare explicit length retruns index",
+		    TOP_pcmpestriintr,
 		    TOP_UNDEFINED);
-  Result(0, int32);
+  Result(0, ecx);
+  Result(1, rflags);
   Operand(0, fp128, opnd1);
   Operand(1, fp128, opnd2);
   Operand(2, simm8, opnd3);
-  Operand(3, int32, opnd4);
-  Operand(4, int32, opnd5);
+  Operand(3, eax, opnd4);
+  Operand(4, edx, opnd5);
+
+   Instruction_Group("qi vector compare explicit length retruns mask",
+		    TOP_pcmpestrmintr,
+		    TOP_UNDEFINED);
+  Result(0, xmm0);
+  Result(1, rflags);
+  Operand(0, fp128, opnd1);
+  Operand(1, fp128, opnd2);
+  Operand(2, simm8, opnd3);
+  Operand(3, eax, opnd4);
+  Operand(4, edx, opnd5);
+
+  Instruction_Group("qi vector compare implicit length returns index",
+          TOP_pcmpistriintr,      
+          TOP_UNDEFINED);
+  Result(0, ecx);
+  Result(1, rflags);
+  Operand(0, fp128,  opnd1);
+  Operand(1, fp128,  opnd2);
+  Operand(2, simm8, opnd3);
+
+  Instruction_Group("qi vector compare implicit length returns mask",
+            TOP_pcmpistrmintr,
+		    TOP_UNDEFINED);
+  Result(0, xmm0);
+  Result(1, rflags);
+  Operand(0, fp128,  opnd1);
+  Operand(1, fp128,  opnd2);
+  Operand(2, simm8, opnd3);
 
 	Instruction_Group("qi vector compare pcmpgtq",
 				TOP_pcmpgtq,
@@ -2556,15 +3056,6 @@ main()
 	Operand(0, fp128, opnd1);
 	Operand(1, fp128, opnd2);
 
-  Instruction_Group("qi vector compare explicit length retruns mask",
-		    TOP_pcmpestrm,
-		    TOP_UNDEFINED);
-  Result(0, fp128);
-  Operand(0, fp128, opnd1);
-  Operand(1, fp128, opnd2);
-  Operand(2, simm8, opnd3);
-  Operand(3, int32, opnd4);
-  Operand(4, int32, opnd5);
 
   Instruction_Group("crc sse4.2 crc32b",
 		  	TOP_crc32b,
@@ -2575,6 +3066,7 @@ main()
 
   Instruction_Group("crc sse4.2 crc32w",
 		  	TOP_crc32w,
+		  	TOP_crc32,
 			TOP_UNDEFINED);
   Result(0, int32);
   Operand(0, int32);
@@ -2589,10 +3081,65 @@ main()
 
   Instruction_Group("crc sse4.2 crc32q",
 		  	TOP_crc32q,
+		  	TOP_crc32_64,
 			TOP_UNDEFINED);
   Result(0, int64);
   Operand(0, int64);
   Operand(1, int64);
+
+  Instruction_Group("crc sse4.2 crc32 x",
+		  	TOP_crc32x,
+			TOP_UNDEFINED);
+  Result(0, int32);
+  Operand(0, int32);
+	 Operand(1, int64, base);
+	 Operand(2, simm32, offset);
+
+  Instruction_Group("crc sse4.2 crc32 xx",
+		  	TOP_crc32xx,
+			TOP_UNDEFINED);
+  Result(0, int32);
+  Operand(0, int32);
+	 Operand(1, int64, base);
+	 Operand(2, int64, index);
+	 Operand(3, uimm8, scale);
+	 Operand(4, simm32, offset);
+		
+  Instruction_Group("crc sse4.2 crc32 xxx",
+		  	TOP_crc32xxx,
+			TOP_UNDEFINED);
+  Result(0, int32);
+  Operand(0, int32);
+	 Operand(1, int64, index);
+	 Operand(2, uimm8, scale);
+	 Operand(3, simm32, offset);
+
+  Instruction_Group("crc sse4.2 crc64 x",
+		  	TOP_crc32_64x,
+			TOP_UNDEFINED);
+  Result(0, int64);
+  Operand(0, int64);
+	 Operand(1, int64, base);
+	 Operand(2, simm32, offset);
+
+  Instruction_Group("crc sse4.2 crc64 xx",
+		  	TOP_crc32_64xx,
+			TOP_UNDEFINED);
+  Result(0, int64);
+  Operand(0, int64);
+	 Operand(1, int64, base);
+	 Operand(2, int64, index);
+	 Operand(3, uimm8, scale);
+	 Operand(4, simm32, offset);
+		
+  Instruction_Group("crc sse4.2 crc64 xxx",
+		  	TOP_crc32_64xxx,
+			TOP_UNDEFINED);
+  Result(0, int64);
+  Operand(0, int64);
+	 Operand(1, int64, index);
+	 Operand(2, uimm8, scale);
+	 Operand(3, simm32, offset);
 
   Instruction_Group("load64 effective addr",
 		    TOP_lea64,
@@ -2612,6 +3159,78 @@ main()
 			TOP_UNDEFINED);
   Result(0, rdx);
   Operand(0, int64);
+
+  	Instruction_Group(" sse4.2 popcnt 16 x",
+		  	TOP_popcnt16x,
+			TOP_UNDEFINED);
+  Result(0, int16);
+  Operand(0, int64, base);
+  Operand(1, simm32, offset);
+	
+	Instruction_Group(" sse4.2 popcnt 32 x",
+		  	TOP_popcnt32x,
+			TOP_UNDEFINED);
+  Result(0, int32);
+  Operand(0, int64, base);
+  Operand(1, simm32, offset);
+
+  Instruction_Group(" sse4.2 popcnt 64 x",
+		  	TOP_popcnt64x,
+			TOP_UNDEFINED);
+  Result(0, int64);
+  Operand(0, int64, base);
+  Operand(1, simm32, offset);
+
+  Instruction_Group(" sse4.2 popcnt 16 xx",
+		  	TOP_popcnt16xx,
+			TOP_UNDEFINED);
+  Result(0, int16);
+  Operand(0, int64, base);
+  Operand(1, int64, index);
+  Operand(2, uimm8, scale);
+  Operand(3, simm32, offset);
+	
+	Instruction_Group(" sse4.2 popcnt 32 xx",
+		  	TOP_popcnt32xx,
+			TOP_UNDEFINED);
+  Result(0, int32);
+  Operand(0, int64, base);
+  Operand(1, int64, index);
+  Operand(2, uimm8, scale);
+  Operand(3, simm32, offset);
+
+  Instruction_Group(" sse4.2 popcnt 64 xx",
+		  	TOP_popcnt64xx,
+			TOP_UNDEFINED);
+  Result(0, int64);
+  Operand(0, int64, base);
+  Operand(1, int64, index);
+  Operand(2, uimm8, scale);
+  Operand(3, simm32, offset);
+
+  Instruction_Group(" sse4.2 popcnt 16 xxx",
+		  	TOP_popcnt16xxx,
+			TOP_UNDEFINED);
+  Result(0, int16);
+  Operand(0, int64, base);
+  Operand(1, uimm8, scale);
+  Operand(2, simm32, offset);
+	
+	Instruction_Group(" sse4.2 popcnt 32 xxx",
+		  	TOP_popcnt32xxx,
+			TOP_UNDEFINED);
+  Result(0, int32);
+  Operand(0, int64, base);
+  Operand(1, uimm8, scale);
+  Operand(2, simm32, offset);
+
+  Instruction_Group(" sse4.2 popcnt 64 xxx",
+		  	TOP_popcnt64xxx,
+			TOP_UNDEFINED);
+  Result(0, int64);
+  Operand(0, int64, base);
+  Operand(1, uimm8, scale);
+  Operand(2, simm32, offset);
 
   Instruction_Group("load32 effective addr w/ indx",
 		    TOP_leax32,
@@ -2806,10 +3425,6 @@ main()
 		    TOP_fmovsldupxx,
 		    TOP_fmovshdupxx,
 		    TOP_fmovddupxx,
-		    /*AVX instructions*/
-		    TOP_vlddqax,
-		    TOP_vldapdx,
-		    TOP_vldapsx,
 		    TOP_UNDEFINED);
   Result(0,  fp128);
   Operand(0, int64, base);
@@ -2850,10 +3465,6 @@ main()
 		    TOP_fmovsldupxxx,
 		    TOP_fmovshdupxxx,
 		    TOP_fmovddupxxx,
-		    /*AVX instructions*/
-		    TOP_vlddqaxx,
-		    TOP_vldapdxx,
-		    TOP_vldapsxx,
 		    TOP_UNDEFINED);
   Result(0,  fp128);
   Operand(0, int64, index);
@@ -2883,10 +3494,6 @@ main()
 		    TOP_stapdx,
 		    TOP_stntpdx,
 		    TOP_stntpsx,
-		    /*AVX instructions*/
-		    TOP_vstdqax,
-		    TOP_vstapdx,
-		    TOP_vstapsx,
 		    TOP_UNDEFINED);
   Operand(0, fp128, storeval);
   Operand(1, int64, base);
@@ -2916,9 +3523,6 @@ main()
 		    TOP_stapdxx,
 		    TOP_stntpdxx,
 		    TOP_stntpsxx,
-		    TOP_vstdqaxx,
-		    TOP_vstapdxx,
-		    TOP_vstapsxx,
 		    TOP_UNDEFINED);
   Operand(0, fp128, storeval);
   Operand(1, int64, index);
@@ -3023,6 +3627,11 @@ main()
   Instruction_Group("xzerov",
 		    TOP_xzero128v32,
 		    TOP_xzero128v64,
+		    /*avx added by hand*/
+            TOP_vxzero128v64,
+            TOP_vxzero128v32,
+            TOP_vxzero256v64,
+            TOP_vxzero256v32,
 		    TOP_UNDEFINED);
   Result(0, fp128);
 
@@ -3256,6 +3865,7 @@ main()
 		     TOP_psubusw,
 		     TOP_pmullw,
 		     TOP_pmulhw,
+		     TOP_pmuludq,
 		     TOP_pmaddwd,
 		     TOP_pcmpeqb,
 		     TOP_pcmpeqw,
@@ -3397,8 +4007,35 @@ main()
   Instruction_Group("fp128 ptest int32",
 				TOP_ptest,
 		    TOP_UNDEFINED);
+  Result(0, rflags);
   Operand(0, fp128, opnd1);
   Operand(1, fp128, opnd2);
+
+  Instruction_Group("fp128 ptest x",
+						TOP_ptestx,
+						TOP_UNDEFINED);
+	Result(0, rflags);
+	Operand(0, fp128, opnd1);
+	Operand(1, int64, base);
+	Operand(2, simm32, offset);
+
+  Instruction_Group("fp128 ptest xx",
+						TOP_ptestxx,
+						TOP_UNDEFINED);
+	Result(0,rflags);
+	Operand(0, fp128, opnd1);
+	Operand(1, int64, index);
+	Operand(2, uimm8, scale);
+	Operand(3, simm32, offset);
+
+  Instruction_Group("fp128 ptest xxx",
+						TOP_ptestxxx,
+						TOP_UNDEFINED);
+	Result(0,rflags);
+	Operand(0, fp128, opnd1);
+	Operand(1, int64, index);
+	Operand(2, uimm8, scale);
+	Operand(3, simm32, offset);
 
   Instruction_Group("maskmov mmx",
 		    TOP_maskmovq,
@@ -3419,12 +4056,6 @@ main()
   Operand(0, fp128, opnd1);
   Operand(1, fp128, opnd2);
 
-  Instruction_Group("vadd ymm",
-                    TOP_vaddpd,
-                    TOP_UNDEFINED);
-  Result(0, fp128);
-  Operand(0, fp128, opnd1);
-  Operand(1, fp128, opnd2);
 
   Instruction_Group("pmax pmin xmm",
                     TOP_pmaxsb,
@@ -3481,6 +4112,7 @@ main()
   Operand(2, simm32, offset);
 
 #include "isa_avx_operands.cxx"
+#include "isa_xop_fma_operands.cxx";
 
   Instruction_Group("tls_get_addr_64",
 		    TOP_tls_get_addr_64,

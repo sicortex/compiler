@@ -362,7 +362,7 @@ U64_LOWER_stmt_wn(WN *tree, BOOL leave_CVTL_at_leaf)
  * M WHIRL assumed.
  * ==================================================================== */
 void
-U64_lower_wn(WN *tree, BOOL leave_CVTL_at_leaf)
+U64_lower_wn(PU *pu, WN *tree, BOOL leave_CVTL_at_leaf)
 {
   Start_Timer(T_Lower_CU);
   Set_Error_Phase("U64 Lowering");
@@ -379,7 +379,7 @@ U64_lower_wn(WN *tree, BOOL leave_CVTL_at_leaf)
 
   WN_Lower_Checkdump("After U64 lowering", tree, 0);   
 
-  WN_verifier(tree);
+  WN_verifier(pu, tree);
 
   return;
 }

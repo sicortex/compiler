@@ -118,6 +118,12 @@ extern BOOL Target_3DNow;
 extern BOOL Target_SSE4a;
 extern BOOL Target_SSE4_1;
 extern BOOL Target_SSE4_2;
+extern BOOL Target_AVX;
+extern BOOL Target_FMA;
+extern BOOL Target_XOP;
+extern BOOL Target_AES;
+extern BOOL Target_PCLMUL;
+
 extern int Target_x86_Precision;
 
 /* ================ */
@@ -133,6 +139,7 @@ typedef enum {
   TARGET_barcelona,     /* AMD Barcelona (opteron) */
   TARGET_athlon64,	/* AMD Athlon64 */
   TARGET_athlon,	/* AMD Athlon */
+  TARGET_orochi,	/* AMD orochi*/
   TARGET_em64t,		/* Intel EM64T */
   TARGET_core,		/* Intel Core */
   TARGET_wolfdale,	/* Intel Wolfdale */
@@ -148,7 +155,7 @@ extern TARGET_PROCESSOR Target;		/* -Tc */
 extern const char *Targ_Name (TARGET_PROCESSOR target);
 
 // NOTE: for this definition, all processors are treated x86-64!
-#define Is_Target_x86_64()	(Target >= TARGET_opteron && Target <= TARGET_xeon)
+#define Is_Target_x86_64()	(Target >= TARGET_opteron && Target <= TARGET_sandy)
 #define Is_Target_64bit()       (Target_ABI == ABI_n64)
 #define Is_Target_32bit()       (Target_ABI == ABI_n32)
 #define Is_Target_SSE()         (Target_SSE == TRUE)
@@ -157,6 +164,11 @@ extern const char *Targ_Name (TARGET_PROCESSOR target);
 #define Is_Target_3DNow()       (Target_3DNow == TRUE)
 #define Is_Target_SSE4a()       (Target_SSE4a == TRUE)
 #define Is_Target_SSE4_2()       (Target_SSE4_2 == TRUE)
+#define Is_Target_AVX()			(Target_AVX == TRUE)
+#define Is_Target_FMA()         (Target_FMA == TRUE)
+#define Is_Target_XOP()         (Target_XOP == TRUE)
+#define Is_Target_AES()         (Target_AES == TRUE)
+#define Is_Target_PCLMUL()         (Target_PCLMUL == TRUE)
 #define Is_Target_Pentium4()    (Target == TARGET_pentium4)
 #define Is_Target_EM64T()	(Target == TARGET_em64t)
 #define Is_Target_Core()	(Target == TARGET_core)
@@ -165,6 +177,8 @@ extern const char *Targ_Name (TARGET_PROCESSOR target);
 #define Target_x87_precision()	(Target_x87_Precision+0)
 #define Is_Target_Barcelona()   (Target == TARGET_barcelona)
 #define Is_Target_Sandy_Bridge() (Target == TARGET_sandy)
+#define Is_Target_Orochi()      (Target == TARGET_orochi)
+
 
 
 /* ========== */

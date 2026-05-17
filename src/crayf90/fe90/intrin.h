@@ -3325,6 +3325,9 @@ intrin_tbl_type         intrin_tbl[] =
    {"pathf90_ftell8",14,0,0,0,1,0,0,0,1,0,Pathf90_Intrinsic,0,0},
       {"UNIT",4,0,0,0,0,0,0,0,0,0,0,I8_MASK,0},
       {"OFFSET",6,0,0,0,0,0,0,0,0,0,0,I8_MASK,0},
+{"GAMMA",6,1,1,1,0,0,1,1,0,1,0,0,ANSI_FAMILY|TRADITIONAL_FAMILY|PGI_FAMILY|G77_FAMILY},
+   {"GAMMA",6,1,1,0,0,0,0,0,0,0,Gamma_Intrinsic,Real_4,0},
+      {"X",1,0,0,0,0,0,0,0,0,0,0,REAL_MASK,0},
 {"GERROR",6,0,0,0,1,0,0,1,0,1,0,0,PGI_FAMILY|G77_FAMILY},
    {"G77_gerror_0",12,0,0,0,1,0,0,0,1,0,Pathf90_Intrinsic,0,0},
       {"MESSAGE",7,0,0,0,0,0,0,0,0,0,0,CHARACTER_MASK,0},
@@ -4115,6 +4118,9 @@ intrin_tbl_type         intrin_tbl[] =
 {"LOG",3,1,1,0,0,0,1,1,0,1,0,0,ANSI_FAMILY|TRADITIONAL_FAMILY|PGI_FAMILY|G77_FAMILY},
    {"LOG",3,1,1,0,0,0,0,0,0,0,Log_Intrinsic,Real_4,0},
       {"X",1,0,0,0,0,0,0,0,0,0,0,REAL_COMPLEX_MASK,0},
+{"LOG_GAMMA",9,1,1,0,0,0,1,1,0,1,0,0,ANSI_FAMILY|TRADITIONAL_FAMILY|PGI_FAMILY|G77_FAMILY},
+   {"LOG_GAMMA",9,1,1,0,0,0,0,0,0,0,Log_Gamma_Intrinsic,Real_4,0},
+      {"X",1,0,0,0,0,0,0,0,0,0,0,REAL_MASK,0},
 {"LOG10",5,1,1,0,0,0,1,1,0,1,0,0,ANSI_FAMILY|TRADITIONAL_FAMILY|PGI_FAMILY|G77_FAMILY},
    {"LOG10",5,1,1,0,0,0,0,0,0,0,Log10_Intrinsic,Real_4,0},
       {"X",1,0,0,0,0,0,0,0,0,0,0,REAL_MASK,0},
@@ -14306,6 +14312,7 @@ void	(*intrinsic_semantics[]) ()	= {
 #ifdef KEY
 	fstat_intrinsic,	        /*  Fstat_Intrinsic          	     */
 #endif
+	sin_intrinsic,			/*  Gamma_Intrinsic                  */
 	getpos_intrinsic,       	/*  Getpos_Intrinsic        	     */
 	get_ieee_status_intrinsic,      /*  Get_Ieee_Exceptions_Intrinsic    */
 	get_ieee_status_intrinsic,      /*  Get_Ieee_Interrupts_Intrinsic    */
@@ -14444,6 +14451,7 @@ void	(*intrinsic_semantics[]) ()	= {
 	lock_release_intrinsic,      	/*  Lock_Release_Intrinsic           */
 	fetch_and_add_intrinsic,      	/*  Lock_Test_And_Set_Intrinsic      */
 	sin_intrinsic,          	/*  Log_Intrinsic           	     */
+	sin_intrinsic,			/*  Log_Gamma_Intrinsic		     */
 	sin_intrinsic,	        	/*  Log10_Intrinsic         	     */
         num_images_intrinsic,           /*  Log2_Images_Intrinsic            */
 	logical_intrinsic,      	/*  Logical_Intrinsic       	     */
